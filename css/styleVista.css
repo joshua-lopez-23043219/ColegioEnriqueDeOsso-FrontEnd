@@ -7,14 +7,20 @@
 :root {
   --header-height: 4rem;
   
-  /* — Palette — */
-  --first-color: #1E3A8A; /* Royal Blue */       /* Indigo 500 */
-  --title-color: #0F172A;       /* Slate 900 */
-  --text-color: #475569;        /* Slate 600 */
+  /* — Palette Oficial Colegio Enrique de Ossó — */
+  --first-color: #3E2C23; /* Café Institucional */
+  --first-color-light: #5A4237;
+  --first-color-dark: #2A1E17;
+  --accent-color: #3E8FD6; /* Celeste Institucional */
+  --title-color: #3E2C23;
+  --text-color: #475569;
   --body-color: #F8FAFC;
   --container-color: #FFFFFF;
-  --border-color: rgba(30, 58, 138, 0.2);
-  --first-color-glow: rgba(30, 58, 138, 0.12);
+  --border-color: rgba(62, 44, 35, 0.2);
+  --first-color-glow: rgba(62, 44, 35, 0.12);
+
+  --gradient-primary: linear-gradient(135deg, #3E2C23 0%, #2A1E17 100%);
+  --gradient-accent: linear-gradient(135deg, #3E8FD6 0%, #2A73B5 100%);
 
   /* — z index — */
   --z-fixed: 100;
@@ -51,10 +57,10 @@ body {
 /* ==================== HEADER & TOP LOGO ==================== */
 .menu__header {
   padding: 1.25rem 2rem;
-  background: rgba(15, 23, 42, 0.85);
+  background: linear-gradient(135deg, rgba(62, 44, 35, 0.96) 0%, rgba(42, 30, 23, 0.96) 100%);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 3px solid #3E8FD6;
   color: white;
 }
 

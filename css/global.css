@@ -7,14 +7,14 @@
 
 /* ===================== DESIGN TOKENS ===================== */
 :root {
-  /* — Amethyst & Amber Color Palette — */
-  --primary: #1E3A8A; /* Royal Blue */           /* Indigo 600 */
-  --primary-light: #3B82F6; /* Slate Blue */     /* Indigo 500 */
-  --primary-dark: #1E40AF; /* Deep Navy */      /* Indigo 800 */
-  --primary-glow: rgba(30, 58, 138, 0.12);
-  --accent: #D97706; /* Warm Gold */            /* Amber 500 */
-  --accent-light: #FBBF24; /* Light Gold */      /* Amber 300 */
-  --accent-dark: #B45309; /* Dark Gold */       /* Amber 700 */
+  /* — Palette Oficial Colegio Enrique de Ossó — */
+  --primary: #3E2C23; /* Café Institucional */
+  --primary-light: #5A4237; /* Café Claro */
+  --primary-dark: #2A1E17; /* Café Oscuro / Espresso */
+  --primary-glow: rgba(62, 44, 35, 0.12);
+  --accent: #3E8FD6; /* Celeste Institucional */
+  --accent-light: #63A6E2; /* Celeste Claro */
+  --accent-dark: #2A73B5; /* Celeste Oscuro */
 
   /* — Semantic Colors — */
   --success: #10B981;           /* Emerald 500 */
@@ -22,11 +22,11 @@
   --danger: #EF4444;            /* Red 500 */
   --danger-hover: #DC2626;
   --warning: #F59E0B;
-  --info: #3B82F6;
+  --info: #3E8FD6;              /* Celeste */
 
   /* — Gradients — */
-  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #D97706 100%);
+  --gradient-primary: linear-gradient(135deg, #3E2C23 0%, #2A1E17 100%);
+  --gradient-accent: linear-gradient(135deg, #3E8FD6 0%, #2A73B5 100%);
   --gradient-success: linear-gradient(135deg, var(--success) 0%, var(--success-hover) 100%);
   --gradient-danger: linear-gradient(135deg, var(--danger) 0%, var(--danger-hover) 100%);
 
