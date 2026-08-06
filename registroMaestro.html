@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Maestro — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item">
+      <span class="nav__title">Maestro</span>
+    </div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout">
+      <div class="layout__image">
+        <img src="./images/docente.png" alt="imagen">
+      </div>
+
+      <section class="layout__section">
+        <div class="section">
+          <div class="section__title">Registro de Maestro</div>
+          <form class="form" id="form-validation" novalidate>
+            <div class="form__grid">
+              <div class="form__group">
+                <label class="form__label" for="Nmaestro">N° de Cédula</label>
+                <input type="text" class="form__control" id="Nmaestro" name="Nmaestro"
+                  placeholder="Ingrese el N.Identidad" required>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="nombres">Nombres</label>
+                <input type="text" class="form__control" id="nombres" name="nombre_maestro"
+                  placeholder="Ingrese Nombre" required>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="apellidos">Apellidos</label>
+                <input type="text" class="form__control" id="apellidos" name="apellidos_maestro"
+                  placeholder="Ingrese Apellidos" required>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="direccion">Dirección</label>
+                <input type="text" class="form__control" id="direccion" name="direccion"
+                  placeholder="Ingrese Dirección" required>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="telefono">N.Teléfono</label>
+                <input type="tel" class="form__control" id="telefono" name="telefono"
+                  placeholder="Ingrese Numero de Teléfono" required>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="email">Correo Electrónico</label>
+                <input type="email" class="form__control" id="email" name="email"
+                  placeholder="Ingrese el Email" required>
+              </div>
+              <input type="hidden" id="id_teacher">
+              <div class="form__group">
+                <label class="form__label" for="asignatura">Área o Asignatura</label>
+                <select class="form__control" id="asignatura" name="asignatura" required>
+                  <option value="" disabled selected>Seleccione una opción</option>
+                  <option>Lengua y Literatura</option>
+                  <option>Lengua Extranjera (Inglés)</option>
+                  <option>Talleres de Arte y Cultura</option>
+                  <option>Creciendo en Valores</option>
+                  <option>Educación Física Y Práctica Deportiva</option>
+                  <option>Educación para Aprender, Emprender, Prosperar</option>
+                  <option>Ciencias Sociales (Geografía)</option>
+                  <option>Ciencias Sociales (Geografía/Historia)</option>
+                  <option>Ciencias Sociales (Geografía/Economía)</option>
+                  <option>Ciencias Sociales (Geografía/Filosofía)</option>
+                  <option>Ciencias Naturales</option>
+                  <option>Química</option>
+                  <option>Física</option>
+                  <option>Biología</option>
+                  <option>Matemática</option>
+                  <option>TI</option>
+                </select>
+              </div>
+            </div>
+            <div class="form__button">
+              <button type="submit" class="form__button--green" onclick="guardarmaestro(event)">
+                Guardar
+              </button>
+              <button type="submit" class="form__button--purple" onclick="editarmaestro(event)">
+                Editar
+              </button>
+              <button type="submit" class="form__button--red" onclick="eliminarmaestro(event)">
+                Eliminar
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/scriptMaestro.js?v=1.1.0"></script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayuda — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <script src="js/ayuda.js?v=1.1.0" defer></script>
+</head>
+<body>
+  <div class="background"></div>
+
+  <header class="menu-header">
+    <div class="header__content">
+      <img src="./images/LOGO.png" alt="Logo Colegio Enrique de Osso" class="header__content-imagen">
+      <h1 class="header__title">Ayuda y Soporte</h1>
+    </div>
+  </header>
+
+  <div class="separador"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <span class="nav__title">Preguntas Frecuentes</span>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="faq-container" style="margin-top: 24px;">
+    <h2 style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--primary-dark); margin-bottom: 16px; text-align: center;">Preguntas Frecuentes</h2>
+    <input type="text" id="faq-search" class="faq-search" placeholder="🔍 Buscar en preguntas...">
+    <p style="text-align: center; color: var(--gray-600); margin: 12px 0 24px; font-size: 0.92rem;">
+      Si tienes alguna duda, consulta las preguntas frecuentes. Si no encuentras la respuesta, contacta con soporte técnico.
+    </p>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">🔒</span>
+        <span class="question-text">¿Cómo puedo recuperar mi contraseña?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Haz clic en "¿Olvidaste tu contraseña?" en la pantalla de inicio de sesión y sigue las instrucciones que recibirás en tu correo registrado.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">📊</span>
+        <span class="question-text">¿Dónde puedo ver mis calificaciones?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Ingresa al sistema, ve a la sección "Mi perfil" y luego selecciona "Historial académico".</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">⚙️</span>
+        <span class="question-text">¿Cómo actualizo mis datos personales?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Ve a "Configuración" > "Datos personales" y edita la información necesaria. Luego haz clic en "Guardar cambios".</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">🚫</span>
+        <span class="question-text">¿Qué hago si no puedo acceder a mi cuenta?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Verifica que estás ingresando tu usuario y contraseña correctamente. Si el problema persiste, contacta al administrador del sistema o al correo de soporte institucional.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">📝</span>
+        <span class="question-text">¿Cómo inscribo mis materias?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>En el menú principal, selecciona la opción "Inscripción" y luego "Inscribir materias". Asegúrate de cumplir los requisitos previos antes de confirmar la inscripción.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">📄</span>
+        <span class="question-text">¿Puedo descargar mis constancias de estudio?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Sí. Ve a la sección "Documentos" o "Trámites" y selecciona "Generar constancia". Podrás descargarla en formato PDF.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">👨‍🏫</span>
+        <span class="question-text">¿Cómo puedo contactar a un docente?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Desde el perfil del docente en la plataforma puedes enviarle un mensaje directo o encontrar su correo institucional.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">❌</span>
+        <span class="question-text">¿Qué hago si una materia no aparece en mi perfil?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Es posible que aún no haya sido asignada. Verifica con tu coordinación académica o actualiza tu sesión para confirmar los cambios recientes.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">📤</span>
+        <span class="question-text">¿Cómo subo una tarea o entrega?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Ingresa a la sección "Asignaturas", selecciona la clase correspondiente, luego busca la actividad asignada y haz clic en "Subir archivo".</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">💰</span>
+        <span class="question-text">¿Puedo revisar el historial de mis pagos?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Ve a la sección "Finanzas" o "Pagos". Ahí podrás ver tu historial de transacciones, montos pendientes y generar recibos.</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <button class="faq-question">
+        <span class="icon">✅</span>
+        <span class="question-text">¿Cómo sé si estoy oficialmente matriculado?</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="faq-answer">
+        <p>Una vez completes la inscripción y el pago correspondiente, recibirás una notificación en tu panel indicando que tu matrícula ha sido validada.</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/global.js?v=1.1.0"></script>
+</body>
+</html>

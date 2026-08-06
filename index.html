@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Académico — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+</head>
+<body>
+  <div class="background"></div>
+
+  <header class="header">
+    <div class="header__content">
+      <img src="./images/LOGO.png" alt="Logo Colegio Enrique de Osso" class="header__content-imagen">
+      <h1 class="header__title">Portal Académico - Colegio Enrique de Osso (PA-CEO)</h1>
+    </div>
+  </header>
+
+  <nav class="nav">
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="container">
+    <div class="layout">
+      <div class="layout__image">
+        <img src="./images/user3.png" alt="imagen">
+      </div>
+      <section class="layout__section">
+        <div class="section">
+          <div class="section__items stagger">
+            <a href="registros.html" class="section__item" id="card-registros">
+              <img src="./images/Resgistro.png" class="section__item-icon" alt="Registro">
+              Registro
+            </a>
+            <a href="gAcademica.html" class="section__item" id="card-gacademica">
+              <img src="./images/g.educativa.png" class="section__item-icon" alt="Gestión Académica">
+              Gestión Académica
+            </a>
+            <a href="actividades.html" class="section__item" id="card-actividades">
+              <img src="./images/Reportes.png" class="section__item-icon" alt="Registro de Actividades">
+              Registro de Actividades
+            </a>
+            <a href="dashboard.html" class="section__item" id="card-dashboard">
+              <img src="./images/dashboard.png" class="section__item-icon" alt="Dashboard">
+              Dashboard
+            </a>
+            <a href="analisisIA.html" class="section__item" id="card-analisis-ia" style="display: none;">
+              <img src="./images/dashboard.png" class="section__item-icon" alt="Análisis IA">
+              Análisis IA
+            </a>
+            <a href="registroMatricula.html" class="section__item" id="card-matricula-online" style="display: none;">
+              <img src="./images/Matricula.png" class="section__item-icon" alt="Matrícula en Línea">
+              Matrícula en Línea
+            </a>
+            <a href="portalEstudiante.html" class="section__item" id="card-portal-estudiante" style="display: none;">
+              <img src="./images/user3.png" class="section__item-icon" alt="Mi Portal">
+              Mi Portal
+            </a>
+            <a href="registroNotas.html" class="section__item" id="card-boletin" style="display: none;">
+              <img src="./images/Notas.png" class="section__item-icon" alt="Boletín de Calificaciones">
+              Boletín de Calificaciones
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.1.0"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const role = localStorage.getItem('user_role');
+      
+      // Ocultar todas por defecto
+      document.getElementById('card-registros').style.display = 'none';
+      document.getElementById('card-gacademica').style.display = 'none';
+      document.getElementById('card-actividades').style.display = 'none';
+      document.getElementById('card-dashboard').style.display = 'none';
+      document.getElementById('card-analisis-ia').style.display = 'none';
+      document.getElementById('card-matricula-online').style.display = 'none';
+      document.getElementById('card-boletin').style.display = 'none';
+      document.getElementById('card-portal-estudiante').style.display = 'none';
+      
+      if (role === 'DIRECTOR') {
+        document.getElementById('card-registros').style.display = 'flex';
+        document.getElementById('card-gacademica').style.display = 'flex';
+        document.getElementById('card-actividades').style.display = 'flex';
+        document.getElementById('card-dashboard').style.display = 'flex';
+        document.getElementById('card-analisis-ia').style.display = 'flex';
+      } else if (role === 'DOCENTE') {
+        document.getElementById('card-gacademica').style.display = 'flex';
+        document.getElementById('card-actividades').style.display = 'flex';
+      } else if (role === 'ADMINISTRACION') {
+        document.getElementById('card-registros').style.display = 'flex';
+        document.getElementById('card-gacademica').style.display = 'flex';
+      } else if (role === 'TUTOR') {
+        document.getElementById('card-matricula-online').style.display = 'flex';
+        document.getElementById('card-boletin').style.display = 'flex';
+      } else if (role === 'ESTUDIANTE') {
+        document.getElementById('card-portal-estudiante').style.display = 'flex';
+        document.getElementById('card-boletin').style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+</html>

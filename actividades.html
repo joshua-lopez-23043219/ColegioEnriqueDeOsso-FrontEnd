@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Actividades — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+</head>
+<body>
+  <div class="background"></div>
+
+  <header class="header">
+    <div class="header__content">
+      <h1 class="header__title">PA-CEO</h1>
+    </div>
+  </header>
+  <div class="separador"></div>
+
+  <nav class="nav">
+    <button class="nav__button" onclick="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd" />
+      </svg>
+    </button>
+    <span class="nav__title">Registro de Actividades</span>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <section class="section">
+      <div class="section__items">
+        <a href="registroEstudiante.html" class="section__item" id="card-act-estudiante">
+          <img src="./images/Estudiante.png" class="section__item-icon" alt="Estudiante">
+          Estudiante
+        </a>
+        <a href="registroTutor.html" class="section__item" id="card-act-tutor">
+          <img src="./images/Tutor.png" class="section__item-icon" alt="Tutor">
+          Tutor
+        </a>
+        <a href="registroMaestro.html" class="section__item" id="card-act-docente">
+          <img src="./images/docente.png" class="section__item-icon" alt="Docente">
+          Docente
+        </a>
+        <a href="registroGrupo.html" class="section__item" id="card-act-grupo">
+          <img src="./images/Grupo.png" class="section__item-icon" alt="Grupo">
+          Grupo
+        </a>
+        <a href="registroAsignatura.html" class="section__item" id="card-act-asignatura">
+          <img src="./images/Asignatura.png" class="section__item-icon" alt="Asignatura">
+          Asignatura
+        </a>
+        <a href="registroAsistencia.html" class="section__item" id="card-act-asistencia">
+          <img src="./images/Asistencia.png" class="section__item-icon" alt="Asistencia">
+          Asistencia
+        </a>
+        <a href="registroNotas.html" class="section__item" id="card-act-nota">
+          <img src="./images/Notas.png" class="section__item-icon" alt="Nota">
+          Nota
+        </a>
+        <a href="registroHorario.html" class="section__item" id="card-act-horario">
+          <img src="./images/Horario.png" class="section__item-icon" alt="Horario">
+          Horario
+        </a>
+        <a href="registroMatricula.html" class="section__item" id="card-act-matricula">
+          <img src="./images/Matricula.png" class="section__item-icon" alt="Matrícula">
+          Matrícula
+        </a>
+        <a href="listadoEstudiantes.html" class="section__item" id="card-act-listado-estudiantes">
+          <img src="./images/Estudiante.png" class="section__item-icon" alt="Listado Estudiantes">
+          Listado Estudiantes
+        </a>
+        <a href="confirmarMatricula.html" class="section__item" id="card-act-confirmar-matricula">
+          <img src="./images/Matricula.png" class="section__item-icon" alt="Habilitar Matrícula">
+          Habilitar Matrícula
+        </a>
+        <a href="listadoDocentes.html" class="section__item" id="card-act-listado-docentes">
+          <img src="./images/docente.png" class="section__item-icon" alt="Listado Docentes">
+          Listado Docentes
+        </a>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/global.js?v=1.1.0"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const role = localStorage.getItem('user_role');
+      const cards = [
+        'card-act-estudiante', 'card-act-tutor', 'card-act-docente', 'card-act-grupo',
+        'card-act-asignatura', 'card-act-asistencia', 'card-act-nota', 'card-act-horario',
+        'card-act-matricula', 'card-act-listado-estudiantes', 'card-act-confirmar-matricula',
+        'card-act-listado-docentes'
+      ];
+      
+      // Ocultar todo
+      cards.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      
+      if (role === 'DIRECTOR') {
+        // Director ve todo
+        cards.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'flex';
+        });
+      } else if (role === 'DOCENTE') {
+        // Docente ve asistencia y notas
+        document.getElementById('card-act-asistencia').style.display = 'flex';
+        document.getElementById('card-act-nota').style.display = 'flex';
+      } else if (role === 'ADMINISTRACION') {
+        // Admin ve estudiantes, tutores, docentes, matrícula, listado, confirmar, listado docentes y horario
+        document.getElementById('card-act-estudiante').style.display = 'flex';
+        document.getElementById('card-act-tutor').style.display = 'flex';
+        document.getElementById('card-act-docente').style.display = 'flex';
+        document.getElementById('card-act-matricula').style.display = 'flex';
+        document.getElementById('card-act-listado-estudiantes').style.display = 'flex';
+        document.getElementById('card-act-confirmar-matricula').style.display = 'flex';
+        document.getElementById('card-act-listado-docentes').style.display = 'flex';
+        document.getElementById('card-act-horario').style.display = 'flex';
+      }
+    });
+  </script>
+</body>
+</html>

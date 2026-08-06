@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Matrícula — PA-CEO</title>
+    <link rel="stylesheet" href="css/global.css?v=1.0.8">
+
+</head>
+
+
+<body>
+    <div class="background"></div>
+
+    <nav class="nav">
+        <div class="nav__container">
+            <button class="nav__button" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+        <div class="nav__item">
+            <span class="nav__title" aria-disabled="true">Matricula</span>
+        </div>
+        <!--Foto de perfil del usuario que inicio sesion en el sistema-->
+        <div class="nav__profile">
+            <img src="./images/usuario.png" class="nav__profile-img">
+            <ul class="nav__profile-link">
+                <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+                <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="separador"></div>
+
+
+    <!-- Formulario completo para el almacenamiento de datos -->
+    <form id="form_matricula" enctype="multipart/form-data">
+        <div class="layout__conteiner">
+            <!-- Contenedor para Banners de Estado de Matrícula -->
+            <div id="enrollment-status-banner" style="display: none; width: 100%; margin-bottom: 20px;"></div>
+
+            <div class="layout" id="matricula-main-layout">
+                <div class="layout__image">
+                    <img src="./images/Notas.png" alt="Imagen" style="position: sticky; top: 20px;">
+                </div>
+
+                <div class="steps-wrapper" style="flex: 1; max-width: 800px; width: 100%;">
+                    <!-- Pestañas de Bloques -->
+                    <div class="tabs-header">
+                        <button type="button" class="tab-btn active" id="tab_btn_1" onclick="showStep(1)">
+                            <span class="tab-number">1</span>
+                            <span class="tab-text">Matrícula</span>
+                        </button>
+                        <button type="button" class="tab-btn" id="tab_btn_2" onclick="showStep(2)">
+                            <span class="tab-number">2</span>
+                            <span class="tab-text">Estudiante & Docs</span>
+                        </button>
+                        <button type="button" class="tab-btn" id="tab_btn_3" onclick="showStep(3)">
+                            <span class="tab-number">3</span>
+                            <span class="tab-text">Tutor</span>
+                        </button>
+                        <button type="button" class="tab-btn" id="tab_btn_4" onclick="showStep(4)">
+                            <span class="tab-number">4</span>
+                            <span class="tab-text">Grupo & Guardar</span>
+                        </button>
+                    </div>
+
+                    <!-- BLOQUE 1: Detalles de Matrícula -->
+                    <div id="step_1" class="step-content active">
+                        <section class="layout__section">
+                            <div class="section">
+                                <div class="section__title">1. Detalles de Matrícula</div>
+                                <div class="form__grid">
+                                    <div class="form__group">
+                                        <label class="form__label" for="code_registration">Código de Matrícula</label>
+                                        <input type="text" class="form__control" id="code_registration" name="codigo"
+                                            readonly style="background-color: var(--gray-200); cursor: not-allowed; font-weight: bold; color: var(--primary-dark);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="date_registration">Fecha de Creación</label>
+                                        <input type="date" class="form__control" id="date_registration" name="fecha" readonly
+                                            style="background-color: var(--gray-200); cursor: not-allowed;">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="mode_registration">Turno</label>
+                                        <select class="form__control" id="mode_registration" name="turno" required>
+                                            <option value="" disabled selected>Seleccione una opción</option>
+                                            <option>Matutino</option>
+                                            <option>Vespertino</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="level_registration">Año Académico</label>
+                                        <select class="form__control" id="level_registration" name="anio" required>
+                                            <option value="" disabled selected>Seleccione una opción</option>
+                                            <option>Primer Año</option>
+                                            <option>Segundo Año</option>
+                                            <option>Tercer Año</option>
+                                            <option>Cuarto Año</option>
+                                            <option>Quinto Año</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="step-navigation">
+                                    <button type="button" class="form__button--purple" onclick="showStep(2)">Siguiente &rarr;</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- BLOQUE 2: Detalles de Estudiante y Documentos -->
+                    <div id="step_2" class="step-content">
+                        <section class="layout__section">
+                            <div class="section">
+                                <div class="section__title">2. Detalles del Estudiante</div>
+                                <div class="form__grid">
+                                    <div class="form__group">
+                                        <label class="form__label" for="code_student">Código Estudiante [Presione Enter]</label>
+                                        <input type="text" class="form__control" id="code_student" name="codestudiante"
+                                            required placeholder="Escribe el código y presiona Enter">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="name_student">Nombre</label>
+                                        <input type="text" class="form__control" id="name_student" name="nombreestudiante"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="surname_student">Apellidos</label>
+                                        <input type="text" class="form__control" id="surname_student" name="apellidoestudiante"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="birthday_student">Fecha de Nacimiento</label>
+                                        <input type="date" class="form__control" id="birthday_student" name="fecha_nac"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="phone_student">Teléfono</label>
+                                        <input type="tel" class="form__control" id="phone_student" name="telefono"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="email_student">Correo Electrónico</label>
+                                        <input type="email" class="form__control" id="email_student" name="email"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <input type="hidden" id="id_student" name="id_student">
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="layout__section">
+                            <div class="section">
+                                <div class="section__title">Documentos Adjuntos</div>
+                                <div class="form__grid">
+                                    <div class="form__grid--columna">
+                                        <div class="form__group">
+                                            <img src="./images/Ico.PDF04.png" class="form__group-img">
+                                        </div>
+                                        <div class="form__group">
+                                            <a href="#" onclick="AbrirModalDocumentos()" class="form__group-item">Adjuntar Documento PDF</a>
+                                        </div>
+                                        <div id="document_badge" style="display: none; margin-top: 10px; color: var(--success); font-weight: bold; font-size: 0.9rem;">
+                                            &check; Documento cargado: <span id="loaded_doc_name"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="step-navigation">
+                                    <button type="button" class="form__button--purple" onclick="showStep(1)">&larr; Anterior</button>
+                                    <button type="button" class="form__button--purple" onclick="showStep(3)">Siguiente &rarr;</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- BLOQUE 3: Detalles de Tutor -->
+                    <div id="step_3" class="step-content">
+                        <section class="layout__section">
+                            <div class="section">
+                                <div class="section__title">3. Detalles del Tutor</div>
+                                <div class="form__grid">
+                                    <div class="form__group">
+                                        <label class="form__label" for="code_tutor">Número de Identidad / Cédula [Presione Enter]</label>
+                                        <input type="text" class="form__control" id="code_tutor" name="Ncédula"
+                                            required placeholder="Escribe la cédula y presiona Enter">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="name_tutor">Nombre</label>
+                                        <input type="text" class="form__control" id="name_tutor" name="nombres"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="surname_tutor">Apellidos</label>
+                                        <input type="text" class="form__control" id="surname_tutor" name="apellidos"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="birthdate_tutor">Fecha de Nacimiento</label>
+                                        <input type="date" class="form__control" id="birthdate_tutor" name="fecha"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="address_tutor">Dirección</label>
+                                        <input type="text" class="form__control" id="address_tutor"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="phone_tutor">Teléfono</label>
+                                        <input type="tel" class="form__control" id="phone_tutor"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="email_tutor">Correo Electrónico</label>
+                                        <input type="email" class="form__control" id="email_tutor"
+                                            required readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <input type="hidden" id="id_tutor" name="id_tutor">
+                                </div>
+                                <div class="step-navigation">
+                                    <button type="button" class="form__button--purple" onclick="showStep(2)">&larr; Anterior</button>
+                                    <button type="button" class="form__button--purple" onclick="showStep(4)">Siguiente &rarr;</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- BLOQUE 4: Información del Grupo y Confirmación -->
+                    <div id="step_4" class="step-content">
+                        <section class="layout__section">
+                            <div class="section">
+                                <div class="section__title">4. Asignación de Grupo & Guardado</div>
+                                <div class="form__grid--columna" style="margin-bottom: 25px;">
+                                    <div class="form__group" style="width: 100%; max-width: 400px; margin: auto;">
+                                        <label class="form__label" for="group_select">Grupo / Sección Disponible</label>
+                                        <select class="form__control" id="group_select" name="seccion" required>
+                                            <option value="" disabled selected>Seleccione un grupo</option>
+                                        </select>
+                                        <input type="hidden" id="id_group" name="id_group">
+                                    </div>
+                                </div>
+                                <div class="form__button" style="border-top: 1px solid var(--gray-200); padding-top: 20px;">
+                                    <button type="button" class="form__button--green" onclick="guardarMatricula()">Guardar Matrícula</button>
+                                    <button type="button" class="form__button--purple" style="display:none;">Editar</button>
+                                    <button type="button" class="form__button--red" style="display:none;">Eliminar</button>
+                                </div>
+                                <div class="step-navigation">
+                                    <button type="button" class="form__button--purple" onclick="showStep(3)">&larr; Anterior</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal para agregar documentos -->
+            <div id="modalDocumentos" class="modal__container">
+                <div class="modal">
+                    <span class="modal__close" onclick="CerrarModalDocumentos()">&times;</span>
+                    <div class="form">
+                        <h2>Agregar Documento</h2>
+                        <div class="form__grid">
+                            <div class="form__grid--columna">
+                                <div class="form__group">
+                                    <label class="form__label" for="name_document">Nombre del Documento</label>
+                                    <input id="name_document" type="text" class="form__control" placeholder="Ej. Certificado de Notas" required>
+                                </div>
+                                <div class="form__group">
+                                    <label class="form__label" for="file">Seleccionar Archivo PDF</label>
+                                    <input type="file" class="form__control" id="file" accept="application/pdf" required>
+                                </div>
+                                <div style="margin-top: 15px; display: flex; justify-content: flex-end; width: 100%;">
+                                    <button type="button" class="form__button--green" onclick="AceptarDocumento()" style="padding: 10px 24px; font-weight: 600;">Aceptar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script src="js/global.js?v=1.1.0"></script>
+    <script src="js/scriptMatricula.js?v=1.1.0"></script>
+</body>
+
+</html>

@@ -1,0 +1,19 @@
+# Secretos y entornos
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+
+# Dependencias / build
+node_modules/
+dist/
+build/
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+*.log

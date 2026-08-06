@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Matrículas — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    /* Tarjetas de configuración de cada ventana de matrícula */
+    .ventana-card {
+      background: var(--white);
+      border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .ventana-card__head {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap; margin-bottom: 14px;
+    }
+    .ventana-card__title {
+      font-family: var(--font-heading); font-size: 1.05rem; font-weight: 700;
+      color: var(--slate-800); margin: 0;
+    }
+    .ventana-card .form__button { margin-top: 8px; }
+
+    /* Bloques de matrículas pendientes (nuevos ingresos / reingresos) */
+    .pendientes-bloque { margin-bottom: 26px; }
+    .pendientes-bloque__head {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .pendientes-bloque__title {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
+      color: var(--slate-800); margin: 0;
+    }
+    .pendientes-bloque__vacio {
+      color: var(--gray-600); font-size: 0.87rem; font-style: italic;
+      padding: 14px 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <header class="header">
+    <div class="header__content">
+      <h1 class="header__title">PA-CEO</h1>
+    </div>
+  </header>
+  <div class="separador"></div>
+
+  <nav class="nav">
+    <button class="nav__button" onclick="goBack()">
+      <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd"
+          d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          clip-rule="evenodd" />
+      </svg>
+    </button>
+    <span class="nav__title">Gestión de Matrículas</span>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="layout__container">
+    <div class="layout">
+      <div class="layout__image">
+        <img src="./images/Matricula.png" alt="Matrícula" style="position: sticky; top: 20px;">
+      </div>
+
+      <div class="steps-wrapper" style="flex: 1; max-width: 950px; width: 100%;">
+        <!-- Pestañas de Navegación (imagen 3) -->
+        <div class="tabs-header">
+          <button type="button" class="tab-btn active" id="tab_btn_1" onclick="showTab(1)">
+            <span class="tab-number">1</span>
+            <span class="tab-text">Matrículas por Confirmar</span>
+          </button>
+          <button type="button" class="tab-btn" id="tab_btn_2" onclick="showTab(2)">
+            <span class="tab-number">2</span>
+            <span class="tab-text">Habilitar Matrícula</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: Matrículas por Confirmar -->
+        <div id="step_1" class="step-content active">
+          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0;">
+            <div class="section">
+              <div class="section__title">⏳ Matrículas Pendientes de Confirmar</div>
+              <p style="color: var(--slate-500); font-size: 0.88rem; margin: -6px 0 18px;">
+                Toda matrícula requiere la aprobación de Dirección o Secretaría.
+                Quien la registró no puede confirmarla: debe hacerlo otra persona.
+              </p>
+
+              <div id="no-pending-message" style="display: none; text-align: center; padding: 30px; color: var(--gray-600); font-weight: 500;">
+                No hay matrículas pendientes de confirmación en este momento.
+              </div>
+
+              <!-- ===== Nuevos ingresos ===== -->
+              <div class="pendientes-bloque" id="bloque-nuevos">
+                <div class="pendientes-bloque__head">
+                  <h3 class="pendientes-bloque__title">🆕 Nuevos Ingresos</h3>
+                  <span class="status-pill status-pill--neutral" id="conteo-nuevos">0</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="form__table" style="width: 100%;">
+                    <thead>
+                      <tr>
+                        <th class="form__table-campo form__table-campo--header">Código Reg.</th>
+                        <th class="form__table-campo form__table-campo--header">Estudiante</th>
+                        <th class="form__table-campo form__table-campo--header">Grado Elegido</th>
+                        <th class="form__table-campo form__table-campo--header">Turno</th>
+                        <th class="form__table-campo form__table-campo--header">Grupo</th>
+                        <th class="form__table-campo form__table-campo--header">Ciclo</th>
+                        <th class="form__table-campo form__table-campo--header" style="width: 210px;">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-nuevos">
+                      <!-- Rellenado dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- ===== Reingresos ===== -->
+              <div class="pendientes-bloque" id="bloque-reingresos">
+                <div class="pendientes-bloque__head">
+                  <h3 class="pendientes-bloque__title">🔁 Reingresos</h3>
+                  <span class="status-pill status-pill--neutral" id="conteo-reingresos">0</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="form__table" style="width: 100%;">
+                    <thead>
+                      <tr>
+                        <th class="form__table-campo form__table-campo--header">Código Reg.</th>
+                        <th class="form__table-campo form__table-campo--header">Estudiante</th>
+                        <th class="form__table-campo form__table-campo--header">Grado Elegido</th>
+                        <th class="form__table-campo form__table-campo--header">Turno</th>
+                        <th class="form__table-campo form__table-campo--header">Grupo</th>
+                        <th class="form__table-campo form__table-campo--header">Ciclo</th>
+                        <th class="form__table-campo form__table-campo--header" style="width: 210px;">Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody-reingresos">
+                      <!-- Rellenado dinámicamente -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- TAB 2: Habilitar Matrícula (Extraído de Dashboard) -->
+        <div id="step_2" class="step-content">
+          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0;">
+            <div class="section">
+              <div class="section__title">⚙️ Ventanas de Matrícula en Línea</div>
+              <p style="color: var(--slate-500); font-size: 0.88rem; margin: -6px 0 18px;">
+                Se abren de forma secuencial: primero <strong>Reingreso</strong>, para que los
+                tutores confirmen la continuidad de sus hijos; luego <strong>Matrícula</strong>,
+                para llenar los cupos libres y recibir estudiantes nuevos.
+                Cada ventana se cierra automáticamente al pasar su fecha de fin.
+              </p>
+
+              <!-- ===== Ventana de Reingreso ===== -->
+              <div class="ventana-card" id="card-reingreso">
+                <div class="ventana-card__head">
+                  <h3 class="ventana-card__title">🔁 Reingreso</h3>
+                  <span class="status-pill" id="estado-reingreso">—</span>
+                </div>
+                <div class="form__grid">
+                  <div class="form__group">
+                    <label class="form__label" for="rein_enabled">Estado</label>
+                    <select class="form__control" id="rein_enabled">
+                      <option value="true">Habilitada</option>
+                      <option value="false">Inhabilitada</option>
+                    </select>
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="rein_period">Periodo Académico</label>
+                    <input type="text" class="form__control" id="rein_period" placeholder="Ej. 2026-1">
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="rein_start">Fecha de inicio</label>
+                    <input type="date" class="form__control" id="rein_start">
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="rein_end">Fecha de fin</label>
+                    <input type="date" class="form__control" id="rein_end">
+                  </div>
+                </div>
+                <div class="form__button">
+                  <button type="button" class="form__button--green" data-ventana="reingreso">
+                    💾 Guardar Reingreso
+                  </button>
+                </div>
+              </div>
+
+              <!-- ===== Ventana de Matrícula ===== -->
+              <div class="ventana-card" id="card-matricula">
+                <div class="ventana-card__head">
+                  <h3 class="ventana-card__title">📝 Matrícula</h3>
+                  <span class="status-pill" id="estado-matricula">—</span>
+                </div>
+                <div class="form__grid">
+                  <div class="form__group">
+                    <label class="form__label" for="mat_enabled">Estado</label>
+                    <select class="form__control" id="mat_enabled">
+                      <option value="true">Habilitada</option>
+                      <option value="false">Inhabilitada</option>
+                    </select>
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="mat_period">Periodo Académico</label>
+                    <input type="text" class="form__control" id="mat_period" placeholder="Ej. 2026-1">
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="mat_start">Fecha de inicio</label>
+                    <input type="date" class="form__control" id="mat_start">
+                  </div>
+                  <div class="form__group">
+                    <label class="form__label" for="mat_end">Fecha de fin</label>
+                    <input type="date" class="form__control" id="mat_end">
+                  </div>
+                </div>
+                <div class="form__button">
+                  <button type="button" class="form__button--green" data-ventana="matricula">
+                    💾 Guardar Matrícula
+                  </button>
+                </div>
+              </div>
+
+              <!-- ===== Reporte de continuidad ===== -->
+              <div class="ventana-card">
+                <div class="ventana-card__head">
+                  <h3 class="ventana-card__title">📊 Reporte de continuidad</h3>
+                </div>
+                <p style="color: var(--slate-500); font-size: 0.86rem; margin: 0 0 14px;">
+                  Descarga en Excel quiénes confirmaron reingreso y quiénes no, con los
+                  datos de contacto del tutor para darles seguimiento.
+                </p>
+                <div class="form__button">
+                  <button type="button" class="form__button--purple" id="btn-export-continuidad">
+                    ⬇️ Descargar Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Detalles Completos de Matrícula -->
+  <div class="modal__container" id="detailsModal">
+    <div class="modal" style="width: 600px; max-width: 95%;">
+      <span class="modal__close" onclick="closeDetailsModal()">&times;</span>
+      <h2>🔍 Detalles Completos de la Matrícula</h2>
+      
+      <div style="max-height: 400px; overflow-y: auto; padding-right: 8px; text-align: left;">
+        <div style="margin-bottom: 16px;">
+          <h3 style="color: var(--primary); font-size: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 4px; margin-bottom: 8px; font-weight: 600;">Estudiante</h3>
+          <p style="margin-bottom: 4px;"><strong>Nombre Completo:</strong> <span id="det-student-name"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Código Alumno:</strong> <span id="det-student-code"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Grado Elegido:</strong> <span id="det-level"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Turno / Shift:</strong> <span id="det-mode"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Grupo Asignado:</strong> <span id="det-group"></span></p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h3 style="color: var(--primary); font-size: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 4px; margin-bottom: 8px; font-weight: 600;">Tutor / Responsable</h3>
+          <p style="margin-bottom: 4px;"><strong>Nombre:</strong> <span id="det-tutor-name"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Teléfono de Contacto:</strong> <span id="det-tutor-phone"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Correo Electrónico:</strong> <span id="det-tutor-email"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Dirección Completa:</strong> <span id="det-tutor-address"></span></p>
+        </div>
+
+        <div style="margin-bottom: 16px;">
+          <h3 style="color: var(--primary); font-size: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 4px; margin-bottom: 8px; font-weight: 600;">Datos del Registro</h3>
+          <p style="margin-bottom: 4px;"><strong>Código Matrícula:</strong> <span id="det-reg-code"></span></p>
+          <p style="margin-bottom: 4px;"><strong>Fecha Registro:</strong> <span id="det-reg-date"></span></p>
+        </div>
+
+        <div style="margin-bottom: 8px;">
+          <h3 style="color: var(--primary); font-size: 1rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 4px; margin-bottom: 8px; font-weight: 600;">Documentos Adjuntos</h3>
+          <div id="det-documents-list" style="display: flex; flex-direction: column; gap: 8px; margin-top: 8px;">
+            <!-- Rellenado dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--gray-200);">
+        <button type="button" class="form__button--green" id="det-confirm-btn" style="padding: 8px 16px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; background: var(--success); color: white;">
+          Confirmar Matrícula
+        </button>
+        <button type="button" style="background: var(--gray-600); color: white; border: none; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer;" onclick="closeDetailsModal()">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/confirmarMatricula.js?v=1.1.0"></script>
+</body>
+</html>

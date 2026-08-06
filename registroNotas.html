@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Notas — PA-CEO</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    /* Custom styles for grades page */
+    .badge-activity {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: var(--primary);
+      color: var(--white);
+      border-radius: var(--radius-xl);
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+    .badge-activity .remove-btn {
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      transition: color var(--transition-fast);
+    }
+    .badge-activity .remove-btn:hover {
+      color: var(--white);
+    }
+    .form__table input.form__input {
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item">
+      <span class="nav__title">Registro de Calificaciones</span>
+    </div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout">
+      <div class="layout__image">
+        <img src="./images/Notas.png" alt="Imagen" style="position: sticky; top: 20px;">
+      </div>
+
+      <div class="steps-wrapper" style="flex: 1; max-width: 950px; width: 100%;">
+        <!-- Pestañas de Bloques -->
+        <div class="tabs-header">
+          <button type="button" class="tab-btn active" id="tab_btn_1" onclick="showNotesStep(1)">
+            <span class="tab-number">1</span>
+            <span class="tab-text">Registro por Actividades</span>
+          </button>
+          <button type="button" class="tab-btn" id="tab_btn_2" onclick="showNotesStep(2)">
+            <span class="tab-number">2</span>
+            <span class="tab-text">Boletín del Estudiante</span>
+          </button>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- BLOQUE 1: Registro Acumulado (Actividades)  -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div id="step_1" class="step-content active">
+          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0;">
+            <div class="section">
+              <div class="section__title">📝 Calificaciones Acumulativas por Parcial</div>
+
+              <!-- Filtros -->
+              <div class="attendance-controls" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin-bottom: 20px;">
+                <div class="form__group" style="flex: 1; min-width: 180px;">
+                  <label class="form__label" for="notes_teacher">Docente</label>
+                  <select class="form__control" id="notes_teacher">
+                    <option value="" selected>Todos los docentes</option>
+                  </select>
+                </div>
+                <div class="form__group" style="flex: 1; min-width: 180px;">
+                  <label class="form__label" for="notes_group">Grupo</label>
+                  <select class="form__control" id="notes_group" required>
+                    <option value="" disabled selected>Seleccione un grupo</option>
+                  </select>
+                </div>
+                <div class="form__group" style="flex: 1; min-width: 180px;">
+                  <label class="form__label" for="notes_subject">Asignatura</label>
+                  <select class="form__control" id="notes_subject" required>
+                    <option value="" disabled selected>Seleccione asignatura</option>
+                  </select>
+                </div>
+                <div class="form__group" style="flex: 1; min-width: 180px;">
+                  <label class="form__label" for="notes_partial">Parcial / Periodo</label>
+                  <select class="form__control" id="notes_partial" required>
+                    <option value="" disabled selected>Seleccione parcial</option>
+                    <option value="I">Parcial I</option>
+                    <option value="II">Parcial II</option>
+                    <option value="III">Parcial III</option>
+                    <option value="IV">Parcial IV</option>
+                  </select>
+                </div>
+                <div class="form__group" style="flex: 0 0 auto;">
+                  <label class="form__label">&nbsp;</label>
+                  <button type="button" class="form__button--purple" onclick="loadActivityGrades()" 
+                    style="padding: 10px 20px; font-weight: 600; font-family: var(--font-heading); border: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--white); font-size: 0.9rem; height: 42px;">
+                    🔍 Cargar Alumnos
+                  </button>
+                </div>
+              </div>
+
+              <!-- Sección de Gestión de Actividades -->
+              <div id="activities-management-section" style="display: none; background: rgba(93, 60, 166, 0.05); padding: 16px; border-radius: var(--radius-md); margin-bottom: 20px; border: 1.5px dashed var(--primary-light);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                  <span style="font-weight: 600; color: var(--primary-dark); font-family: var(--font-heading); font-size: 0.95rem;">🛠️ Columnas de Actividades Acumulativas</span>
+                  <button type="button" class="form__group-item" onclick="openAddActivityModal()" style="padding: 6px 16px; font-size: 0.85rem; height: auto;">
+                    ➕ Agregar Actividad
+                  </button>
+                </div>
+                
+                <!-- Lista de actividades activas -->
+                <div id="activities-badge-list" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px;">
+                  <!-- Dinámico: badges de actividades -->
+                </div>
+                
+                <div style="margin-top: 10px; font-size: 0.82rem; color: var(--gray-600); font-weight: 500;">
+                  Puntaje total asignado: <span id="total-assigned-score" style="font-weight: 700; color: var(--primary);">0</span> / 100 puntos.
+                  <span id="score-warning" style="display: none; color: var(--danger); font-weight: 700; margin-left: 10px;">⚠️ ¡El puntaje excede los 100 puntos permitidos!</span>
+                </div>
+              </div>
+
+              <!-- Tabla de Notas por Actividades -->
+              <div id="grades-table-container">
+                <div class="empty-state" id="empty-state-grades">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.905 59.905 0 0 1 12 3.493a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M12 13.489v-3.34" />
+                  </svg>
+                  <p>Seleccione un <strong>Grupo</strong>, <strong>Asignatura</strong> y <strong>Parcial</strong> para registrar o ver calificaciones acumuladas.</p>
+                </div>
+              </div>
+
+              <!-- Área de Guardado -->
+              <div class="save-area" id="grades-save-area" style="display: none; justify-content: flex-end; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--gray-200);">
+                <button type="button" class="form__button--purple" onclick="exportarNotas()"
+                  style="padding: 12px 24px; font-weight: 700; font-family: var(--font-heading); border: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--white); font-size: 0.95rem; letter-spacing: 0.3px; margin-right: 10px;">
+                  📊 Exportar Notas del Grupo
+                </button>
+                <button type="button" class="form__button--green" onclick="saveActivityGrades()"
+                  style="padding: 12px 30px; font-weight: 700; font-family: var(--font-heading); border: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--white); font-size: 0.95rem; letter-spacing: 0.3px;">
+                  💾 Guardar Calificaciones
+                </button>
+              </div>
+
+            </div>
+          </section>
+        </div>
+
+        <!-- ═══════════════════════════════════════════ -->
+        <!-- BLOQUE 2: Boletín del Estudiante            -->
+        <!-- ═══════════════════════════════════════════ -->
+        <div id="step_2" class="step-content">
+          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0;">
+            <div class="section">
+              <div class="section__title">🎓 Boletín de Calificaciones del Estudiante</div>
+
+              <!-- Búsqueda y Filtro de Estudiante -->
+              <div class="attendance-controls" style="display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; margin-bottom: 20px;">
+                <div class="form__group" style="flex: 2; min-width: 250px;">
+                  <label class="form__label" for="student_search_input">Buscar Estudiante (Código)</label>
+                  <input type="text" class="form__control" id="student_search_input" placeholder="Escriba código de estudiante... (Ej. EST-0001)" required>
+                </div>
+                <div class="form__group" style="flex: 0 0 auto;">
+                  <label class="form__label">&nbsp;</label>
+                  <button type="button" class="form__button--purple" onclick="loadStudentBulletin()" 
+                    style="padding: 10px 20px; font-weight: 600; font-family: var(--font-heading); border: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--white); font-size: 0.9rem; height: 42px;">
+                    🔍 Consultar Notas
+                  </button>
+                </div>
+              </div>
+
+              <!-- Datos del Estudiante Consultador -->
+              <div id="student-bulletin-info" style="display: none; background: var(--white); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--gray-300); margin-bottom: 20px;">
+                <h3 style="font-size: 1rem; color: var(--primary); margin-bottom: 10px; font-family: var(--font-heading);" id="bulletin_student_name">Estudiante: -</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.88rem;">
+                  <div><strong>Código:</strong> <span id="bulletin_student_code">-</span></div>
+                  <div><strong>Turno:</strong> <span id="bulletin_student_shift">-</span></div>
+                  <div><strong>Nivel Académico:</strong> <span id="bulletin_student_level">-</span></div>
+                  <div><strong>Sección:</strong> <span id="bulletin_student_section">-</span></div>
+                </div>
+              </div>
+
+              <!-- Tabla de Boletín de Calificaciones -->
+              <div id="bulletin-table-container">
+                <div class="empty-state" id="empty-state-bulletin">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                  <p>Busque un estudiante por su código para desplegar su boletín de calificaciones completo.</p>
+                </div>
+              </div>
+
+              <!-- Guardar Boletín -->
+              <div class="save-area" id="bulletin-save-area" style="display: none; justify-content: flex-end; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--gray-200);">
+                <button type="button" class="form__button--green" onclick="saveStudentBulletin()"
+                  style="padding: 12px 30px; font-weight: 700; font-family: var(--font-heading); border: none; border-radius: var(--radius-sm); cursor: pointer; color: var(--white); font-size: 0.95rem; letter-spacing: 0.3px;">
+                  💾 Guardar Cambios Boletín
+                </button>
+              </div>
+
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Agregar Actividad -->
+  <div class="modal__container" id="activity-modal">
+    <div class="modal">
+      <span class="modal__close" onclick="closeAddActivityModal()">&times;</span>
+      <h2>Agregar Actividad</h2>
+      <div class="form__group mt-2">
+        <label class="form__label" for="modal_act_name">Nombre de la Actividad</label>
+        <input type="text" class="form__control" id="modal_act_name" placeholder="Ej. Tarea 1, Examen Parcial...">
+      </div>
+      <div class="form__group mt-2">
+        <label class="form__label" for="modal_act_score">Puntaje Máximo (1 - 100)</label>
+        <input type="number" class="form__control" id="modal_act_score" placeholder="Ej. 20, 50..." min="1" max="100">
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" style="background: var(--gray-400); color: var(--white); border: none; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer;" onclick="closeAddActivityModal()">
+          Cancelar
+        </button>
+        <button type="button" style="background: var(--primary); color: var(--white); border: none; padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-weight: 600;" onclick="saveActivityFromModal()">
+          Agregar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/scriptNotas.js?v=1.1.0"></script>
+</body>
+</html>

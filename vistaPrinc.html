@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://proyectoinstituto-back-end-production.up.railway.app; connect-src 'self' https://proyectoinstituto-back-end-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://proyectoinstituto-back-end-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Menu principal</title>
+
+  <link rel="stylesheet" href="css/global.css?v=1.0.8" />
+  <link rel="stylesheet" href="css/styleVista.css?v=1.0.1" />
+
+  <!-- Iconos y librerías externas (versiones fijadas + Subresource Integrity) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css"
+    integrity="sha384-2+8OcleUOxnP/2cYXK9FBoMe12ojS0iPrrJy9Um4ICFk2AXl8iODUaIoUKI6TmGj" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://unpkg.com/swiper@14.0.1/swiper-bundle.min.css"
+    integrity="sha384-ZpTu6lu01tFQs79Cy93VlIG+e5ecrVxQJ7y1ls+M+JAXtu6EJEva5oZD9N+D0DsM" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    integrity="sha384-DyZ88mC6Up2uqS4h/KRgHuoeGwBcD4Ng9SiP4dIRy0EXTlnuz47vAwmeGwVChigm" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <!-- Imagen de fondo -->
+  <div class="background__image"></div>
+
+  <!-- Encabezado -->
+  <header class="menu__header">
+    <div class="header__content">
+      <img src="./images/LOGO.png" alt="Logo Colegio Enrique de Osso" class="site__logo" />
+      <h1>Portal Académico - Colegio Enrique de Osso (PA-CEO)</h1>
+    </div>
+  </header>
+
+  <div class="container__prueba">
+    <p>Ciencia Fraternidad Disciplina</p>
+
+  </div>
+
+
+  <!-- Barra de navegación -->
+  <nav class="nav__container">
+    <div class="nav__menu" id="nav-menu">
+      <ul class="nav__list">
+        <li class="nav__item"><a href="#home">Institución</a></li>
+        <li class="nav__item"><a href="#autoridad">Autoridades</a></li>
+        <li class="nav__item"><a href="#identidad">Identidad</a></li>
+        <li class="nav__item"><a href="#mision">Misión y Visión</a></li>
+        <li class="nav__item"><a href="#actividades">Actividades Del Centro</a></li>
+      </ul>
+      <div class="nav__close" id="nav-close">
+        <i class="ri-close-line"></i>
+      </div>
+
+    </div>
+
+    <div class="nav__actions">
+      <i class="ri-search-line nav__search" id="search-btn"></i>
+      <i class="ri-user-line nav__login" id="login-btn"></i>
+      <div class="nav__toggle" id="nav-toggle">
+        <i class="ri-menu-line"></i>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Buscador -->
+  <div class="search" id="search">
+    <form action="" class="search__form">
+      <i class="ri-search-line search__icon"></i>
+      <input type="search" placeholder="¿Qué deseas buscar?" class="search__input" />
+      <i class="ri-close-line search__close" id="search-close"></i>
+    </form>
+  </div>
+
+  <!-- Login -->
+  <div class="login" id="login">
+    <form action="" class="login__form">
+      <i class="ri-close-line login__close" id="login-close"></i>
+      <h2 id="login__title" class="login__title">Inicia Sesión</h2>
+      <div class="login__group">
+        <div>
+          <label for="username" class="login__label">Usuario / Código Estudiante</label>
+          <input type="text" placeholder="Introduce tu Usuario o Código" id="username" class="login__input" required />
+        </div>
+        <div>
+          <label for="password" class="login__label">Contraseña</label>
+          <input type="password" placeholder="Introduce tu Contraseña" id="password" class="login__input" required />
+        </div>
+      </div>
+      <p class="login__signup">¿No tienes una cuenta? <a href="#" id="signup-info-btn">Obtén tus credenciales</a></p>
+      <a href="#" class="login__forgot">¿Olvidaste tu Contraseña?</a>
+      <button type="button" class="login__button" id="access-btn">Acceder</button>
+    </form>
+  </div>
+
+
+
+
+  <!--La seccion de inicio comienza aqui-->
+  <section class="home" id="home">
+    <div class="home__Content">
+      <h2>Colegio Enrique de Osso CEO-Enrique de Osso</h2>
+      <p>
+        Es una institución educativa pública de educación secundaria
+        ubicada en Enrique de Osso, Nicaragua. Fundada en 1989, el CEO-Enrique de Osso
+        se ha destacado por su compromiso con la excelencia académica y la
+        formación integral de sus estudiantes, ofreciendo un ambiente educativo
+        de calidad y promoviendo valores como la disciplina, la responsabilidad
+        y el respeto, con el objetivo de preparar a los jóvenes para enfrentar
+        los desafíos del futuro y contribuir al desarrollo de la sociedad.
+      </p>
+    </div>
+  </section>
+  <!--Aqui termina la seccion de inicio-Institucion-->
+
+  <!--Aqui comienza la seccion de autoridad-->
+  <section class="container__autoridad" id="autoridad">
+    <div class="heading">
+      <div class="autoridad__content">
+        <div class="autoridad__slide box">
+          <div class="content">
+            <h2>Autoridades 2024-2025 CEO-Enrique de Osso</h2>
+          </div>
+        </div>
+        <div class="autoridad__slide box">
+          <div class="img">
+            <img src="images/Direct.1.png" alt="" />
+          </div>
+          <div class="content">
+            <h1>Directora</h1>
+            <h3>Lic. Martha Ericelda Téllez</h3>
+            <p>
+              Directora del Colegio Enrique de Osso, Licenciada en
+              Ciencias de la Educación con mención en Orientación Educativa,
+              con una amplia trayectoria en el ámbito educativo y un firme
+              compromiso con la formación integral de los estudiantes.
+            </p>
+          </div>
+        </div>
+        <div class="autoridad__slide box">
+          <div class="img">
+            <img src="images/SubDir.1.png" alt="" />
+          </div>
+          <div class="content">
+            <h1>Sub Director</h1>
+            <h3>Lic. Juan Carlos Pérez</h3>
+            <p>
+              Sub Director del Colegio Enrique de Osso, Licenciado en
+              Ciencias de la Educación con mención en Orientación Educativa,
+              con una sólida formación en gestión educativa y un compromiso
+              con la mejora continua de la calidad educativa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--Aqui termina el contenido de la seccion de autoridades-->
+
+  <!--Aqui comienza el contenido de la identidad del centro educativo-->
+  <section class="container__identidad" id="identidad">
+    <div class="heading">
+      <h2>Identidad del Centro Educativo CEO-Enrique de Osso</h2>
+    </div>
+    <div class="mission__content">
+      <div class="vision__container">
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/Band.Prin.png" alt="" />
+          </div>
+          <div class="person__review">
+            <h3>Bandera CEO-Enrique de Osso</h3>
+            <p>
+              La Bandera del Colegio Enrique de Osso es un símbolo
+              de identidad y orgullo para toda la comunidad educativa: El rojo
+              simboliza el esfuerzo y la valentía de los estudiantes, el amarillo
+              simboliza la luz del conocimiento y la esperanza, y el azul representa
+              la paz y la unidad que prevalece en el centro educativo.
+            </p>
+          </div>
+        </div>
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/HimnoIna.jpeg" alt="" />
+          </div>
+          <div class="person__review">
+            <h3>Himno CEO-Enrique de Osso</h3>
+            <p>
+              El Himno del Colegio Enrique de Osso es una expresión
+              de los valores y principios que guían a nuestra comunidad
+              educativa. Su letra y melodía inspiran a los estudiantes a
+              alcanzar la excelencia y a ser agentes de cambio en la sociedad.
+            </p>
+          </div>
+        </div>
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/Log.CEO.1.1.png" alt="" />
+          </div>
+          <div class="person__review">
+            <h3>Emblema CEO-Enrique de Osso</h3>
+            <p>
+              El emblema del Colegio Enrique de Osso es un símbolo
+              que representa la identidad y los valores fundamentales de la
+              institución. Con un diseño de antorcha encendida que refleja luz de
+              conocimiento, la educación y la formación integral de los estudiantes,
+              en el resaltan las palabras "Ciencia, Fraternidad y Disciplina", que son los pilares
+              fundamentales que guían nuestra misión educativa.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Aqui termina el contenido de la identidad del centro educativo -->
+
+  <!--Aqui comienza el contenido de la seccion de mision y vision-->
+  <section class="container__mision" id="mision">
+    <div class="heading">
+      <h2>MISIÓN Y VISIÓN</h2>
+    </div>
+    <div class="mission__content">
+      <div class="vision__container">
+        <div class="vision__slide box">
+          <div class="person__review">
+            <h2>MISIÓN</h2>
+            <p>
+              Somos un centro educativo que brinda educación secundaria con
+              la responsabilidad y el compromiso de formar jóvenes de manera
+              integral apropiados de conocimientos intelectuales, éticos y
+              morales que contribuyen con la enseñanza y formación educativa.
+            </p>
+          </div>
+        </div>
+        <div class="vision__slide box">
+          <div class="person__review">
+            <h2>VISIÓN</h2>
+            <p>
+              Ser una institución educativa que ofrezca a sus estudiantes,
+              una formación educativa, donde desarrollen y adquieran conocimientos,
+              habilidades y valores que les permitan continuar con su formación académica
+              e incorporarse con éxito a la sociedad en donde conviven, que sean capaces
+              de utilizar las competencias adquiridas en situaciones de su vida diaria.
+              Es nuestro deseo ser una institución que ofrezca educación de calidad para la vida.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Aqui termina la seccion de mision y vision -->
+
+  <!--Aqui comienza el contenido de la identidad del centro educativo-->
+  <section class="container__actividades" id="actividades">
+    <div class="heading">
+      <h2>Actividades Del centro</h2>
+    </div>
+    <div class="mission__content">
+      <div class="vision__container">
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/Img.26.jpg" alt="" />
+          </div>
+          <div class="person__review">
+            <h3>Area de TICS</h3>
+          </div>
+        </div>
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/Img.21.jpg"
+              alt="Students in a classroom sitting at individual desks wearing school uniforms, some with backpacks, listening attentively to a teacher standing at the front. The classroom is brightly lit with large windows, tiled floor, and blue and yellow walls. The atmosphere is focused and studious. Text in the lower left corner reads Ministerio de Educación." />
+          </div>
+          <div class="person__review">
+            <h3>Salones de Clases</h3>
+          </div>
+        </div>
+        <div class="vision__slide box">
+          <div class="img">
+            <img src="images/Img.23.jpg"
+              alt="Three color-coded recycling bins labeled Plastico, Organico, and Papel stand side by side under a metal roof structure in a schoolyard. The bins are yellow, green, and blue with red accents, each with a mesh design and clear labels for sorting waste. Behind the bins is a chain-link fence, green grass, and trees, with a blue sky above. The setting is clean and organized, promoting environmental responsibility. Text in the lower left corner reads Ministerio de Educacion." />
+          </div>
+          <div class="person__review">
+            <h3>Actos Conmemorativos</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- product section end here  -->
+
+
+  <!--aqui comienza el footer-->
+  <footer class="footer" id="contact">
+    <div class="box__container">
+      <div class="main__Box">
+        <div class="content">
+          <a href="#"><img src="images/LOGO.png" alt="" /></a>
+          <h1 class="logoName">Colegio Enrique de Osso</h1>
+        </div>
+
+        <p>CEO-Enrique de Osso</p>
+      </div>
+      <div class="box">
+        <h3>Otros</h3>
+        <a href="#">
+          <i class="fas fa-arrow-right"></i>Políticas De Privacidad</a>
+        <a href="#"> <i class="fas fa-arrow-right"></i>Otros Servicios</a>
+      </div>
+      <div class="box">
+        <h3>Contáctanos</h3>
+        <a href="#"> <i class="fas fa-phone"></i>+505 22258756</a>
+        <a href="#">
+          <i class="fas fa-envelope"></i>InstitutoDeEnrique de OssoCEO@gmail.com</a>
+
+      </div>
+      <p>CEO-Enrique de Osso</p>
+    </div>
+
+    <div class="box__container">
+      <div class="box">
+        <h3>Dirección</h3>
+        <a href="#"> <i class="fas fa-map-marker-alt"></i>Enrique de Osso, Masaya</a>
+        <a href="#"> <i class="fas fa-map-marker-alt"></i>Carretera a Enrique de Osso</a>
+      </div>
+      <div class="box">
+        <h3>Horarios</h3>
+        <a href="#">Lunes - Viernes: 7:00 AM - 5:30 PM</a>
+      </div>
+      <div class="share">
+        <a href="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.facebook.com%2Fp%2FInstituto-Nacional-de-Enrique de Osso-Oficial-100077354135240%2F%3Flocale%3Des_LA&psig=AOvVaw3tkvqSYrpfZaHlniwqZMUU&ust=1750435918980000&source=images&cd=vfe&opi=89978449&ved=0CAYQrpoMahcKEwiAuZ6M8P2NAxUAAAAAHQAAAAAQCA"
+          class="fab fa-facebook-f"></a>
+        <a href="https://youtu.be/nCI78lDEgs4?si=4EouOXV0udCzLOeB" class="fab fa-youtube"></a>
+        <a href="#" class="fab fa-instagram"></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/swiper@14.0.1/swiper-bundle.min.js"
+    integrity="sha384-89/1IydW0I7pCr9YFOrcrOCXJ0kW16DWtAF+a7BCXKovVqBaR090u7jHfvIoIxkK" crossorigin="anonymous"></script>
+  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/login.js?v=1.1.0"></script>
+  <script src="js/scriptVist.js?v=1.1.0"></script>
+</body>
+
+</html>

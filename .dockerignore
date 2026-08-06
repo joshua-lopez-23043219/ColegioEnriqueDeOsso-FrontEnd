@@ -1,0 +1,14 @@
+# Control de versiones (evita publicar el historial de Git en la web)
+.git
+.gitignore
+.dockerignore
+
+# Configuración de editor / IDE / tooling
+.vscode
+.claude
+
+# El propio Dockerfile no debe servirse
+Dockerfile
+
+# Documentación
+*.md
