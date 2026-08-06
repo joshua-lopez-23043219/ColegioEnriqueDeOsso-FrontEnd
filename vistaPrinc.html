@@ -7,8 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema Académico — Colegio Enrique de Ossó</title>
 
-  <link rel="stylesheet" href="css/global.css?v=1.1.0" />
-  <link rel="stylesheet" href="css/styleVista.css?v=1.1.0" />
+  <link rel="stylesheet" href="css/global.css?v=1.1.2" />
+  <link rel="stylesheet" href="css/styleVista.css?v=1.1.2" />
 
   <!-- Iconos y librerías externas -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css"
@@ -18,18 +18,18 @@
 </head>
 
 <body>
-  <!-- Imagen de fondo -->
+  <!-- Fondo con gradiente limpio -->
   <div class="background__image"></div>
 
-  <!-- Encabezado Principal -->
+  <!-- Encabezado Principal con Escudo Oficial -->
   <header class="menu__header">
     <div class="header__content">
-      <img src="./images/LOGO.png" alt="Logo Oficial Colegio Enrique de Ossó" class="site__logo" style="border-radius: 50%;" />
+      <img src="./images/LOGO.png" alt="Escudo Oficial Colegio Enrique de Ossó" class="site__logo" style="width: 56px; height: 56px; object-fit: contain; border-radius: 0; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.25));" />
       <h1 class="header__title">Sistema Académico Colegio Enrique de Ossó</h1>
     </div>
   </header>
 
-  <!-- Lema / Franja Institucional -->
+  <!-- Lema Institucional -->
   <div class="container__prueba">
     <p>EDUCACIÓN TERESIANA QUE INSPIRA Y TRANSFORMA — REPARTO SCHICK, MANAGUA</p>
   </div>
@@ -63,7 +63,7 @@
   <div class="search" id="search">
     <form action="" class="search__form">
       <i class="ri-search-line search__icon"></i>
-      <input type="search" placeholder="¿Qué deseas buscar en la plataforma?" class="search__input" />
+      <input type="search" placeholder="¿Qué deseas buscar en el sistema?" class="search__input" />
       <i class="ri-close-line search__close" id="search-close"></i>
     </form>
   </div>
@@ -92,18 +92,18 @@
   <!-- Hero Section -->
   <section class="home" id="home">
     <div class="home__Content">
-      <span class="badge__teresiano" style="display: inline-block; background: var(--accent); color: white; padding: 4px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 12px; text-transform: uppercase;">
+      <span class="badge__teresiano" style="display: inline-block; background: var(--accent); color: white; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.825rem; letter-spacing: 1px; margin-bottom: 14px; text-transform: uppercase;">
         Escuela Teresiana de América
       </span>
-      <h2>Colegio Enrique de Ossó</h2>
-      <p>
+      <h2 style="color: var(--white); font-size: clamp(2rem, 4vw, 2.8rem); font-family: var(--font-heading); margin-bottom: 1rem;">Colegio Enrique de Ossó</h2>
+      <p style="color: rgba(255, 255, 255, 0.9); font-size: 1.05rem; line-height: 1.7;">
         El Colegio Enrique de Ossó, es una Comunidad Educativa que se caracteriza por ofrecer una formación integral de calidad, humanizadora, liberadora, transformadora, y promover liderazgo compartido y un estilo de relación inclusivo-respetuoso.
       </p>
-      <div style="display: flex; gap: 14px; margin-top: 24px; flex-wrap: wrap;">
-        <button type="button" onclick="document.getElementById('login-btn').click();" class="login__button" style="padding: 12px 24px; font-size: 0.95rem; text-decoration: none;">
+      <div style="display: flex; gap: 14px; margin-top: 28px; flex-wrap: wrap;">
+        <button type="button" onclick="document.getElementById('login-btn').click();" class="login__button" style="padding: 14px 28px; font-size: 1rem; text-decoration: none; border-radius: var(--radius-md);">
           🔐 Iniciar Sesión en el Sistema
         </button>
-        <a href="#mision" class="form__button--purple" style="padding: 12px 24px; font-size: 0.95rem; background: var(--gradient-accent); text-decoration: none;">
+        <a href="#mision" class="form__button--purple" style="padding: 14px 28px; font-size: 1rem; background: var(--gradient-accent); text-decoration: none; border-radius: var(--radius-md);">
           📖 Conocer Misión y Visión
         </a>
       </div>
@@ -115,20 +115,30 @@
     <div class="heading">
       <h2>Identidad del Centro Educativo Colegio Enrique de Ossó</h2>
     </div>
-    <div class="mission__content">
-      <div class="vision__container" style="display: flex; justify-content: center;">
-        <div class="vision__slide box" style="max-width: 520px; text-align: center; padding: 36px 28px;">
-          <div class="img" style="width: 180px; height: 180px; margin: 0 auto; background: transparent; border: none; box-shadow: none;">
-            <img src="images/LOGO.png" alt="Escudo Oficial Colegio Enrique de Ossó" style="width: 100%; height: 100%; object-fit: contain;" />
-          </div>
-          <div class="person__review" style="margin-top: 20px;">
-            <h3>Colegio Enrique de Ossó</h3>
-            <p style="font-size: 0.95rem; color: var(--slate-600); line-height: 1.7;">
-              Formamos parte de las <strong>Escuelas Teresianas de América</strong>, guiados por el pensamiento y carisma educativo de San Enrique de Ossó. Nuestro emblema simboliza la luz del conocimiento, la fe profunda y la misión transformadora en la comunidad del Reparto Schick.
-            </p>
-          </div>
+    <div class="mission__content" style="max-width: 900px; margin: 0 auto;">
+      
+      <!-- Card del Escudo -->
+      <div class="vision__slide box" style="text-align: center; padding: 36px 28px; margin-bottom: 30px;">
+        <div style="width: 160px; height: 160px; margin: 0 auto;">
+          <img src="images/LOGO.png" alt="Escudo Oficial Colegio Enrique de Ossó" style="width: 100%; height: 100%; object-fit: contain;" />
+        </div>
+        <div class="person__review" style="margin-top: 20px;">
+          <h3 style="font-size: 1.4rem; color: var(--primary-dark);">Escudo Institucional</h3>
+          <p style="font-size: 0.98rem; color: var(--slate-700); line-height: 1.7; max-width: 680px; margin: 10px auto 0 auto;">
+            Formamos parte de las <strong>Escuelas Teresianas de América</strong>, guiados por el pensamiento y carisma educativo de San Enrique de Ossó. Nuestro emblema simboliza la luz del conocimiento, la fe profunda y la misión transformadora en el Reparto Schick.
+          </p>
         </div>
       </div>
+
+      <!-- Banner Institucional Rectangular -->
+      <div class="vision__slide box" style="padding: 16px; border-radius: 16px;">
+        <img src="images/Banner2026.jpg" alt="Año Escolar 2026 Colegio Enrique de Ossó" style="width: 100%; max-height: 380px; object-fit: cover; border-radius: 12px;" />
+        <div style="padding: 16px 8px 8px 8px; text-align: center;">
+          <h4 style="font-family: var(--font-heading); color: var(--primary-dark); font-size: 1.15rem; margin-bottom: 4px;">Año Escolar 2026 — Educación Teresiana que Inspira y Transforma</h4>
+          <p style="font-size: 0.9rem; color: var(--slate-600);">Comunidad Educativa comprometida con el desarrollo integral, la innovación y el liderazgo social.</p>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -139,21 +149,21 @@
     </div>
     <div class="mission__content">
       <div class="vision__container">
-        <div class="vision__slide box">
+        <div class="vision__slide box" style="padding: 36px 28px;">
           <div class="person__review">
-            <h2>MISIÓN</h2>
-            <p>
+            <h2 style="font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 14px;">MISIÓN</h2>
+            <p style="font-size: 0.98rem; color: var(--slate-700); line-height: 1.8;">
               Somos escuela teresiana animada por el carisma educativo de Enrique de Ossó. Como escuela católica, inserta en el Reparto Schick, brindamos a nuestros estudiantes una educación integral de calidad para el desarrollo del pensamiento crítico, creativo, el fortalecimiento del liderazgo, la vivencia de valores y la transformación social.
             </p>
           </div>
         </div>
-        <div class="vision__slide box">
+        <div class="vision__slide box" style="padding: 36px 28px;">
           <div class="person__review">
-            <h2>VISIÓN</h2>
-            <p>
+            <h2 style="font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 14px;">VISIÓN</h2>
+            <p style="font-size: 0.98rem; color: var(--slate-700); line-height: 1.8;">
               En el año 2022, las Escuelas teresianas de América conforman una red coordinada por un equipo de Gestión continental y por los Equipos de Gestión Provinciales desde un liderazgo compartido en comunidades teresianas que aprenden.
             </p>
-            <p style="margin-top: 12px;">
+            <p style="font-size: 0.98rem; color: var(--slate-700); line-height: 1.8; margin-top: 14px;">
               La red cuenta con itinerarios formativos que animan el compromiso vocacional de los educadores, cultivan la identidad teresiana y acompañan su proceso de crecimiento personal y profesional. Se caracteriza por ofrecer una formación integral, de calidad e innovadora en coherencia con el Modelo Educativo Teresiano. Las comunidades educativas, se comprometen con la transformación de la realidad política y social, asumiendo con responsabilidad la ética del cuidado.
             </p>
           </div>
@@ -168,73 +178,93 @@
       <h2>VALORES INSTITUCIONALES</h2>
     </div>
     <div class="mission__content">
-      <div class="vision__container" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
-        <div class="vision__slide box" style="text-align: center;">
-          <div style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;">🧘‍♂️</div>
-          <h3>Interioridad</h3>
-          <p>Cultivo de la vida personal, la oración, la reflexión consciente y el autoconocimiento en el encuentro con Dios y con uno mismo.</p>
+      <div class="vision__container" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        
+        <!-- Valor 1 -->
+        <div class="vision__slide box" style="text-align: center; padding: 30px 20px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(62, 143, 214, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">
+            <i class="ri-heart-pulse-fill"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; color: var(--primary-dark);">Interioridad</h3>
+          <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">Cultivo de la vida personal, la oración, la reflexión consciente y el autoconocimiento en el encuentro con Dios y con uno mismo.</p>
         </div>
-        <div class="vision__slide box" style="text-align: center;">
-          <div style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;">🤝</div>
-          <h3>Relacionalidad</h3>
-          <p>Fomento de vínculos fraternos, empatía, diálogo inclusivo y relaciones interpersonales basadas en el respeto mutuo.</p>
+
+        <!-- Valor 2 -->
+        <div class="vision__slide box" style="text-align: center; padding: 30px 20px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(62, 143, 214, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">
+            <i class="ri-team-fill"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; color: var(--primary-dark);">Relacionalidad</h3>
+          <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">Fomento de vínculos fraternos, empatía, diálogo inclusivo y relaciones interpersonales basadas en el respeto mutuo.</p>
         </div>
-        <div class="vision__slide box" style="text-align: center;">
-          <div style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;">🌱</div>
-          <h3>Compromiso con la Transformación Social</h3>
-          <p>Educación liberadora y crítica orientada al liderazgo de cambio en el entorno social, promoviendo justicia y fraternidad.</p>
+
+        <!-- Valor 3 -->
+        <div class="vision__slide box" style="text-align: center; padding: 30px 20px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(62, 143, 214, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">
+            <i class="ri-rocket-fill"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; color: var(--primary-dark);">Compromiso Social</h3>
+          <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">Educación liberadora y crítica orientada al liderazgo de cambio en el entorno social, promoviendo justicia y fraternidad.</p>
         </div>
-        <div class="vision__slide box" style="text-align: center;">
-          <div style="font-size: 2.2rem; color: var(--accent); margin-bottom: 10px;">🛡️</div>
-          <h3>Cuidado de la Vida</h3>
-          <p>Asumir con responsabilidad la ética del cuidado, la protección del medio ambiente, la dignidad humana y el bienestar comunitario.</p>
+
+        <!-- Valor 4 -->
+        <div class="vision__slide box" style="text-align: center; padding: 30px 20px;">
+          <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(62, 143, 214, 0.12); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 16px auto;">
+            <i class="ri-plant-fill"></i>
+          </div>
+          <h3 style="font-size: 1.2rem; color: var(--primary-dark);">Cuidado de la Vida</h3>
+          <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">Asumir con responsabilidad la ética del cuidado, la protección del medio ambiente, la dignidad humana y el bienestar comunitario.</p>
         </div>
+
       </div>
     </div>
   </section>
 
   <!-- Seccion de Actividades del Centro -->
-  <section class="container__actividades" id="actividades">
+  <section class="container__actividades" id="actividades" style="background-color: var(--slate-50); padding: 5rem 2rem;">
     <div class="heading">
-      <h2>Actividades del Centro Educativo</h2>
+      <h2 style="color: var(--slate-900);">Actividades del Centro Educativo</h2>
     </div>
+    
     <div class="mission__content">
-      <div style="text-align: center; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto;">
-        <p style="font-size: 1.05rem; color: var(--slate-700); margin-bottom: 16px;">
-          Mantente al día con las últimas novedades, eventos y la programación de actividades correspondientes al mes de <strong>Agosto 2026</strong>.
-        </p>
-        <a href="https://www.facebook.com/CEEnriquedeOsso" target="_blank" class="form__button--purple" style="display: inline-flex; align-items: center; gap: 8px; background: #1877F2; text-decoration: none; padding: 12px 26px;">
-          <i class="fab fa-facebook-f"></i> Visitar Página Oficial en Facebook
-        </a>
-      </div>
-      <div class="vision__container">
-        <div class="vision__slide box">
-          <div class="img" style="border-radius: 12px; width: 100%; height: 180px;">
-            <img src="images/Banner2026.jpg" alt="Año Escolar 2026" style="border-radius: 12px;" />
+      <p style="text-align: center; font-size: 1.05rem; color: var(--slate-700); max-width: 680px; margin: 0 auto 36px auto; font-weight: 500;">
+        Programación institucional y eventos correspondientes al mes de <strong>Agosto 2026</strong>.
+      </p>
+
+      <div class="vision__container" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+        
+        <!-- Actividad Principal: Herencia Viva de mi Tierra -->
+        <div class="vision__slide box" style="padding: 20px; display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 100%; border-radius: 12px; overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow-md);">
+            <img src="images/HerenciaViva.jpg" alt="Poster Herencia Viva de mi Tierra" style="width: 100%; height: auto; max-height: 360px; object-fit: contain; background: #0F172A;" />
           </div>
-          <div class="person__review">
-            <h3>Año Escolar 2026</h3>
-            <p>Educación teresiana que inspira y transforma. Inicio de jornadas académicas y formación en valores teresianos.</p>
-          </div>
-        </div>
-        <div class="vision__slide box">
-          <div class="img" style="border-radius: 12px; width: 100%; height: 180px;">
-            <img src="images/Img.26.jpg" alt="Área de Tecnologías de Información" style="border-radius: 12px;" />
-          </div>
-          <div class="person__review">
-            <h3>Área de Tecnología e Innovación</h3>
-            <p>Integración de herramientas digitales, laboratorio de computación y análisis educativo para estudiantes.</p>
+          <div class="person__review" style="text-align: center;">
+            <span style="display: inline-block; background: var(--accent); color: white; padding: 4px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">
+              📅 14 DE AGOSTO DE 2026 — 2:00 PM
+            </span>
+            <h3 style="font-size: 1.25rem; color: var(--primary-dark); margin-bottom: 8px;">Herencia Viva de mi Tierra</h3>
+            <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">
+              Gala Cultural Teresiana. Expresión artística, folklore, música y rescate de la identidad de nuestra patria con la participación de la comunidad educativa.
+            </p>
           </div>
         </div>
-        <div class="vision__slide box">
-          <div class="img" style="border-radius: 12px; width: 100%; height: 180px;">
-            <img src="images/Img.23.jpg" alt="Proyectos Ecológicos y Comunitarios" style="border-radius: 12px;" />
+
+        <!-- Actividad 2: Tecnología e Innovación -->
+        <div class="vision__slide box" style="padding: 20px; display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 100%; height: 220px; border-radius: 12px; overflow: hidden; margin-bottom: 16px;">
+            <img src="images/Img.26.jpg" alt="Área de Tecnologías de Información" style="width: 100%; height: 100%; object-fit: cover;" />
           </div>
-          <div class="person__review">
-            <h3>Cuidado del Medio Ambiente</h3>
-            <p>Jornadas comunitarias de reciclaje y cuidado de la casa común fomentando la ética de la responsabilidad.</p>
+          <div class="person__review" style="text-align: center;">
+            <span style="display: inline-block; background: var(--primary); color: white; padding: 4px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: 700; margin-bottom: 8px;">
+              💻 AGOSTO 2026
+            </span>
+            <h3 style="font-size: 1.25rem; color: var(--primary-dark); margin-bottom: 8px;">Tecnología e Innovación Académica</h3>
+            <p style="font-size: 0.92rem; color: var(--slate-600); line-height: 1.6;">
+              Jornadas educativas en el laboratorio de informática para fortalecer las habilidades digitales y el pensamiento crítico en los estudiantes.
+            </p>
           </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -244,7 +274,7 @@
     <div class="box__container">
       <div class="main__Box">
         <div class="content">
-          <a href="#"><img src="images/LOGO.png" alt="Logo Colegio Enrique de Ossó" style="border-radius: 50%;" /></a>
+          <a href="#"><img src="images/LOGO.png" alt="Logo Colegio Enrique de Ossó" style="width: 48px; height: 48px; object-fit: contain;" /></a>
           <h1 class="logoName">Colegio Enrique de Ossó</h1>
         </div>
         <p style="color: var(--slate-300);">Educación teresiana que inspira y transforma.</p>
@@ -278,9 +308,9 @@
   </footer>
 
   <!-- Scripts -->
-  <script src="js/global.js?v=1.1.0"></script>
-  <script src="js/login.js?v=1.1.0"></script>
-  <script src="js/scriptVist.js?v=1.1.0"></script>
+  <script src="js/global.js?v=1.1.2"></script>
+  <script src="js/login.js?v=1.1.2"></script>
+  <script src="js/scriptVist.js?v=1.1.2"></script>
 </body>
 
 </html>

@@ -41,16 +41,14 @@ body {
   overflow-x: hidden;
 }
 
-/* Background image with overlay */
+/* Background overlay */
 .background__image {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: linear-gradient(135deg, rgba(27, 23, 34, 0.8) 0%, rgba(79, 70, 229, 0.65) 100%), url(../images/Img.1.jpg);
-  background-size: cover;
-  background-position: center;
+  background: radial-gradient(circle at 50% 0%, rgba(62, 143, 214, 0.1) 0%, rgba(62, 44, 35, 0.04) 60%, #F8FAFC 100%);
   z-index: -1;
 }
 
@@ -456,12 +454,12 @@ body {
 
 /* ==================== HERO SECTION ==================== */
 .home {
-  min-height: 100vh;
+  min-height: 85vh;
   display: flex;
   align-items: center;
   padding: 4rem 2rem;
   position: relative;
-  background: linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.72)), url(../images/VistaPrin.png) no-repeat center center/cover;
+  background: linear-gradient(135deg, rgba(62, 44, 35, 0.94) 0%, rgba(42, 30, 23, 0.97) 100%);
 }
 
 .home .home__Content {
