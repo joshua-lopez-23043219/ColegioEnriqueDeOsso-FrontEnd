@@ -5,15 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema Académico — Colegio Enrique de Ossó</title>
-  <link rel="stylesheet" href="css/global.css?v=1.1.0">
+  <link rel="stylesheet" href="css/global.css?v=1.3.5">
 </head>
 <body>
   <div class="background"></div>
 
   <header class="header">
     <div class="header__content">
-      <img src="./images/LOGO.png" alt="Logo Colegio Enrique de Ossó" class="header__content-imagen" style="border-radius: 50%;">
-      <h1 class="header__title">Sistema Académico Colegio Enrique de Ossó</h1>
+      <img src="./images/LOGO.png?v=1.3.5" alt="Logo Colegio Enrique de Ossó" class="header__content-imagen" style="border-radius: 50%; width: 44px; height: 44px;">
+      <h1 class="header__title">Colegio Enrique de Ossó</h1>
     </div>
   </header>
 
@@ -22,7 +22,7 @@
       <img src="./images/usuario.png" class="nav__profile-img">
       <ul class="nav__profile-link">
         <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
-        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
       </ul>
     </div>
   </nav>
@@ -36,6 +36,10 @@
       <section class="layout__section">
         <div class="section">
           <div class="section__items stagger">
+            <a href="gestionUsuarios.html" class="section__item" id="card-gestion-usuarios" style="display: none;">
+              <img src="./images/Admin.1.png" class="section__item-icon" alt="Gestión de Usuarios">
+              Gestión de Usuarios
+            </a>
             <a href="registros.html" class="section__item" id="card-registros">
               <img src="./images/Resgistro.png" class="section__item-icon" alt="Registro">
               Registro
@@ -74,12 +78,13 @@
     </div>
   </div>
 
-  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/global.js?v=1.3.5"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const role = localStorage.getItem('user_role');
       
       // Ocultar todas por defecto
+      document.getElementById('card-gestion-usuarios').style.display = 'none';
       document.getElementById('card-registros').style.display = 'none';
       document.getElementById('card-gacademica').style.display = 'none';
       document.getElementById('card-actividades').style.display = 'none';
@@ -89,16 +94,30 @@
       document.getElementById('card-boletin').style.display = 'none';
       document.getElementById('card-portal-estudiante').style.display = 'none';
       
-      if (role === 'DIRECTOR') {
+      if (role === 'ADMINISTRADOR') {
+        document.getElementById('card-gestion-usuarios').style.display = 'flex';
         document.getElementById('card-registros').style.display = 'flex';
         document.getElementById('card-gacademica').style.display = 'flex';
         document.getElementById('card-actividades').style.display = 'flex';
         document.getElementById('card-dashboard').style.display = 'flex';
         document.getElementById('card-analisis-ia').style.display = 'flex';
+      } else if (role === 'DIRECTOR') {
+        document.getElementById('card-gestion-usuarios').style.display = 'flex';
+        document.getElementById('card-registros').style.display = 'flex';
+        document.getElementById('card-gacademica').style.display = 'flex';
+        document.getElementById('card-actividades').style.display = 'flex';
+        document.getElementById('card-dashboard').style.display = 'flex';
+        document.getElementById('card-analisis-ia').style.display = 'flex';
+      } else if (role === 'COORDINADOR') {
+        document.getElementById('card-registros').style.display = 'flex';
+        document.getElementById('card-gacademica').style.display = 'flex';
+        document.getElementById('card-actividades').style.display = 'flex';
+        document.getElementById('card-dashboard').style.display = 'flex';
       } else if (role === 'DOCENTE') {
         document.getElementById('card-gacademica').style.display = 'flex';
         document.getElementById('card-actividades').style.display = 'flex';
       } else if (role === 'ADMINISTRACION') {
+        document.getElementById('card-gestion-usuarios').style.display = 'flex';
         document.getElementById('card-registros').style.display = 'flex';
         document.getElementById('card-gacademica').style.display = 'flex';
       } else if (role === 'TUTOR') {
@@ -107,6 +126,16 @@
       } else if (role === 'ESTUDIANTE') {
         document.getElementById('card-portal-estudiante').style.display = 'flex';
         document.getElementById('card-boletin').style.display = 'flex';
+      }
+
+      // Logout listener
+      const logoutBtn = document.getElementById('logout-link');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.href = 'vistaPrinc.html';
+        });
       }
     });
   </script>

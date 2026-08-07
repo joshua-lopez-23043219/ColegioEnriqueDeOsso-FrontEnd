@@ -5,14 +5,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registros — Colegio Enrique de Ossó</title>
-  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <link rel="stylesheet" href="css/global.css?v=1.3.5">
 </head>
 <body>
   <div class="background"></div>
 
   <header class="header">
     <div class="header__content">
-      <h1 class="header__title">Sistema Académico Colegio Enrique de Ossó</h1>
+      <img src="./images/LOGO.png?v=1.3.5" alt="Logo Colegio Enrique de Ossó" class="header__content-imagen" style="border-radius: 50%; width: 44px; height: 44px;">
+      <h1 class="header__title">Colegio Enrique de Ossó</h1>
     </div>
   </header>
   <div class="separador"></div>
@@ -30,7 +31,7 @@
       <img src="./images/usuario.png" class="nav__profile-img">
       <ul class="nav__profile-link">
         <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
-        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
       </ul>
     </div>
   </nav>
@@ -38,6 +39,10 @@
   <div class="container">
     <section class="section">
       <div class="section__items stagger">
+        <a href="gestionUsuarios.html" class="section__item" id="card-reg-usuarios" style="display: none;">
+          <img src="./images/Admin.1.png" class="section__item-icon" alt="Gestión de Usuarios">
+          Gestión de Usuarios
+        </a>
         <a href="registroEstudiante.html" class="section__item">
           <img src="./images/Estudiante.png" class="section__item-icon" alt="Estudiante">
           Estudiante
@@ -74,15 +79,30 @@
     </section>
   </div>
 
-  <script src="js/global.js?v=1.1.0"></script>
+  <script src="js/global.js?v=1.3.5"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const role = localStorage.getItem('user_role');
+      const cardUsuarios = document.getElementById('card-reg-usuarios');
+      
+      if (['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'].includes(role)) {
+        if (cardUsuarios) cardUsuarios.style.display = 'flex';
+      }
+
       if (role === 'ADMINISTRACION') {
         const cardGrupo = document.getElementById('card-reg-grupo');
         const cardAsignatura = document.getElementById('card-reg-asignatura');
         if (cardGrupo) cardGrupo.style.display = 'none';
         if (cardAsignatura) cardAsignatura.style.display = 'none';
+      }
+
+      const logoutBtn = document.getElementById('logout-link');
+      if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          localStorage.clear();
+          window.location.href = 'vistaPrinc.html';
+        });
       }
     });
   </script>
