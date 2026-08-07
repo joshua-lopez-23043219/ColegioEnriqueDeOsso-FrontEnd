@@ -1,113 +1,184 @@
 /**
- * scriptGrupo.js — Group registration logic with API integration
- * goBack() and dropdown code removed (now in global.js)
+ * scriptGrupo.js — Gestión de Grupos, Aulas y Asignación de Maestro Guía
+ * Formato Código de Grupo: Grado-Letra-Aula (ej: 7mo-A-F1)
  */
 
-// Guardar grupo
-function guardargrupo(e) {
-  e.preventDefault();
+let allTeachers = [];
+let allGroups = [];
 
-  const grupo = {
-    code_group: document.getElementById("code_group").value,
-    level_group: document.getElementById("level_group").value,
-    section_group: document.getElementById("section_group").value,
-    amount_group: parseInt(document.getElementById("amount_group").value),
-    shift_group: document.getElementById("turno").value
-  };
+document.addEventListener('DOMContentLoaded', () => {
+  loadTeachers();
+  loadGroups();
+});
 
-  if (grupo.amount_group > 41) {
-    showToast("No puedes registrar más de 40 alumnos por grupo.", "error");
-    return;
+// Auto-generar el Código de Grupo con formato Grado-Letra-Aula
+function updateGroupCode() {
+  const level = document.getElementById('level_group').value.trim();
+  const section = document.getElementById('section_group').value.trim();
+  let classroom = document.getElementById('classroom').value.trim().toUpperCase();
+
+  if (level && section && classroom) {
+    document.getElementById('code_group').value = `${level}-${section}-${classroom}`;
+  } else if (level && section) {
+    document.getElementById('code_group').value = `${level}-${section}`;
   }
+}
 
-  apiFetch('/apiGroup/Group/PostGroup/', {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(grupo)
-  })
-    .then(async (res) => {
-      const data = await res.json();
-
-      if (!res.ok) {
-        console.error("Error de validación:", data);
-
-        let errores = data.error || data;
-        let mensaje = "";
-
-        for (let campo in errores) {
-          const mensajeCampo = Array.isArray(errores[campo])
-            ? errores[campo].join(", ")
-            : errores[campo];
-          mensaje += `• ${campo}: ${mensajeCampo}\n`;
-        }
-
-        throw new Error(mensaje || "Error desconocido");
-      }
-
-      showToast(data.message || "✅ Grupo creado correctamente", "info");
-      document.getElementById("form-validation").reset();
+// Cargar la lista de docentes para el selector de Maestro Guía
+function loadTeachers() {
+  apiFetch('/apiTeacher/Teacher/')
+    .then(res => res.json())
+    .then(data => {
+      const select = document.getElementById('guide_teacher');
+      allTeachers = Array.isArray(data) ? data : (data.results || []);
+      
+      select.innerHTML = '<option value="">-- Seleccionar Maestro Guía --</option>';
+      allTeachers.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.name_teacher} (${t.code_teacher || 'Docente'})`;
+        select.appendChild(option);
+      });
     })
-    .catch((err) => {
-      showToast("❌ " + err.message, "info");
+    .catch(err => {
+      console.error('Error al cargar docentes:', err);
+      showToast('Error al cargar la lista de docentes', 'error');
     });
 }
 
-// Editar grupo
-function editargrupo(e) {
-  e.preventDefault();
-
-  const id = prompt("🔍 Ingrese el ID del grupo a editar:");
-  if (!id) return;
-
-  const grupo = {
-    code_group: document.getElementById("code_group").value,
-    level_group: document.getElementById("level_group").value,
-    section_group: document.getElementById("section_group").value,
-    amount_group: parseInt(document.getElementById("amount_group").value),
-    shift_group: document.getElementById("turno").value
-  };
-
-  apiFetch(`/apiGroup/Group/${id}/UpdateGroup/`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(grupo)
-  })
-    .then(res => {
-      if (!res.ok) return res.json().then(data => { throw new Error(data.error || "Error al editar") });
-      return res.json();
-    })
+// Cargar y mostrar la tabla de grupos registrados
+function loadGroups() {
+  apiFetch('/apiGroup/Group/')
+    .then(res => res.json())
     .then(data => {
-      showToast(data.message || "✅ Grupo actualizado correctamente", "info");
-      document.getElementById("form-validation").reset();
+      allGroups = Array.isArray(data) ? data : (data.results || []);
+      renderGroupsTable();
     })
-    .catch(err => showToast("❌ " + err.message), "info");
+    .catch(err => {
+      console.error('Error al cargar grupos:', err);
+    });
 }
 
-// Buscar grupo por código (Enter key)
-document.getElementById('code_group').addEventListener('keydown', function (e) {
-  if (e.key === 'Enter') {
-    e.preventDefault();
-
-    const code = document.getElementById('code_group').value.trim();
-    if (!code) {
-      showToast("Ingrese un código de grupo", "warning");
-      return;
-    }
-
-    apiFetch(`/apiGroup/Group/SpecificGroup/?code_group=${encodeURIComponent(code)}`)
-      .then(res => res.json().then(data => ({ status: res.status, body: data })))
-      .then(({ status, body }) => {
-        if (status === 200) {
-          document.getElementById('code_group').value = body.code_group;
-          document.getElementById('level_group').value = body.level_group;
-          document.getElementById('section_group').value = body.section_group;
-          document.getElementById('amount_group').value = body.amount_group;
-          document.getElementById('turno').value = body.shift_group;
-          showToast("Grupo encontrado", "success");
-        } else {
-          showToast('❌ ' + (body.error || 'Grupo no encontrado'), "info");
-        }
-      })
-      .catch(() => showToast('❌ Error al buscar grupo'), "info");
+function renderGroupsTable() {
+  const tbody = document.getElementById('groups-tbody');
+  if (!allGroups.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--slate-500); padding: 1.5rem;">No hay grupos registrados.</td></tr>`;
+    return;
   }
-});
+
+  tbody.innerHTML = allGroups.map(g => {
+    const guideName = g.guide_teacher_name || 'Sin Maestro Guía';
+    const guideBadge = g.guide_teacher_name ? `<span class="badge-guide"><i class="ri-user-star-fill"></i> ${guideName}</span>` : '<span style="color:var(--slate-400);">Sin Asignar</span>';
+
+    return `
+      <tr>
+        <td><strong>${g.code_group}</strong></td>
+        <td>${g.level_group} ${g.section_group}</td>
+        <td>${g.classroom || 'N/A'}</td>
+        <td>${guideBadge}</td>
+        <td>${g.amount_group} Alumnos</td>
+        <td style="display:flex; gap:6px;">
+          <button type="button" style="padding: 4px 8px; background: #FEF3C7; color: #92400E; border: none; border-radius: 6px; cursor: pointer; font-weight:600;" onclick="cargarFormularioEdicion(${g.id})">
+            <i class="ri-edit-line"></i> Editar
+          </button>
+          <button type="button" style="padding: 4px 8px; background: #FEE2E2; color: #991B1B; border: none; border-radius: 6px; cursor: pointer; font-weight:600;" onclick="eliminarGrupo(${g.id})">
+            <i class="ri-delete-bin-line"></i> Eliminar
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// Guardar o Actualizar Grupo
+function guardargrupo(e) {
+  if (e) e.preventDefault();
+
+  const editingId = document.getElementById('editing_group_id').value;
+  const level = document.getElementById('level_group').value;
+  const section = document.getElementById('section_group').value;
+  const classroom = document.getElementById('classroom').value.trim().toUpperCase();
+  const code = document.getElementById('code_group').value.trim();
+  const guideTeacherId = document.getElementById('guide_teacher').value;
+  const amount = parseInt(document.getElementById('amount_group').value) || 35;
+  const shift = document.getElementById('turno').value;
+
+  if (!level || !section || !classroom || !code) {
+    showToast('Por favor complete el Grado, Sección y Aula para formar el Código de Grupo', 'warning');
+    return;
+  }
+
+  const payload = {
+    code_group: code,
+    level_group: level,
+    section_group: section,
+    classroom: classroom,
+    amount_group: amount,
+    shift_group: shift,
+    guide_teacher: guideTeacherId ? parseInt(guideTeacherId) : null
+  };
+
+  const url = editingId ? `/apiGroup/Group/${editingId}/UpdateGroup/` : '/apiGroup/Group/PostGroup/';
+  const method = editingId ? 'PUT' : 'POST';
+
+  apiFetch(url, {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(async (res) => {
+    const data = await res.json();
+    if (!res.ok) {
+      let errStr = data.error ? (typeof data.error === 'object' ? JSON.stringify(data.error) : data.error) : 'Error al procesar';
+      throw new Error(errStr);
+    }
+    showToast(data.message || (editingId ? '✅ Grupo actualizado correctamente' : '✅ Grupo creado correctamente'), 'success');
+    cancelarEdicion();
+    loadGroups();
+  })
+  .catch(err => {
+    showToast('❌ ' + err.message, 'error');
+  });
+}
+
+function cargarFormularioEdicion(id) {
+  const g = allGroups.find(x => x.id === id);
+  if (!g) return;
+
+  document.getElementById('editing_group_id').value = g.id;
+  document.getElementById('level_group').value = g.level_group || '';
+  document.getElementById('section_group').value = g.section_group || '';
+  document.getElementById('classroom').value = g.classroom || '';
+  document.getElementById('code_group').value = g.code_group || '';
+  document.getElementById('amount_group').value = g.amount_group || '35';
+  document.getElementById('turno').value = g.shift_group || 'Matutino';
+  document.getElementById('guide_teacher').value = g.guide_teacher || '';
+
+  showToast(`Editando grupo ${g.code_group}`, 'info');
+}
+
+function cancelarEdicion() {
+  document.getElementById('editing_group_id').value = '';
+  document.getElementById('form-validation').reset();
+}
+
+function eliminarGrupo(id) {
+  const g = allGroups.find(x => x.id === id);
+  if (!g) return;
+
+  if (!confirm(`¿Está seguro de que desea eliminar el grupo "${g.code_group}"?`)) return;
+
+  apiFetch('/apiGroup/Group/DeleteGroup/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: id })
+  })
+  .then(res => res.json())
+  .then(data => {
+    showToast(data.message || 'Grupo eliminado', 'info');
+    loadGroups();
+  })
+  .catch(err => {
+    showToast('Error al eliminar grupo', 'error');
+  });
+}
