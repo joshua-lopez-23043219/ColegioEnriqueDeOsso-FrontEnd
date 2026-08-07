@@ -61,8 +61,10 @@ function goBack() {
 /* ========== Dropdown de Perfil & Protección de Páginas ========== */
 document.addEventListener('DOMContentLoaded', function () {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  const role = localStorage.getItem('user_role');
-  
+  const role = (localStorage.getItem('user_role') || '').trim();
+  const username = (localStorage.getItem('user_username') || '').trim().toLowerCase();
+  const isAdmin = (role === 'ADMINISTRADOR' || role === 'ADMIN' || username === 'admin');
+
   // 0. Mostrar cualquier alerta pendiente guardada en localStorage
   const pendingToast = localStorage.getItem('pending_toast');
   if (pendingToast) {
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   
   // 1. Validar que exista una sesión activa
-  if (!role && currentPage !== 'vistaPrinc.html' && currentPage !== 'ayuda.html') {
+  if (!role && !username && currentPage !== 'vistaPrinc.html' && currentPage !== 'ayuda.html') {
     window.location.href = 'vistaPrinc.html';
     return;
   }
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
     'gestionUsuarios.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
   };
   
-  if (role === 'ADMINISTRADOR') {
+  if (isAdmin) {
     // El Administrador del Sistema tiene acceso total a todos los módulos y vistas
   } else if (role && pageAccess[currentPage] && !pageAccess[currentPage].includes(role)) {
     localStorage.setItem('pending_toast', JSON.stringify({
