@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const role = localStorage.getItem('user_role');
   
   // 1. Validar accesos
-  if (role !== 'DIRECTOR' && role !== 'ADMINISTRACION') {
+  if (role !== 'DIRECTOR' && role !== 'ADMINISTRACION' && role !== 'ADMINISTRADOR') {
     showToast('Acceso Denegado: Su rol no cuenta con permisos para ver esta sección', 'error');
     setTimeout(() => {
       window.location.href = './index.html';
@@ -11,15 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Si no es director, ocultar pestaña 2 de configuración
-  if (role !== 'DIRECTOR') {
+  // Si no es director ni administrador, ocultar pestaña 2 de configuración
+  if (role !== 'DIRECTOR' && role !== 'ADMINISTRADOR') {
     const configTab = document.getElementById('tab_btn_2');
     if (configTab) configTab.style.display = 'none';
   }
 
   // Cargar datos iniciales
   loadPendingRegistrations();
-  if (role === 'DIRECTOR') {
+  if (role === 'DIRECTOR' || role === 'ADMINISTRADOR') {
     cargarVentanas();
   }
 

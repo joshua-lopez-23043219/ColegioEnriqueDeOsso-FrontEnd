@@ -107,8 +107,8 @@
         if (el) el.style.display = 'none';
       });
       
-      if (role === 'DIRECTOR') {
-        // Director ve todo
+      if (role === 'DIRECTOR' || role === 'ADMINISTRADOR') {
+        // Director y Administrador ven todo
         cards.forEach(id => {
           const el = document.getElementById(id);
           if (el) el.style.display = 'flex';

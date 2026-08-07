@@ -10,7 +10,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   // global.js ya redirige a quien no sea DIRECTOR (pageAccess), pero validamos
   // igual para no montar la interfaz en un rol no autorizado.
-  if (localStorage.getItem('user_role') !== 'DIRECTOR') return;
+  if (!['DIRECTOR', 'ADMINISTRADOR'].includes(localStorage.getItem('user_role'))) return;
 
   const messagesEl = document.getElementById('chat-messages');
   const inputEl = document.getElementById('chat-input');

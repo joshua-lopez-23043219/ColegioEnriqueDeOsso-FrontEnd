@@ -378,7 +378,7 @@
   };
 
   document.addEventListener('DOMContentLoaded', function () {
-    if (localStorage.getItem('user_role') !== 'DIRECTOR') return;
+    if (!['DIRECTOR', 'ADMINISTRADOR'].includes(localStorage.getItem('user_role'))) return;
     document.getElementById('btn-refresh').addEventListener('click', function () {
       cargar(true);
     });

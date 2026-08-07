@@ -81,27 +81,30 @@ document.addEventListener('DOMContentLoaded', function () {
   
   // 2. Control de acceso por roles
   const pageAccess = {
-    'registros.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'registroEstudiante.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'registroTutor.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'registroMaestro.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'registroGrupo.html': ['DIRECTOR'],
-    'registroAsignatura.html': ['DIRECTOR'],
-    'gAcademica.html': ['DIRECTOR', 'DOCENTE', 'ADMINISTRACION'],
-    'registroAsistencia.html': ['DIRECTOR', 'DOCENTE'],
-    'registroNotas.html': ['DIRECTOR', 'DOCENTE', 'TUTOR', 'ESTUDIANTE'],
-    'registroHorario.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'registroMatricula.html': ['DIRECTOR', 'ADMINISTRACION', 'TUTOR'],
-    'confirmarMatricula.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'dashboard.html': ['DIRECTOR'],
-    'analisisIA.html': ['DIRECTOR'],
-    'portalEstudiante.html': ['ESTUDIANTE'],
-    'actividades.html': ['DIRECTOR', 'DOCENTE'],
-    'listadoEstudiantes.html': ['DIRECTOR', 'ADMINISTRACION'],
-    'listadoDocentes.html': ['DIRECTOR', 'ADMINISTRACION'],
+    'registros.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registroEstudiante.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registroTutor.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registroMaestro.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registroGrupo.html': ['ADMINISTRADOR', 'DIRECTOR'],
+    'registroAsignatura.html': ['ADMINISTRADOR', 'DIRECTOR'],
+    'gAcademica.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'ADMINISTRACION'],
+    'registroAsistencia.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE'],
+    'registroNotas.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'TUTOR', 'ESTUDIANTE'],
+    'registroHorario.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registroMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'TUTOR'],
+    'confirmarMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'dashboard.html': ['ADMINISTRADOR', 'DIRECTOR'],
+    'analisisIA.html': ['ADMINISTRADOR', 'DIRECTOR'],
+    'portalEstudiante.html': ['ADMINISTRADOR', 'ESTUDIANTE'],
+    'actividades.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE'],
+    'listadoEstudiantes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'listadoDocentes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'gestionUsuarios.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
   };
   
-  if (role && pageAccess[currentPage] && !pageAccess[currentPage].includes(role)) {
+  if (role === 'ADMINISTRADOR') {
+    // El Administrador del Sistema tiene acceso total a todos los módulos y vistas
+  } else if (role && pageAccess[currentPage] && !pageAccess[currentPage].includes(role)) {
     localStorage.setItem('pending_toast', JSON.stringify({
       message: 'Acceso no autorizado a esta sección',
       type: 'error'

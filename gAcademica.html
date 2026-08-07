@@ -73,7 +73,7 @@
       document.getElementById('card-ga-matricula').style.display = 'none';
       document.getElementById('card-ga-confirmar-matricula').style.display = 'none';
       
-      if (role === 'DIRECTOR') {
+      if (role === 'DIRECTOR' || role === 'ADMINISTRADOR') {
         document.getElementById('card-ga-asistencia').style.display = 'flex';
         document.getElementById('card-ga-notas').style.display = 'flex';
         document.getElementById('card-ga-horario').style.display = 'flex';
