@@ -161,4 +161,23 @@ document.addEventListener('DOMContentLoaded', () => {
          showToast('Favor contactar con la secretaría o administración académica para el restablecimiento de su clave.', 'warning');
       });
    }
+
+   // Toggle Password Visibility
+   const togglePasswordBtn = document.getElementById('toggle-password');
+   if (togglePasswordBtn) {
+      togglePasswordBtn.addEventListener('click', () => {
+         const passwordInput = document.getElementById('password');
+         if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordBtn.classList.remove('ri-eye-off-line');
+            togglePasswordBtn.classList.add('ri-eye-line');
+            togglePasswordBtn.style.color = 'var(--primary)';
+         } else {
+            passwordInput.type = 'password';
+            togglePasswordBtn.classList.remove('ri-eye-line');
+            togglePasswordBtn.classList.add('ri-eye-off-line');
+            togglePasswordBtn.style.color = 'var(--slate-500)';
+         }
+      });
+   }
 });

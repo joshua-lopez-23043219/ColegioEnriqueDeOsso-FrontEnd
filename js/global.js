@@ -216,3 +216,10 @@ function _nombreDescarga(respuesta, porDefecto = 'reporte.xlsx') {
   const ascii = cd.match(/filename="?([^";]+)"?/i);
   return ascii ? ascii[1].trim() : porDefecto;
 }
+
+/* ========== Cierre automático de modales al hacer clic afuera (Backdrop) ========== */
+document.addEventListener('click', function(e) {
+  if (e.target && e.target.classList.contains('modal__container')) {
+    e.target.style.display = 'none';
+  }
+});

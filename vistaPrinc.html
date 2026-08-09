@@ -83,7 +83,10 @@
         </div>
         <div>
           <label for="password" class="login__label">Contraseña</label>
-          <input type="password" placeholder="Introduce tu Contraseña" id="password" class="login__input" required />
+          <div style="position: relative; display: flex; align-items: center;">
+            <input type="password" placeholder="Introduce tu Contraseña" id="password" class="login__input" required style="padding-right: 44px; width: 100%;" />
+            <i class="ri-eye-off-line" id="toggle-password" style="position: absolute; right: 14px; cursor: pointer; color: var(--slate-500); font-size: 1.25rem; z-index: 10;" title="Mostrar / Ocultar Contraseña"></i>
+          </div>
         </div>
       </div>
       <p class="login__signup">¿No tienes una cuenta? <a href="#" id="signup-info-btn">Obtén tus credenciales</a></p>
