@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro Estudiante — Colegio Enrique de Ossó</title>
-  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <title>Registro Completo de Estudiante — Colegio Enrique de Ossó</title>
+  <link rel="stylesheet" href="css/global.css?v=1.4.2">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css">
 </head>
 <body>
   <div class="background"></div>
@@ -14,87 +15,133 @@
     <div class="nav__container">
       <button class="nav__button" onclick="goBack()">
         <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd"
-            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-            clip-rule="evenodd" />
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
         </svg>
       </button>
     </div>
     <div class="nav__item">
-      <span class="nav__title">Estudiante</span>
+      <span class="nav__title">Registro de Estudiante</span>
     </div>
     <div class="nav__profile">
       <img src="./images/usuario.png" class="nav__profile-img">
       <ul class="nav__profile-link">
         <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
-        <li><a href="#"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
       </ul>
     </div>
   </nav>
   <div class="separador"></div>
 
-  <div class="layout__conteiner">
+  <div class="layout__conteiner" style="max-width: 1000px; margin: 0 auto; padding: 1.5rem;">
     <div class="layout">
       <div class="layout__image">
-        <img src="./images/Estudiante.png" alt="imagen">
+        <img src="./images/Estudiante.png" alt="Estudiante" style="position: sticky; top: 20px;">
       </div>
 
-      <section class="layout__section">
+      <section class="layout__section" style="flex:1;">
         <div class="section">
-          <div class="section__title">Registro de Estudiante</div>
+          <div class="section__title">Ficha Completa de Inscripción de Estudiante</div>
           <form class="form" id="form-validation" novalidate>
-            <div class="form__grid">
-              <div class="form__group">
-                <label class="form__label" for="code_student">Cód.Estudiante</label>
-                <input type="text" class="form__control" id="code_student" name="codestudiante"
-                  placeholder="Ingrese el Código" required>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="name_student">Nombre</label>
-                <input type="text" class="form__control" id="name_student" name="nombreestudiante"
-                  placeholder="Ingrese el nombre de Estudiante" required>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="surname_student">Apellidos</label>
-                <input type="text" class="form__control" id="surname_student" name="apellidoestudiante"
-                  placeholder="Ingrese los Apellidos" required>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="birthday_student">Fecha de Nacimiento</label>
-                <input type="date" class="form__control" id="birthday_student" name="fecha" required>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="phone_student">N.Teléfono</label>
-                <input type="tel" class="form__control" id="phone_student" name="phone_student"
-                  placeholder="Ingrese su Numero de Teléfono" required>
-              </div>
-              <div class="form__group">
-                <label class="form__label" for="email_student">Correo Electrónico</label>
-                <input type="email" class="form__control" id="email_student" name="email_student"
-                  placeholder="Ingrese su Email" required>
-              </div>
+            <input type="hidden" id="student_id">
+
+            <!-- DATOS PERSONALES -->
+            <div style="font-weight:700; color:var(--primary-dark); margin-bottom:10px; border-bottom:1px solid var(--slate-200); padding-bottom:4px;">
+              <i class="ri-user-smile-line"></i> Datos del Estudiante
             </div>
             
-            <!-- Apartado Administrativo (Cuenta) -->
-            <div class="section__title mt-2" style="border-bottom: 2px solid var(--accent); padding-bottom: 6px; margin-bottom: 12px; font-size: 1.1rem; color: var(--primary-dark);">
-              🔒 Cuenta de Acceso (Administración)
-            </div>
-            <div class="form__grid" style="margin-bottom: 15px;">
+            <div class="form__grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
               <div class="form__group">
-                <label class="form__label">Cuenta de Acceso (Tutor/Estudiante)</label>
-                <button type="button" id="btn-create-user" class="form__button--purple" style="height: 42px; width: 100%; border: none; font-weight: 600; border-radius: var(--radius-sm); cursor: pointer; padding: 10px 15px; color: var(--white); font-family: var(--font-heading); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                  🔑 Generar Cuenta de Usuario
-                </button>
-                <div id="user-status-text" style="display: none; font-weight: bold; color: var(--success); font-size: 0.85rem; margin-top: 6px; text-align: center;">
-                  ✓ Cuenta de usuario activa
-                </div>
+                <label class="form__label" for="code_student">Código de Estudiante</label>
+                <input type="text" class="form__control" id="code_student" placeholder="Ej: EST-7A-01" required style="text-transform: uppercase; font-weight:700;">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="first_name">Primer Nombre</label>
+                <input type="text" class="form__control" id="first_name" placeholder="Primer Nombre" required>
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="second_name">Segundo Nombre</label>
+                <input type="text" class="form__control" id="second_name" placeholder="Segundo Nombre">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="first_lastname">Primer Apellido</label>
+                <input type="text" class="form__control" id="first_lastname" placeholder="Primer Apellido" required>
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="second_lastname">Segundo Apellido</label>
+                <input type="text" class="form__control" id="second_lastname" placeholder="Segundo Apellido">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="birthday_student">Fecha de Nacimiento</label>
+                <input type="date" class="form__control" id="birthday_student">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="gender">Sexo</label>
+                <select class="form__control" id="gender">
+                  <option value="M">Masculino (M)</option>
+                  <option value="F">Femenino (F)</option>
+                </select>
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="nationality">Nacionalidad</label>
+                <input type="text" class="form__control" id="nationality" value="Nicaragüense">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="religion">Religión</label>
+                <input type="text" class="form__control" id="religion" placeholder="Ej: Católica, Cristiana">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="group_id">Grupo Académico Asignado</label>
+                <select class="form__control" id="group_id" style="font-weight:600;">
+                  <option value="">Seleccione el Grupo</option>
+                </select>
               </div>
             </div>
 
-            <div class="form__button">
-              <button id="register-btn" type="submit" class="form__button--green">Guardar</button>
-              <button id="edit-btn" type="submit" class="form__button--purple">Editar</button>
-              <button type="submit" class="form__button--red">Eliminar</button>
+            <!-- SALUD Y DOMICILIO -->
+            <div style="font-weight:700; color:var(--primary-dark); margin:15px 0 10px 0; border-bottom:1px solid var(--slate-200); padding-bottom:4px;">
+              <i class="ri-health-book-line"></i> Salud y Domicilio
+            </div>
+
+            <div class="form__grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+              <div class="form__group">
+                <label class="form__label" for="weight">Peso (lbs / kg)</label>
+                <input type="text" class="form__control" id="weight" placeholder="Ej: 60 lbs">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="height">Talla / Estatura (cm)</label>
+                <input type="text" class="form__control" id="height" placeholder="Ej: 156 cm">
+              </div>
+
+              <div class="form__group" style="grid-column: span 2;">
+                <label class="form__label" for="health_condition">Diagnóstico de Salud / Alergias</label>
+                <input type="text" class="form__control" id="health_condition" value="NINGUNO" placeholder="Ej: Asma, NINGUNO">
+              </div>
+
+              <div class="form__group" style="grid-column: span 2;">
+                <label class="form__label" for="address">Domicilio de Residencia</label>
+                <textarea class="form__control" id="address" rows="2" placeholder="Dirección exacta de residencia"></textarea>
+              </div>
+
+              <div class="form__group" style="grid-column: span 2;">
+                <label class="form__label" for="siblings_info">Hermanos en el Colegio</label>
+                <input type="text" class="form__control" id="siblings_info" placeholder="Ej. Nombre y Grado del hermano(a)">
+              </div>
+            </div>
+
+            <!-- BOTONES -->
+            <div class="form__button" style="margin-top: 1.5rem; display:flex; gap:12px;">
+              <button id="register-btn" type="submit" class="form__button--green"><i class="ri-save-line"></i> Guardar Estudiante</button>
+              <button type="button" class="form__button--purple" onclick="location.href='listadoEstudiantes.html'"><i class="ri-file-list-line"></i> Ver Listado General</button>
             </div>
           </form>
         </div>
@@ -102,18 +149,7 @@
     </div>
   </div>
 
-  <script src="js/global.js?v=1.1.0"></script>
-  <script src="./js/Creados/Catalagos/indexEstudiante.js"></script>
-  <script>
-    const addForm = document.getElementById("form-validation");
-    addForm.addEventListener("submit", (e) => {
-      if (addForm.checkValidity() === false) {
-        e.preventDefault();
-        e.stopPropagation();
-        addForm.classList.add('was-validated');
-        return false;
-      }
-    });
-  </script>
+  <script src="js/global.js?v=1.4.2"></script>
+  <script src="./js/Creados/Catalagos/indexEstudiante.js?v=1.4.2"></script>
 </body>
 </html>
