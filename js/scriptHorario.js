@@ -152,42 +152,56 @@ function cleanTextForDisplay(str) {
 }
 
 // Load catalog data from backend
-function cargarCatalogos(preserveGroupId = null) {
-  Promise.all([
-    apiFetch(TEACHER_API),
-    apiFetch(GROUP_API),
-    apiFetch(SUBJECT_API),
-    apiFetch(IMPARTE_API)
-  ])
-    .then(responses => {
-      responses.forEach((res, i) => {
-        if (!res.ok) {
-          throw new Error(`Error en petición ${i}: ${res.statusText}`);
+async function cargarCatalogos(preserveGroupId = null) {
+  try {
+    const fetchWithRetry = async (url, retries = 3, delay = 1000) => {
+      for (let i = 0; i < retries; i++) {
+        const res = await apiFetch(url);
+        if (res.status === 429) {
+          console.warn(`Rate limit 429 on ${url}. Retrying in ${delay}ms...`);
+          await new Promise(r => setTimeout(r, delay * (i + 1)));
+          continue;
         }
-      });
-      return Promise.all(responses.map(res => res.json()));
-    })
-    .then(([teachers, groups, subjects, schedules]) => {
-      allTeachers = teachers;
-      allGroups = groups.map(g => ({ ...g, level_group: cleanTextForDisplay(g.level_group) }));
-      allSubjects = subjects.map(s => ({ ...s, academic_subject: cleanTextForDisplay(s.academic_subject) }));
-      allSchedules = schedules;
+        if (!res.ok) throw new Error(`Error en petición a ${url}: ${res.status}`);
+        return await res.json();
+      }
+      throw new Error(`Se excedió el límite de reintentos para ${url}`);
+    };
 
-      populateGroupsSelect();
-      updateFormForSelectedShift();
-      
-      const select = document.getElementById("anio");
-      if (preserveGroupId && select) {
-        select.value = preserveGroupId;
-        handleGroupChange();
-      } else {
-        // Reset subject select
-        const subSelect = document.getElementById("asignatura");
-        if (subSelect) {
-          subSelect.innerHTML = '<option value="" disabled selected>Seleccione un grupo primero</option>';
-        }
-        // Reset table
-        const tbody = document.getElementById("cuerpo-tabla-horario");
+    const teachers = await fetchWithRetry(TEACHER_API);
+    const groups = await fetchWithRetry(GROUP_API);
+    const subjects = await fetchWithRetry(SUBJECT_API);
+    const schedulesRes = await fetchWithRetry(IMPARTE_API);
+    const schedules = Array.isArray(schedulesRes) ? schedulesRes : (schedulesRes.Record || []);
+
+    allTeachers = Array.isArray(teachers) ? teachers : (teachers.Record || []);
+    allGroups = (Array.isArray(groups) ? groups : (groups.Record || [])).map(g => ({ ...g, level_group: cleanTextForDisplay(g.level_group) }));
+    allSubjects = (Array.isArray(subjects) ? subjects : (subjects.Record || [])).map(s => ({ ...s, academic_subject: cleanTextForDisplay(s.academic_subject) }));
+    allSchedules = schedules;
+
+    populateGroupsSelect();
+    updateFormForSelectedShift();
+    
+    const select = document.getElementById("anio");
+    if (preserveGroupId && select) {
+      select.value = preserveGroupId;
+      handleGroupChange();
+    } else {
+      const subSelect = document.getElementById("asignatura");
+      if (subSelect) {
+        subSelect.innerHTML = '<option value="" disabled selected>Seleccione un grupo primero</option>';
+      }
+      const tbody = document.getElementById("cuerpo-tabla-horario");
+      if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="5" class="form__table-campo" style="color: var(--gray-600); font-style: italic; padding: 20px;">Seleccione un grupo para cargar el horario</td></tr>';
+      }
+    }
+    renderGeneralView();
+  } catch (err) {
+    console.error("Error al cargar catálogos:", err);
+    safeShowToast("Cargando información del servidor, por favor espere a que finalice el despliegue...", "info");
+  }
+}
         if (tbody) {
           tbody.innerHTML = `<tr><td colspan="5" class="form__table-campo" style="color: var(--gray-600); font-style: italic; padding: 20px;">Seleccione un grupo para cargar el horario</td></tr>`;
         }
