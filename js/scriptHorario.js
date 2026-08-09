@@ -202,20 +202,6 @@ async function cargarCatalogos(preserveGroupId = null) {
     safeShowToast("Cargando información del servidor, por favor espere a que finalice el despliegue...", "info");
   }
 }
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="5" class="form__table-campo" style="color: var(--gray-600); font-style: italic; padding: 20px;">Seleccione un grupo para cargar el horario</td></tr>`;
-        }
-      }
-      
-      renderGeneralView();
-      
-      safeShowToast("Catálogos y horarios actualizados", "success");
-    })
-    .catch(error => {
-      console.error("Error al cargar catálogos:", error);
-      safeShowToast("Error al conectar con el servidor de la base de datos", "error");
-    });
-}
 
 // Populate groups select
 function populateGroupsSelect() {
