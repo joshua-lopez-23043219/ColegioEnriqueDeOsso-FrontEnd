@@ -24,16 +24,18 @@ let currentEditingId = null;
 let activeGeneralShift = "Matutino";
 let isReadOnly = false;
 
-// Symmetrical shift periods (6 classes of 45 mins + 30-min recess = 5 hours total)
+// Symmetrical shift periods matching official Horarios.xlsx
 const shifts = {
   Matutino: [
-    { start: "07:00:00", end: "07:45:00", label: "07:00 - 07:45" },
-    { start: "07:45:00", end: "08:30:00", label: "07:45 - 08:30" },
-    { start: "08:30:00", end: "09:15:00", label: "08:30 - 09:15" },
-    { start: "09:15:00", end: "10:00:00", label: "09:15 - 10:00" },
-    { start: "10:00:00", end: "10:30:00", label: "10:00 - 10:30", isRecess: true },
-    { start: "10:30:00", end: "11:15:00", label: "10:30 - 11:15" },
-    { start: "11:15:00", end: "12:00:00", label: "11:15 - 12:00" }
+    { start: "07:00:00", end: "07:15:00", label: "07:00 - 07:15 (Oración)" },
+    { start: "07:15:00", end: "08:00:00", label: "07:15 - 08:00" },
+    { start: "08:00:00", end: "08:45:00", label: "08:00 - 08:45" },
+    { start: "08:45:00", end: "09:30:00", label: "08:45 - 09:30" },
+    { start: "09:30:00", end: "10:15:00", label: "09:30 - 10:15" },
+    { start: "10:15:00", end: "11:00:00", label: "10:15 - 11:00" },
+    { start: "11:00:00", end: "11:30:00", label: "11:00 - 11:30", isRecess: true },
+    { start: "11:30:00", end: "12:10:00", label: "11:30 - 12:10" },
+    { start: "12:10:00", end: "12:50:00", label: "12:10 - 12:50" }
   ],
   Vespertino: [
     { start: "12:30:00", end: "13:15:00", label: "12:30 - 01:15" },
