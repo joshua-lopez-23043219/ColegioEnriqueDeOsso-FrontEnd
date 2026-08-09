@@ -66,17 +66,21 @@ function renderGroupsTable() {
     return;
   }
 
+  // CN-010: g.classroom/guide_teacher_name/etc vienen de lo que otro
+  // usuario (registroGrupo.html / registroMaestro.html) escribio en el
+  // formulario -- sin escapeHtml(), un valor malicioso ahi ejecutaria en
+  // el navegador de cualquier admin que abra esta tabla (XSS almacenado).
   tbody.innerHTML = allGroups.map(g => {
-    const guideName = g.guide_teacher_name || 'Sin Maestro Guía';
+    const guideName = g.guide_teacher_name ? escapeHtml(g.guide_teacher_name) : 'Sin Maestro Guía';
     const guideBadge = g.guide_teacher_name ? `<span class="badge-guide"><i class="ri-user-star-fill"></i> ${guideName}</span>` : '<span style="color:var(--slate-400);">Sin Asignar</span>';
 
     return `
       <tr>
-        <td><strong>${g.code_group}</strong></td>
-        <td>${g.level_group} ${g.section_group}</td>
-        <td>${g.classroom || 'N/A'}</td>
+        <td><strong>${escapeHtml(g.code_group)}</strong></td>
+        <td>${escapeHtml(g.level_group)} ${escapeHtml(g.section_group)}</td>
+        <td>${escapeHtml(g.classroom) || 'N/A'}</td>
         <td>${guideBadge}</td>
-        <td>${g.amount_group} Alumnos</td>
+        <td>${escapeHtml(g.amount_group)} Alumnos</td>
         <td style="display:flex; gap:6px;">
           <button type="button" style="padding: 4px 8px; background: #FEF3C7; color: #92400E; border: none; border-radius: 6px; cursor: pointer; font-weight:600;" onclick="cargarFormularioEdicion(${g.id})">
             <i class="ri-edit-line"></i> Editar

@@ -15,27 +15,80 @@ function getApiUrl(endpoint) {
   return `${API_BASE_URL}${slash}${endpoint}`;
 }
 
-async function apiFetch(endpoint, options = {}) {
+/**
+ * Renueva el access_token usando el refresh_token guardado.
+ *
+ * Antes (CN-019), el access_token duraba 7 días y nunca se renovaba, así que
+ * un token robado (p.ej. vía el XSS ya corregido en scriptGrupo.js /
+ * gestionUsuarios.html) seguía siendo válido casi una semana. Ahora el
+ * access_token dura 1 hora; esta función lo renueva en silencio para que la
+ * sesión del usuario no se corte, y guarda el refresh_token nuevo que
+ * devuelve el backend (SIMPLE_JWT tiene ROTATE_REFRESH_TOKENS activado: cada
+ * refresh invalida el token anterior y emite uno nuevo).
+ *
+ * Devuelve el access_token nuevo, o null si no se pudo renovar (refresh
+ * vencido/revocado, o no hay sesión) -- en ese caso quien llama debe cerrar
+ * la sesión.
+ */
+let _refreshEnCurso = null;
+async function _renovarAccessToken() {
+  if (_refreshEnCurso) return _refreshEnCurso;
+
+  _refreshEnCurso = (async () => {
+    const refreshToken = localStorage.getItem('refresh_token');
+    if (!refreshToken) return null;
+    try {
+      const res = await fetch(getApiUrl('/api/token/refresh/'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh: refreshToken }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!data.access) return null;
+      localStorage.setItem('access_token', data.access);
+      if (data.refresh) {
+        localStorage.setItem('refresh_token', data.refresh);
+      }
+      return data.access;
+    } catch (e) {
+      return null;
+    }
+  })();
+
+  const resultado = await _refreshEnCurso;
+  _refreshEnCurso = null;
+  return resultado;
+}
+
+async function apiFetch(endpoint, options = {}, _retried = false) {
   const url = getApiUrl(endpoint);
   options.headers = options.headers || {};
-  
+
   if (options.body && !(options.body instanceof FormData) && !options.headers['Content-Type']) {
     options.headers['Content-Type'] = 'application/json';
   }
-  
+
   const token = localStorage.getItem('access_token');
   if (token) {
     options.headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   const response = await fetch(url, options);
-  
+
+  if (response.status === 401 && !_retried) {
+    const nuevoToken = await _renovarAccessToken();
+    if (nuevoToken) {
+      return apiFetch(endpoint, options, true);
+    }
+  }
+
   if (response.status === 401) {
     localStorage.clear();
     window.location.href = 'vistaPrinc.html';
     throw new Error('Sesión expirada. Por favor inicie sesión nuevamente.');
   }
-  
+
   return response;
 }
 
@@ -151,7 +204,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /* ========== Sistema de Alertas Premium (Toast) ========== */
-function showToast(message, type = 'info') {
+// duracionMs: gestionUsuarios.html llama showToast(msg, tipo, 8000) al
+// mostrar una contraseña temporal -- antes el tercer argumento se ignoraba
+// y el toast desaparecia a los 4s fijos, muy poco para copiar una clave.
+function showToast(message, type = 'info', duracionMs = 4000) {
   let container = document.querySelector('.toast-container');
   if (!container) {
     container = document.createElement('div');
@@ -184,13 +240,13 @@ function showToast(message, type = 'info') {
     toast.classList.add('show');
   }, 10);
 
-  // Remoción automática después de 4 segundos
+  // Remoción automática
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => {
       toast.remove();
     }, 400);
-  }, 4000);
+  }, duracionMs);
 }
 
 /**
