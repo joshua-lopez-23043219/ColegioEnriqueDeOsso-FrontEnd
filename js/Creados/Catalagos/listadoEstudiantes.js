@@ -1,6 +1,6 @@
 /**
  * listadoEstudiantes.js
- * Carga directa de estudiantes de la base de datos, filtrado por grupo y gestión de cuentas/solvencia.
+ * Carga directa de estudiantes de la base de datos, filtrado estricto por grupo ID y columnas alineadas.
  */
 
 let allStudentsList = [];
@@ -44,7 +44,7 @@ function loadGroups() {
     .then(groups => {
       allGroupsList = groups;
       const select = document.getElementById('group-filter');
-      select.innerHTML = '<option value="ALL">Mostrar Todos los Grupos (553+ Estudiantes)</option>';
+      select.innerHTML = '<option value="ALL">Mostrar Todos los Grupos (553 Estudiantes)</option>';
       
       groups.forEach(group => {
         const option = document.createElement('option');
@@ -68,7 +68,9 @@ function loadAllStudents() {
     .then(resData => {
       const records = resData.Record || resData || [];
       allStudentsList = records;
-      renderStudentsTable(allStudentsList);
+      
+      const currentGroupVal = document.getElementById('group-filter')?.value || 'ALL';
+      filterStudentsByGroup(currentGroupVal);
     })
     .catch(error => {
       console.error(error);
@@ -76,21 +78,22 @@ function loadAllStudents() {
     });
 }
 
-// Filtrar listado por el grupo seleccionado
-function filterStudentsByGroup(groupId) {
-  if (!groupId || groupId === 'ALL') {
+// Filtrar listado estricto por el id del grupo seleccionado
+function filterStudentsByGroup(selectedGroupId) {
+  if (!selectedGroupId || selectedGroupId === 'ALL') {
     renderStudentsTable(allStudentsList);
     return;
   }
 
+  const numericGroupId = parseInt(selectedGroupId);
   const filtered = allStudentsList.filter(s => {
-    return s.group === parseInt(groupId) || (s.group_code && s.group_code.includes(groupId));
+    return s.group === numericGroupId;
   });
 
   renderStudentsTable(filtered);
 }
 
-// Renderizar la tabla de estudiantes
+// Renderizar la tabla de estudiantes con 8 columnas perfectamente alineadas
 function renderStudentsTable(students) {
   const section = document.getElementById('students-section');
   const tbody = document.getElementById('students-tbody');
@@ -118,20 +121,21 @@ function renderStudentsTable(students) {
     const row = document.createElement('tr');
     row.className = 'form__table-fila';
 
-    // Celda Código Estudiante
+    // 1. Celda Código Estudiante
     const cellCode = document.createElement('td');
     cellCode.className = 'form__table-campo';
     cellCode.innerHTML = `<strong>${escapeHtml(student.code_student)}</strong>`;
     row.appendChild(cellCode);
 
-    // Celda Nombre Completo Estudiante
+    // 2. Celda Nombre Completo Estudiante
     const cellName = document.createElement('td');
     cellName.className = 'form__table-campo';
-    const fullName = `${student.name_student} ${student.surname_student}`.strip ? `${student.name_student} ${student.surname_student}`.trim() : (student.name_student || student.code_student);
+    const constructedName = `${student.first_name || ''} ${student.second_name || ''} ${student.first_lastname || ''} ${student.second_lastname || ''}`.replace(/\s+/g, ' ').trim();
+    const fullName = constructedName || `${student.name_student || ''} ${student.surname_student || ''}`.trim() || student.code_student;
     cellName.textContent = fullName;
     row.appendChild(cellName);
 
-    // Celda Sexo / Salud
+    // 3. Celda Sexo / Salud
     const cellHealth = document.createElement('td');
     cellHealth.className = 'form__table-campo';
     const genderBadge = student.gender === 'F' ? '<span style="color:#EC4899; font-weight:700;">(F)</span>' : '<span style="color:#3B82F6; font-weight:700;">(M)</span>';
@@ -139,10 +143,22 @@ function renderStudentsTable(students) {
     cellHealth.innerHTML = `${genderBadge} · ${healthText}`;
     row.appendChild(cellHealth);
 
-    // Celda Solvencia (Alternar con un Click)
+    // 4. Celda Tutor / Responsable
+    const cellTutor = document.createElement('td');
+    cellTutor.className = 'form__table-campo';
+    const tutorText = student.tutor_name ? `${student.tutor_name} ${student.tutor_phone ? '(' + student.tutor_phone + ')' : ''}` : 'Responsable Inscrito';
+    cellTutor.textContent = tutorText;
+    row.appendChild(cellTutor);
+
+    // 5. Celda Grupo
+    const cellGroup = document.createElement('td');
+    cellGroup.className = 'form__table-campo';
+    cellGroup.innerHTML = student.group_code ? `<span style="background:rgba(93,60,166,0.1); color:var(--primary); padding:3px 8px; border-radius:4px; font-weight:700; font-size:0.85rem;">${escapeHtml(student.group_code)}</span>` : '<span style="color:var(--gray-500);">Sin Grupo</span>';
+    row.appendChild(cellGroup);
+
+    // 6. Celda Solvencia (Alternar con un Click)
     const cellSolvency = document.createElement('td');
     cellSolvency.className = 'form__table-campo';
-    
     const solvencyBtn = document.createElement('button');
     solvencyBtn.type = 'button';
     solvencyBtn.className = student.is_solvent ? 'action-btn action-btn--solvent' : 'action-btn action-btn--insolvent';
@@ -166,7 +182,7 @@ function renderStudentsTable(students) {
     cellSolvency.appendChild(solvencyBtn);
     row.appendChild(cellSolvency);
 
-    // Celda Acceso de Usuario
+    // 7. Celda Acceso de Usuario
     const cellAccess = document.createElement('td');
     cellAccess.className = 'form__table-campo';
 
@@ -191,7 +207,7 @@ function renderStudentsTable(students) {
     }
     row.appendChild(cellAccess);
 
-    // Celda Acciones (Editar)
+    // 8. Celda Acciones (Editar)
     const cellActions = document.createElement('td');
     cellActions.className = 'form__table-campo';
 
@@ -304,8 +320,8 @@ function copyCredentials() {
 function openEditModal(student) {
   document.getElementById('modal_student_id').value = student.id;
   document.getElementById('modal_code_student').value = student.code_student;
-  document.getElementById('modal_name_student').value = student.name_student;
-  document.getElementById('modal_surname_student').value = student.surname_student;
+  document.getElementById('modal_name_student').value = student.name_student || student.first_name || '';
+  document.getElementById('modal_surname_student').value = student.surname_student || student.first_lastname || '';
   document.getElementById('modal_birthday_student').value = student.birthday_student || '';
   document.getElementById('modal_phone_student').value = student.phone_student || '';
   document.getElementById('modal_email_student').value = student.email_student || '';
