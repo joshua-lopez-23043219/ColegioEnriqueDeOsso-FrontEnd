@@ -21,12 +21,29 @@ let allGroups = [];
 let allSubjects = [];
 let allTeachers = [];
 
+// Asignaturas disponibles según el docente elegido (o todas). Se guarda
+// aparte del filtro por grupo para poder combinar ambos: docente ↓ grupo ↓.
+let subjectsDisponibles = { att: [], hist: [] };
+
+// Fecha de hoy según el reloj local. No se usa toISOString(): esa convierte
+// a UTC y en Nicaragua (UTC-6) devolvería el día siguiente a partir de las
+// 6 de la tarde, así que la asistencia se guardaría con fecha equivocada.
+function hoyLocalISO() {
+  const d = new Date();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mes}-${dia}`;
+}
+
+// Normaliza para comparar sin tildes ni mayúsculas ("9no" vs "9NO").
+function _limpiar(texto) {
+  return String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+}
+
 // ========== Initialize on DOM Load ==========
 document.addEventListener('DOMContentLoaded', function () {
-  // Set today's date
-  const today = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('att_date');
-  if (dateInput) dateInput.value = today;
+  if (dateInput) dateInput.value = hoyLocalISO();
 
   // Initialize data loading
   loadInitialData();
@@ -45,6 +62,19 @@ document.addEventListener('DOMContentLoaded', function () {
       handleTeacherFilterChange('hist', this.value);
     });
   }
+
+  // Al cambiar de grupo hay que reducir las asignaturas a las de ESE grado.
+  // Cada materia existe una vez por grado ("Creciendo en Valores" tiene una
+  // fila para 7mo, otra para 8vo, etc.), así que sin este filtro se podía
+  // pasar asistencia de 9no contra la asignatura de 8vo.
+  ['att', 'hist'].forEach(prefijo => {
+    const selectGrupo = document.getElementById(`${prefijo}_group`);
+    if (selectGrupo) {
+      selectGrupo.addEventListener('change', function () {
+        populateSubjects(`${prefijo}_subject`, subjectsDisponibles[prefijo], this.value);
+      });
+    }
+  });
 });
 
 // ========== Load Initial Data from API ==========
@@ -89,8 +119,9 @@ function loadInitialData() {
     })
     .then(response => {
       allSubjects = response.Record || response;
-      populateSubjects('att_subject', allSubjects);
-      populateSubjects('hist_subject', allSubjects);
+      subjectsDisponibles = { att: allSubjects, hist: allSubjects };
+      populateSubjects('att_subject', allSubjects, document.getElementById('att_group')?.value);
+      populateSubjects('hist_subject', allSubjects, document.getElementById('hist_group')?.value);
     })
     .catch(err => {
       console.error(err);
@@ -123,21 +154,43 @@ function populateGroups(selectId, groups) {
   });
 }
 
-function populateSubjects(selectId, subjects) {
+/**
+ * Llena el selector de asignaturas, limitado al grado del grupo elegido.
+ *
+ * Antes esta función quitaba duplicados POR NOMBRE y se quedaba con el
+ * primero. Como cada asignatura existe una vez por grado ("Creciendo en
+ * Valores desde el Diálogo" tiene una fila para 7mo, otra para 8vo, etc.),
+ * eso dejaba una sola de las cinco: al elegir un grupo de 9no se ofrecía
+ * "CVD-8vo", y la asistencia se guardaba contra la asignatura equivocada.
+ *
+ * Ahora se filtra por el grado real del grupo (`academic_subject` de la
+ * asignatura contra `level_group` del grupo, igual que en Registro de
+ * Horario). Si no calza ninguna, se muestran todas en vez de dejar el
+ * selector vacío, para no bloquear al usuario si los datos están
+ * incompletos.
+ */
+function populateSubjects(selectId, subjects, groupId) {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.innerHTML = '<option value="" disabled selected>Seleccione asignatura</option>';
 
-  const seen = new Set();
-  subjects.forEach(s => {
-    const label = s.name_subject;
-    if (!seen.has(label)) {
-      seen.add(label);
-      const opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = `${s.code_subject} - ${label}`;
-      select.appendChild(opt);
-    }
+  const lista = subjects || [];
+  const grupo = groupId
+    ? allGroups.find(g => String(g.id) === String(groupId))
+    : null;
+
+  let disponibles = lista;
+  if (grupo) {
+    const nivel = _limpiar(grupo.level_group);
+    const delGrado = lista.filter(s => _limpiar(s.academic_subject) === nivel);
+    if (delGrado.length) disponibles = delGrado;
+  }
+
+  disponibles.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.code_subject} - ${s.name_subject}`;
+    select.appendChild(opt);
   });
 }
 
@@ -148,8 +201,9 @@ function handleTeacherFilterChange(prefix, teacherId) {
 
   if (!teacherId) {
     // Restore all options
+    subjectsDisponibles[prefix] = allSubjects;
     populateGroups(groupSelectId, allGroups);
-    populateSubjects(subjectSelectId, allSubjects);
+    populateSubjects(subjectSelectId, allSubjects, document.getElementById(groupSelectId)?.value);
     return;
   }
 
@@ -164,8 +218,11 @@ function handleTeacherFilterChange(prefix, teacherId) {
       const groups = data.groups || [];
       const subjects = data.subjects || [];
 
+      subjectsDisponibles[prefix] = subjects;
       populateGroups(groupSelectId, groups);
-      populateSubjects(subjectSelectId, subjects);
+      // Sin grupo elegido todavía: se muestran todas las del docente, y al
+      // escoger grupo el listener las reduce al grado que corresponde.
+      populateSubjects(subjectSelectId, subjects, document.getElementById(groupSelectId)?.value);
 
       if (groups.length === 0 && subjects.length === 0) {
         showToast('El docente seleccionado no tiene clases asignadas en el horario.', 'warning');

@@ -107,7 +107,25 @@
                                             <option>Quinto Año</option>
                                         </select>
                                     </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="tipo_matricula">Tipo de Matrícula</label>
+                                        <select class="form__control" id="tipo_matricula" name="tipo_matricula">
+                                            <option value="" selected>Detectar automáticamente</option>
+                                            <option value="NUEVO_INGRESO">Nuevo Ingreso</option>
+                                            <option value="REINGRESO">Reingreso</option>
+                                        </select>
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="anio_lectivo">Ciclo Lectivo</label>
+                                        <input type="number" class="form__control" id="anio_lectivo" name="anio_lectivo"
+                                            min="2020" max="2100" step="1">
+                                    </div>
                                 </div>
+                                <small style="display:block; color: var(--gray-600); font-size: 0.82rem;">
+                                    Si deja el tipo en <strong>Detectar automáticamente</strong>, el sistema marca
+                                    Reingreso cuando el estudiante ya tuvo matrícula antes. El ciclo lectivo se usa
+                                    para capturar fichas en papel de un año distinto al actual.
+                                </small>
                                 <div class="step-navigation">
                                     <button type="button" class="form__button--purple" onclick="showStep(2)">Siguiente &rarr;</button>
                                 </div>
@@ -151,8 +169,42 @@
                                         <input type="email" class="form__control" id="email_student" name="email"
                                             required readonly style="background-color: var(--gray-100);">
                                     </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="gender_student">Sexo</label>
+                                        <input type="text" class="form__control" id="gender_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="nationality_student">Nacionalidad</label>
+                                        <input type="text" class="form__control" id="nationality_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="religion_student">Religión</label>
+                                        <input type="text" class="form__control" id="religion_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="health_student">Diagnóstico de Salud / Alergias</label>
+                                        <input type="text" class="form__control" id="health_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group" style="grid-column: span 2;">
+                                        <label class="form__label" for="address_student">Domicilio de Residencia</label>
+                                        <input type="text" class="form__control" id="address_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group" style="grid-column: span 2;">
+                                        <label class="form__label" for="siblings_student">Hermanos en el Colegio</label>
+                                        <input type="text" class="form__control" id="siblings_student"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
                                     <input type="hidden" id="id_student" name="id_student">
                                 </div>
+                                <small style="display:block; color: var(--gray-600); font-size: 0.82rem;">
+                                    Estos datos provienen de la ficha del estudiante. Para corregirlos, edítelos en
+                                    <a href="registroEstudiante.html" style="color: var(--primary); font-weight:600;">Registro de Estudiante</a>.
+                                </small>
                             </div>
                         </section>
 
@@ -221,6 +273,21 @@
                                         <input type="email" class="form__control" id="email_tutor"
                                             required readonly style="background-color: var(--gray-100);">
                                     </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="document_tutor">Documento de Identidad</label>
+                                        <input type="text" class="form__control" id="document_tutor"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="nationality_tutor">Nacionalidad</label>
+                                        <input type="text" class="form__control" id="nationality_tutor"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
+                                    <div class="form__group">
+                                        <label class="form__label" for="religion_tutor">Religión</label>
+                                        <input type="text" class="form__control" id="religion_tutor"
+                                            readonly style="background-color: var(--gray-100);">
+                                    </div>
                                     <input type="hidden" id="id_tutor" name="id_tutor">
                                 </div>
                                 <div class="step-navigation">
@@ -287,7 +354,7 @@
     </form>
 
     <script src="js/global.js?v=1.5.0"></script>
-    <script src="js/scriptMatricula.js?v=1.1.0"></script>
+    <script src="js/scriptMatricula.js?v=1.2.0"></script>
 </body>
 
 </html>

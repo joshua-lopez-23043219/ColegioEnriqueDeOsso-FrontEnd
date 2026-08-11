@@ -220,7 +220,7 @@ function renderStudentsTable(students) {
 
     // 6. Tutor / Responsable
     const cellTutor = document.createElement('td');
-    cellTutor.className = 'form__table-campo celda-larga';
+    cellTutor.className = 'form__table-campo';
     if (student.tutor_name) {
       const tel = student.tutor_phone
         ? `<br><span style="color:var(--gray-600); font-size:0.78rem;">📞 ${escapeHtml(student.tutor_phone)}</span>`
@@ -234,7 +234,7 @@ function renderStudentsTable(students) {
 
     // 7. Hermanos en el colegio
     const cellSiblings = document.createElement('td');
-    cellSiblings.className = 'form__table-campo celda-larga';
+    cellSiblings.className = 'form__table-campo';
     if (student.siblings_info && student.siblings_info.trim()) {
       cellSiblings.textContent = student.siblings_info;
       cellSiblings.title = student.siblings_info;
@@ -245,7 +245,7 @@ function renderStudentsTable(students) {
 
     // 8. Salud
     const cellHealth = document.createElement('td');
-    cellHealth.className = 'form__table-campo celda-larga';
+    cellHealth.className = 'form__table-campo';
     if (student.health_condition && student.health_condition !== 'NINGUNO') {
       cellHealth.innerHTML = `<span style="color:#D97706; font-weight:600;">⚠️ ${escapeHtml(student.health_condition)}</span>`;
       cellHealth.title = student.health_condition;

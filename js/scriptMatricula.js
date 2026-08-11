@@ -82,10 +82,26 @@ function loadNextRegistrationCode() {
     });
 }
 
-// Auto-completar fecha de matrícula al día actual
+// Auto-completar fecha de matrícula al día actual.
+// No se usa toISOString(): esa convierte a UTC y en Nicaragua (UTC-6) a
+// partir de las 6 de la tarde devolvía la fecha del día siguiente, así que
+// las matrículas de la tarde quedaban con la fecha equivocada.
 function setTodayDate() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("date_registration").value = today;
+  const d = new Date();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  document.getElementById("date_registration").value = `${d.getFullYear()}-${mes}-${dia}`;
+
+  // El ciclo lectivo arranca en el año en curso; el personal puede cambiarlo
+  // al capturar una ficha en papel de otro año.
+  const campoCiclo = document.getElementById("anio_lectivo");
+  if (campoCiclo && !campoCiclo.value) campoCiclo.value = d.getFullYear();
+}
+
+// Escribe un valor en un campo de solo lectura, tolerando que no exista.
+function _fijar(id, valor) {
+  const campo = document.getElementById(id);
+  if (campo) campo.value = valor || '';
 }
 
 // Buscar estudiante por código (Tecla Enter)
@@ -111,6 +127,13 @@ document.getElementById("code_student").addEventListener("keydown", function (ev
         document.getElementById('birthday_student').value = dataST.birthday_student;
         document.getElementById('phone_student').value = dataST.phone_student;
         document.getElementById('email_student').value = dataST.email_student;
+        // Datos de la ficha del estudiante que antes no se veian al matricular
+        _fijar('gender_student', dataST.gender === 'F' ? 'Femenino (F)' : 'Masculino (M)');
+        _fijar('nationality_student', dataST.nationality);
+        _fijar('religion_student', dataST.religion);
+        _fijar('health_student', dataST.health_condition);
+        _fijar('address_student', dataST.address);
+        _fijar('siblings_student', dataST.siblings_info);
         document.getElementById("id_student").value = dataST.id;
         
         showToast("Estudiante encontrado correctamente", "success");
@@ -122,6 +145,8 @@ document.getElementById("code_student").addEventListener("keydown", function (ev
         document.getElementById("birthday_student").value = '';
         document.getElementById("phone_student").value = '';
         document.getElementById("email_student").value = '';
+        ['gender_student', 'nationality_student', 'religion_student',
+         'health_student', 'address_student', 'siblings_student'].forEach(id => _fijar(id, ''));
         document.getElementById("id_student").value = '';
       });
   }
@@ -151,6 +176,9 @@ document.getElementById("code_tutor").addEventListener("keydown", function (even
         document.getElementById('phone_tutor').value = dataTR.phone_tutor;
         document.getElementById('email_tutor').value = dataTR.email_tutor;
         document.getElementById('address_tutor').value = dataTR.address_tutor;
+        _fijar('document_tutor', dataTR.id_document_number);
+        _fijar('nationality_tutor', dataTR.nationality);
+        _fijar('religion_tutor', dataTR.religion);
         document.getElementById("id_tutor").value = dataTR.id;
         
         showToast("Tutor encontrado correctamente", "success");
@@ -163,6 +191,7 @@ document.getElementById("code_tutor").addEventListener("keydown", function (even
         document.getElementById("phone_tutor").value = '';
         document.getElementById("email_tutor").value = '';
         document.getElementById("address_tutor").value = '';
+        ['document_tutor', 'nationality_tutor', 'religion_tutor'].forEach(id => _fijar(id, ''));
         document.getElementById("id_tutor").value = '';
       });
   }
@@ -385,6 +414,12 @@ function guardarMatricula() {
   formData.append('date_registration', document.getElementById('date_registration').value);
   formData.append('mode_registration', document.getElementById('mode_registration').value);
   formData.append('level_registration', document.getElementById('level_registration').value);
+  // Opcionales: si van vacios el servidor deduce el tipo del historial y usa
+  // el ciclo en curso.
+  const tipoMatricula = document.getElementById('tipo_matricula')?.value;
+  if (tipoMatricula) formData.append('tipo_matricula', tipoMatricula);
+  const anioLectivo = document.getElementById('anio_lectivo')?.value;
+  if (anioLectivo) formData.append('anio_lectivo', anioLectivo);
   formData.append('id_student', idStudent);
   formData.append('id_tutor', idTutor);
   formData.append('id_group', idGroup);

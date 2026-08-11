@@ -70,26 +70,44 @@
       top: 0;
       z-index: 2;
     }
+    /* `table-layout: fixed` + anchos por columna: sin esto el navegador
+       reparte el ancho segun el contenido y una dirección larga aplasta al
+       resto de columnas. */
     .students-scroll table {
-      min-width: 1450px;
+      min-width: 1500px;
+      table-layout: fixed;
     }
     .students-scroll .form__table-campo {
       text-align: left;
       font-size: 0.85rem;
       padding: 10px 12px;
-      vertical-align: middle;
+      vertical-align: top;
+      /* El texto se acomoda en varias líneas en vez de cortarse. Antes estas
+         celdas usaban nowrap + ellipsis y los nombres de tutores, hermanos y
+         condiciones de salud se veían a medias. */
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      line-height: 1.4;
     }
     .students-scroll .form__table-campo--header {
       text-align: left;
       padding: 12px;
       white-space: nowrap;
     }
-    .celda-larga {
-      max-width: 220px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+
+    /* Anchos fijos por columna, en el mismo orden del <thead>. */
+    .students-scroll col.c-codigo     { width: 110px; }
+    .students-scroll col.c-nombre     { width: 230px; }
+    .students-scroll col.c-sexo       { width: 62px; }
+    .students-scroll col.c-edad       { width: 110px; }
+    .students-scroll col.c-grupo      { width: 105px; }
+    .students-scroll col.c-tutor      { width: 200px; }
+    .students-scroll col.c-hermanos   { width: 210px; }
+    .students-scroll col.c-salud      { width: 180px; }
+    .students-scroll col.c-solvencia  { width: 92px; }
+    .students-scroll col.c-acceso     { width: 80px; }
+    .students-scroll col.c-acciones   { width: 96px; }
 
     /* Barra de resumen y buscador */
     .listado-toolbar {
@@ -223,6 +241,12 @@
 
               <div class="students-scroll" id="table-wrapper">
                 <table class="form__table" id="students-table">
+                  <colgroup>
+                    <col class="c-codigo"><col class="c-nombre"><col class="c-sexo">
+                    <col class="c-edad"><col class="c-grupo"><col class="c-tutor">
+                    <col class="c-hermanos"><col class="c-salud"><col class="c-solvencia">
+                    <col class="c-acceso"><col class="c-acciones">
+                  </colgroup>
                   <thead>
                     <tr>
                       <th class="form__table-campo--header">Código</th>
@@ -363,6 +387,6 @@
   </div>
 
   <script src="js/global.js?v=1.5.0"></script>
-  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.6.0"></script>
+  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.6.1"></script>
 </body>
 </html>

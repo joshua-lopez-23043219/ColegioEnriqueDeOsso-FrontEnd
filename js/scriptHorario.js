@@ -470,6 +470,27 @@ function programarSlot(timeStr) {
 }
 
 // Save or route to Update
+/**
+ * Traduce una respuesta de error del horario a un mensaje para el usuario.
+ *
+ * El backend responde 409 con {error, conflictos:[...]} cuando la clase
+ * choca con otra ya registrada (mismo docente en dos grupos a la vez, o un
+ * grupo con dos clases en el mismo bloque). Sin esto el usuario solo veía
+ * "No se pudo guardar el horario", sin saber contra qué chocó.
+ */
+async function _errorDeHorario(res, mensajePorDefecto) {
+  try {
+    const cuerpo = await res.json();
+    if (Array.isArray(cuerpo.conflictos) && cuerpo.conflictos.length) {
+      return cuerpo.conflictos.join(' ');
+    }
+    if (cuerpo.error) return cuerpo.error;
+  } catch (e) {
+    // Respuesta sin cuerpo JSON: se usa el mensaje genérico.
+  }
+  return mensajePorDefecto;
+}
+
 function guardarhorario(event) {
   if (event) event.preventDefault();
 
@@ -524,8 +545,8 @@ function guardarhorario(event) {
       Dia: dia
     })
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al guardar el horario");
+    .then(async res => {
+      if (!res.ok) throw new Error(await _errorDeHorario(res, "No se pudo guardar el horario"));
       return res.json();
     })
     .then(data => {
@@ -535,7 +556,7 @@ function guardarhorario(event) {
     })
     .catch(err => {
       console.error(err);
-      safeShowToast("❌ No se pudo guardar el horario", "error");
+      safeShowToast(`⚠️ ${err.message}`, "error");
     });
 }
 
@@ -595,8 +616,8 @@ function editarhorario(event) {
       Dia: dia
     })
   })
-    .then(res => {
-      if (!res.ok) throw new Error("Error al actualizar el horario");
+    .then(async res => {
+      if (!res.ok) throw new Error(await _errorDeHorario(res, "No se pudo actualizar el horario"));
       return res.json();
     })
     .then(data => {
@@ -606,7 +627,7 @@ function editarhorario(event) {
     })
     .catch(err => {
       console.error(err);
-      safeShowToast("❌ No se pudo actualizar el horario", "error");
+      safeShowToast(`⚠️ ${err.message}`, "error");
     });
 }
 

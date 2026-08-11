@@ -1,6 +1,128 @@
 /**
  * scriptMaestro.js — Teacher registration logic with API integration
+ *
+ * Áreas/asignaturas: un docente puede impartir más de una (Marta Herrera da
+ * Química y Biología; Fanni Casco, Matemática y Aprender-Emprender-Prosperar).
+ * El formulario permite agregar varias filas y se guardan en `area_teacher`
+ * separadas por coma. Se mantiene ese mismo campo —y no una tabla nueva—
+ * porque `area_teacher` es la ESPECIALIDAD del docente, texto libre que el
+ * colegio ya escribe así ("Química y Biología"); las asignaturas concretas
+ * que imparte a cada grupo viven en el horario (Imparte), que es donde
+ * realmente se asignan clase por clase.
  */
+
+const AREAS_DISPONIBLES = [
+  'Lengua y Literatura',
+  'Lengua Extranjera (Inglés)',
+  'Talleres de Arte y Cultura',
+  'Creciendo en Valores',
+  'Educación Física Y Práctica Deportiva',
+  'Educación para Aprender, Emprender, Prosperar',
+  'Ciencias Sociales (Geografía)',
+  'Ciencias Sociales (Geografía/Historia)',
+  'Ciencias Sociales (Geografía/Economía)',
+  'Ciencias Sociales (Geografía/Filosofía)',
+  'Ciencias Naturales',
+  'Química',
+  'Física',
+  'Biología',
+  'Matemática',
+  'TI',
+];
+
+// Crea una fila de área. La primera lleva el id "asignatura" para no romper
+// el `for` de la etiqueta ni la validación del formulario.
+function crearFilaArea(valor = '') {
+  const contenedor = document.getElementById('areas-container');
+  const fila = document.createElement('div');
+  fila.className = 'area-fila';
+
+  const select = document.createElement('select');
+  select.className = 'form__control area-select';
+  if (!contenedor.querySelector('.area-select')) {
+    select.id = 'asignatura';
+    select.required = true;
+  }
+
+  const vacia = document.createElement('option');
+  vacia.value = '';
+  vacia.textContent = 'Seleccione una opción';
+  vacia.disabled = true;
+  select.appendChild(vacia);
+
+  // Si el docente trae un área que no está en la lista (datos viejos o
+  // escritos a mano), se agrega como opción para no perderla al editar.
+  const opciones = AREAS_DISPONIBLES.includes(valor) || !valor
+    ? AREAS_DISPONIBLES
+    : [...AREAS_DISPONIBLES, valor];
+
+  opciones.forEach(area => {
+    const opt = document.createElement('option');
+    opt.value = area;
+    opt.textContent = area;
+    select.appendChild(opt);
+  });
+
+  select.value = valor || '';
+  if (!valor) vacia.selected = true;
+
+  const quitar = document.createElement('button');
+  quitar.type = 'button';
+  quitar.className = 'btn-quitar-area';
+  quitar.title = 'Quitar esta materia';
+  quitar.textContent = '×';
+  quitar.addEventListener('click', () => {
+    fila.remove();
+    if (!contenedor.querySelector('.area-fila')) crearFilaArea();
+    sincronizarBotonesQuitar();
+  });
+
+  fila.appendChild(select);
+  fila.appendChild(quitar);
+  contenedor.appendChild(fila);
+  sincronizarBotonesQuitar();
+  return select;
+}
+
+// Con una sola fila no tiene sentido poder quitarla.
+function sincronizarBotonesQuitar() {
+  const filas = document.querySelectorAll('#areas-container .area-fila');
+  filas.forEach(fila => {
+    const boton = fila.querySelector('.btn-quitar-area');
+    if (boton) boton.disabled = filas.length === 1;
+  });
+}
+
+// Áreas elegidas, sin vacíos ni repetidas, listas para enviar.
+function areasSeleccionadas() {
+  const valores = Array.from(document.querySelectorAll('#areas-container .area-select'))
+    .map(s => s.value.trim())
+    .filter(Boolean);
+  return Array.from(new Set(valores));
+}
+
+// Rellena las filas a partir de lo guardado ("Química, Biología").
+function cargarAreas(areaTexto) {
+  const contenedor = document.getElementById('areas-container');
+  contenedor.innerHTML = '';
+  const areas = String(areaTexto || '')
+    .split(',')
+    .map(a => a.trim())
+    .filter(Boolean);
+  if (areas.length === 0) {
+    crearFilaArea();
+    return;
+  }
+  areas.forEach(area => crearFilaArea(area));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  cargarAreas('');
+  const botonAgregar = document.getElementById('btn-add-area');
+  if (botonAgregar) {
+    botonAgregar.addEventListener('click', () => crearFilaArea());
+  }
+});
 
 // Buscar maestro por cédula (Enter key)
 document.getElementById("Nmaestro").addEventListener("keydown", function (event) {
@@ -39,14 +161,8 @@ document.getElementById("Nmaestro").addEventListener("keydown", function (event)
         document.getElementById('telefono').value = dataTR.phone_teacher;
         document.getElementById('email').value = dataTR.email_teacher;
         
-        // Seleccionar la asignatura en el select
-        const selectAsig = document.getElementById('asignatura');
-        for (let i = 0; i < selectAsig.options.length; i++) {
-          if (selectAsig.options[i].text.toLowerCase() === dataTR.area_teacher.toLowerCase()) {
-            selectAsig.selectedIndex = i;
-            break;
-          }
-        }
+        // Rellenar las filas de area/asignatura del docente
+        cargarAreas(dataTR.area_teacher);
 
         document.getElementById("id_teacher").value = dataTR.id;
         showToast("Maestro encontrado correctamente", "success");
@@ -58,7 +174,7 @@ document.getElementById("Nmaestro").addEventListener("keydown", function (event)
         document.getElementById("direccion").value = '';
         document.getElementById("telefono").value = '';
         document.getElementById("email").value = '';
-        document.getElementById("asignatura").selectedIndex = 0;
+        cargarAreas('');
         document.getElementById("id_teacher").value = '';
       });
   }
@@ -73,7 +189,8 @@ function guardarmaestro(event) {
   const direccion = document.getElementById("direccion").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
   const email = document.getElementById("email").value.trim();
-  const asignatura = document.getElementById("asignatura").value;
+  const areas = areasSeleccionadas();
+  const asignatura = areas.join(", ");
 
   if (!Nmaestro || !nombres || !apellidos || !direccion || !telefono || !email || !asignatura) {
     showToast("Completa todos los Campos", "warning");
@@ -103,6 +220,7 @@ function guardarmaestro(event) {
     .then(data => {
       showToast("Maestro guardado correctamente", "success");
       document.getElementById("form-validation").reset();
+      cargarAreas('');
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
@@ -120,7 +238,8 @@ function editarmaestro(event) {
   const direccion = document.getElementById("direccion").value.trim();
   const telefono = document.getElementById("telefono").value.trim();
   const email = document.getElementById("email").value.trim();
-  const asignatura = document.getElementById("asignatura").value;
+  const areas = areasSeleccionadas();
+  const asignatura = areas.join(", ");
 
   if (!idTeacher) {
     showToast("Por favor, busque un maestro primero para poder editarlo", "warning");
@@ -156,6 +275,7 @@ function editarmaestro(event) {
     .then(data => {
       showToast("Maestro actualizado correctamente", "success");
       document.getElementById("form-validation").reset();
+      cargarAreas('');
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
@@ -195,6 +315,7 @@ function eliminarmaestro(event) {
     .then(data => {
       showToast("Maestro eliminado correctamente", "success");
       document.getElementById("form-validation").reset();
+      cargarAreas('');
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
