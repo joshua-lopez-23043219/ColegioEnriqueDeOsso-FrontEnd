@@ -34,6 +34,15 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Al cambiar de grupo hay que reducir las asignaturas a las de ESE grado
+  // (cada materia existe una vez por grado).
+  const notesGroup = document.getElementById('notes_group');
+  if (notesGroup) {
+    notesGroup.addEventListener('change', function () {
+      populateSubjects('notes_subject', subjectsDisponibles, this.value);
+    });
+  }
+
   // Configure view based on role
   configureGradesView();
 });
@@ -70,6 +79,15 @@ function configureGradesView() {
       loadStudentBulletin();
     }, 500);
   }
+}
+
+// Asignaturas disponibles segun el docente elegido (o todas). Se guarda
+// aparte del filtro por grupo para poder combinar ambos.
+let subjectsDisponibles = [];
+
+// Normaliza para comparar sin tildes ni mayusculas ("9no" vs "9NO").
+function _limpiar(texto) {
+  return String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 }
 
 // ========== Load Initial Data from API ==========
@@ -112,7 +130,8 @@ function loadInitialData() {
     })
     .then(response => {
       allSubjects = response.Record || response;
-      populateSubjects('notes_subject', allSubjects);
+      subjectsDisponibles = allSubjects;
+      populateSubjects('notes_subject', allSubjects, document.getElementById('notes_group')?.value);
     })
     .catch(err => {
       console.error(err);
@@ -145,21 +164,38 @@ function populateGroups(selectId, groups) {
   });
 }
 
-function populateSubjects(selectId, subjects) {
+/**
+ * Llena el selector de asignaturas, limitado al grado del grupo elegido.
+ *
+ * Antes quitaba duplicados POR NOMBRE y se quedaba con el primero. Como cada
+ * asignatura existe una vez por grado ("Creciendo en Valores desde el
+ * Dialogo" tiene una fila para 7mo, otra para 8vo, etc.), eso dejaba una
+ * sola de las cinco: al elegir un grupo de 9no se ofrecia la de 8vo y las
+ * notas se habrian guardado contra la asignatura del grado equivocado.
+ * Mismo arreglo que ya se aplico en Toma de Asistencia.
+ */
+function populateSubjects(selectId, subjects, groupId) {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.innerHTML = '<option value="" disabled selected>Seleccione asignatura</option>';
 
-  const seen = new Set();
-  subjects.forEach(s => {
-    const label = s.name_subject;
-    if (!seen.has(label)) {
-      seen.add(label);
-      const opt = document.createElement('option');
-      opt.value = s.id;
-      opt.textContent = `${s.code_subject} - ${label}`;
-      select.appendChild(opt);
-    }
+  const lista = subjects || [];
+  const grupo = groupId
+    ? allGroups.find(g => String(g.id) === String(groupId))
+    : null;
+
+  let disponibles = lista;
+  if (grupo) {
+    const nivel = _limpiar(grupo.level_group);
+    const delGrado = lista.filter(s => _limpiar(s.academic_subject) === nivel);
+    if (delGrado.length) disponibles = delGrado;
+  }
+
+  disponibles.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id;
+    opt.textContent = `${s.code_subject} - ${s.name_subject}`;
+    select.appendChild(opt);
   });
 }
 
@@ -171,7 +207,8 @@ function handleTeacherFilterChange(teacherId) {
   if (!teacherId) {
     // Restore all options
     populateGroups(groupSelectId, allGroups);
-    populateSubjects(subjectSelectId, allSubjects);
+    subjectsDisponibles = allSubjects;
+    populateSubjects(subjectSelectId, allSubjects, document.getElementById(groupSelectId)?.value);
     return;
   }
 
@@ -187,7 +224,8 @@ function handleTeacherFilterChange(teacherId) {
       const subjects = data.subjects || [];
 
       populateGroups(groupSelectId, groups);
-      populateSubjects(subjectSelectId, subjects);
+      subjectsDisponibles = subjects;
+      populateSubjects(subjectSelectId, subjects, document.getElementById(groupSelectId)?.value);
 
       if (groups.length === 0 && subjects.length === 0) {
         showToast('El docente seleccionado no tiene clases asignadas en el horario.', 'warning');
@@ -256,10 +294,23 @@ function loadActivityGrades() {
 
       // Show activities section
       document.getElementById('activities-management-section').style.display = 'block';
-      
+
       // Render badges and table
       renderActivitiesList();
       renderGradesTable();
+
+      // Sin estudiantes no es un error de la pantalla: esta lista sale de las
+      // MATRICULAS del ciclo en curso, no de los estudiantes asignados al
+      // grupo. Un estudiante puede verse en "Listado de Estudiantes" y aun
+      // asi no salir aqui si no tiene matricula de este año. Se avisa con
+      // esas palabras para no dejar al usuario mirando una tabla vacia.
+      if (activeStudents.length === 0) {
+        showToast(
+          'Este grupo no tiene estudiantes matriculados en el ciclo actual. ' +
+          'Regístrelos en Matrícula para que aparezcan aquí.',
+          'warning', 8000
+        );
+      }
     })
     .catch(err => {
       console.error(err);
@@ -325,7 +376,13 @@ function renderGradesTable() {
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
         </svg>
-        <p>No hay estudiantes registrados en este grupo.</p>
+        <p><strong>Este grupo no tiene estudiantes matriculados en el ciclo actual.</strong></p>
+        <p style="font-size: 0.88rem; color: var(--gray-600); margin-top: 6px; max-width: 460px;">
+          Esta lista se arma con las <strong>matrículas del año en curso</strong>, no con los
+          estudiantes asignados al grupo. Si el estudiante aparece en “Listado de Estudiantes”
+          pero no aquí, es que le falta la matrícula de este ciclo: regístrela en
+          <a href="registroMatricula.html" style="color: var(--primary); font-weight: 600;">Matrícula</a>.
+        </p>
       </div>`;
     saveArea.style.display = 'none';
     return;
