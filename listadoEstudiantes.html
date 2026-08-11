@@ -35,10 +35,118 @@
       background: rgba(93, 60, 166, 0.1);
       border-color: rgba(93, 60, 166, 0.25);
     }
-    .table-container {
+
+    /* El listado necesita mucho más ancho que el resto de pantallas: son 11
+       columnas y más de 500 estudiantes. Se le quita la columna de imagen
+       lateral y el tope de 950px del layout estándar. */
+    .layout__conteiner {
+      max-width: 1700px;
+    }
+    .layout--full {
+      grid-template-columns: 1fr;
+    }
+    .layout__section--full {
       width: 100%;
-      overflow-x: auto;
-      margin-top: 15px;
+      max-width: 100%;
+      margin: 0;
+      padding: 24px;
+    }
+
+    /* Scroll interno: la tabla se desplaza dentro de su propia caja, con el
+       encabezado fijo. Antes había que bajar toda la página hasta el fondo
+       para ver el último registro, y al llegar ya no se veían los títulos de
+       las columnas. */
+    .students-scroll {
+      max-height: 68vh;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200);
+      box-shadow: var(--shadow-sm);
+      background: var(--white);
+    }
+    .students-scroll thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .students-scroll table {
+      min-width: 1450px;
+    }
+    .students-scroll .form__table-campo {
+      text-align: left;
+      font-size: 0.85rem;
+      padding: 10px 12px;
+      vertical-align: middle;
+    }
+    .students-scroll .form__table-campo--header {
+      text-align: left;
+      padding: 12px;
+      white-space: nowrap;
+    }
+    .celda-larga {
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Barra de resumen y buscador */
+    .listado-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+      margin-bottom: 18px;
+    }
+    .listado-toolbar .form__group {
+      margin: 0;
+      flex: 1 1 260px;
+    }
+    .listado-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .chip-dato {
+      background: rgba(93, 60, 166, 0.08);
+      color: var(--primary-dark);
+      border: 1px solid rgba(93, 60, 166, 0.18);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    /* Ficha completa del estudiante */
+    .ficha-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px 22px;
+    }
+    .ficha-bloque-titulo {
+      grid-column: 1 / -1;
+      font-weight: 700;
+      color: var(--primary-dark);
+      border-bottom: 1px solid var(--slate-200);
+      padding-bottom: 4px;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+    .ficha-dato-label {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--gray-600);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .ficha-dato-valor {
+      font-size: 0.92rem;
+      color: var(--gray-900);
+      word-break: break-word;
     }
   </style>
 </head>
@@ -70,12 +178,8 @@
   <div class="separador"></div>
 
   <div class="layout__conteiner">
-    <div class="layout">
-      <div class="layout__image">
-        <img src="./images/Estudiante.png" alt="Estudiantes" style="position: sticky; top: 20px;">
-      </div>
-
-      <div class="steps-wrapper" style="flex: 1; max-width: 950px; width: 100%;">
+    <div class="layout layout--full">
+      <div class="steps-wrapper" style="width: 100%;">
         <!-- Pestañas de Navegación -->
         <div class="tabs-header">
           <button type="button" class="tab-btn active" id="tab_btn_1" onclick="showTab(1)">
@@ -90,42 +194,47 @@
 
         <!-- TAB 1: Listado de Estudiantes -->
         <div id="step_1" class="step-content active">
-          <!-- SECCIÓN 1: Filtro de Grupo -->
-          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0 0 20px 0;">
+          <section class="layout__section layout__section--full">
             <div class="section">
-              <div class="section__title">🔍 Filtro de Estudiantes por Grupo</div>
-              <div class="form__grid" style="grid-template-columns: 1fr; padding-bottom: 0;">
+              <div class="section__title" id="students-title">📋 Listado de Estudiantes</div>
+
+              <!-- Filtros -->
+              <div class="listado-toolbar">
                 <div class="form__group">
                   <label class="form__label" for="group-filter">Grupo Académico</label>
                   <select class="form__control" id="group-filter">
-                    <option value="" disabled selected>Seleccione un grupo para visualizar los estudiantes</option>
+                    <option value="ALL" selected>Todos los grupos</option>
                   </select>
                 </div>
+                <div class="form__group">
+                  <label class="form__label" for="search-student">Buscar estudiante</label>
+                  <input type="text" class="form__control" id="search-student"
+                    placeholder="🔍 Nombre, código, tutor o hermano...">
+                </div>
               </div>
-            </div>
-          </section>
 
-          <!-- SECCIÓN 2: Tabla de Estudiantes -->
-          <section class="layout__section" style="width: 100%; max-width: 950px; display: none; margin: 0;" id="students-section">
-            <div class="section">
-              <div class="section__title" id="students-title">📋 Estudiantes del Grupo</div>
-              
+              <!-- Resumen rápido -->
+              <div class="listado-chips" id="listado-chips"></div>
+
               <!-- Mensaje de no estudiantes -->
               <div id="no-students-message" style="display: none; text-align: center; padding: 30px; color: var(--gray-600); font-weight: 500;">
-                No hay estudiantes matriculados en este grupo.
+                No hay estudiantes que coincidan con el filtro.
               </div>
 
-              <div class="table-responsive" id="table-wrapper">
+              <div class="students-scroll" id="table-wrapper">
                 <table class="form__table" id="students-table">
                   <thead>
                     <tr>
                       <th class="form__table-campo--header">Código</th>
                       <th class="form__table-campo--header">Estudiante</th>
-                      <th class="form__table-campo--header">Sexo / Salud</th>
-                      <th class="form__table-campo--header">Tutor / Responsable</th>
+                      <th class="form__table-campo--header">Sexo</th>
+                      <th class="form__table-campo--header">Edad / Nacimiento</th>
                       <th class="form__table-campo--header">Grupo</th>
-                      <th class="form__table-campo--header">Solvencia (Pago)</th>
-                      <th class="form__table-campo--header">Acceso (Cuenta)</th>
+                      <th class="form__table-campo--header">Tutor / Responsable</th>
+                      <th class="form__table-campo--header">Hermanos en el Colegio</th>
+                      <th class="form__table-campo--header">Salud</th>
+                      <th class="form__table-campo--header">Solvencia</th>
+                      <th class="form__table-campo--header">Acceso</th>
                       <th class="form__table-campo--header">Acciones</th>
                     </tr>
                   </thead>
@@ -140,7 +249,7 @@
 
         <!-- TAB 2: Ver / Restablecer Contraseña -->
         <div id="step_2" class="step-content">
-          <section class="layout__section" style="width: 100%; max-width: 950px; margin: 0;">
+          <section class="layout__section layout__section--full">
             <div class="section">
               <div class="section__title">🔑 Restablecer y Ver Contraseña</div>
               <p style="margin-bottom: 20px; font-size: 0.9rem; color: var(--gray-600);">
@@ -172,6 +281,19 @@
           </section>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Ficha completa del estudiante (todos los datos de matrícula) -->
+  <div class="modal__container" id="fichaModal">
+    <div class="modal" style="width: min(820px, 94vw); max-height: 88vh; overflow-y: auto;">
+      <span class="modal__close" onclick="closeFichaModal()">&times;</span>
+      <h2 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 4px;" id="ficha-nombre">Ficha del Estudiante</h2>
+      <p style="color: var(--gray-600); font-size: 0.88rem; margin-bottom: 18px;" id="ficha-subtitulo"></p>
+      <div class="ficha-grid" id="ficha-contenido"></div>
+      <div class="form__button mt-2" style="justify-content: flex-end;">
+        <button type="button" class="form__button--purple" onclick="closeFichaModal()">Cerrar</button>
       </div>
     </div>
   </div>
@@ -225,7 +347,7 @@
         <div style="background: var(--gray-100); padding: 16px; border-radius: var(--radius-md); margin: 16px 0; font-family: monospace; border: 1px solid var(--gray-300);">
           <p style="margin-bottom: 8px;"><strong>Usuario (Código):</strong> <span id="cred_username" style="font-weight: bold; color: var(--primary-dark);"></span></p>
           <p style="margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <strong>Contraseña Temporal:</strong> 
+            <strong>Contraseña Temporal:</strong>
             <span id="cred_password" style="font-weight: bold; color: var(--primary-dark); display: none;"></span>
             <span id="cred_password_masked" style="font-weight: bold; color: var(--primary-dark);">••••••••••••</span>
             <button type="button" id="btn_toggle_cred_password" onclick="toggleCredPasswordVisibility()" style="background: none; border: none; cursor: pointer; color: var(--primary); font-size: 0.85rem; padding: 0 4px; display: inline-flex; align-items: center; text-decoration: underline; font-family: var(--font-body);">Mostrar</button>
@@ -241,6 +363,6 @@
   </div>
 
   <script src="js/global.js?v=1.5.0"></script>
-  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.1.0"></script>
+  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.6.0"></script>
 </body>
 </html>

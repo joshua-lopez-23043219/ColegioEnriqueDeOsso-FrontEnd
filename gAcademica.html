@@ -42,6 +42,10 @@
           <img src="./images/Asistencia.png" class="section__item-icon" alt="Asistencia">
           Asistencia
         </a>
+        <a href="consolidadoAsistencia.html" class="section__item" id="card-ga-consolidado">
+          <img src="./images/Asistencia.png" class="section__item-icon" alt="Consolidado de Asistencia">
+          Consolidado Asistencia
+        </a>
         <a href="registroNotas.html" class="section__item" id="card-ga-notas">
           <img src="./images/Notas.png" class="section__item-icon" alt="Nota">
           Nota
@@ -67,25 +71,31 @@
     document.addEventListener('DOMContentLoaded', function () {
       const role = localStorage.getItem('user_role');
       
+      const mostrar = (ids) => ids.forEach(id => {
+        const card = document.getElementById(id);
+        if (card) card.style.display = 'flex';
+      });
+
       document.getElementById('card-ga-asistencia').style.display = 'none';
+      document.getElementById('card-ga-consolidado').style.display = 'none';
       document.getElementById('card-ga-notas').style.display = 'none';
       document.getElementById('card-ga-horario').style.display = 'none';
       document.getElementById('card-ga-matricula').style.display = 'none';
       document.getElementById('card-ga-confirmar-matricula').style.display = 'none';
-      
+
       if (role === 'DIRECTOR' || role === 'ADMINISTRADOR') {
-        document.getElementById('card-ga-asistencia').style.display = 'flex';
-        document.getElementById('card-ga-notas').style.display = 'flex';
-        document.getElementById('card-ga-horario').style.display = 'flex';
-        document.getElementById('card-ga-matricula').style.display = 'flex';
-        document.getElementById('card-ga-confirmar-matricula').style.display = 'flex';
+        mostrar(['card-ga-asistencia', 'card-ga-consolidado', 'card-ga-notas',
+                 'card-ga-horario', 'card-ga-matricula', 'card-ga-confirmar-matricula']);
       } else if (role === 'DOCENTE') {
-        document.getElementById('card-ga-asistencia').style.display = 'flex';
-        document.getElementById('card-ga-notas').style.display = 'flex';
+        // El consolidado es de toda la secundaria: un docente solo puede ver
+        // sus propios grupos, así que no se le muestra (el backend también
+        // se lo rechaza).
+        mostrar(['card-ga-asistencia', 'card-ga-notas']);
       } else if (role === 'ADMINISTRACION') {
-        document.getElementById('card-ga-horario').style.display = 'flex';
-        document.getElementById('card-ga-matricula').style.display = 'flex';
-        document.getElementById('card-ga-confirmar-matricula').style.display = 'flex';
+        mostrar(['card-ga-consolidado', 'card-ga-horario',
+                 'card-ga-matricula', 'card-ga-confirmar-matricula']);
+      } else if (role === 'COORDINADOR') {
+        mostrar(['card-ga-consolidado']);
       }
     });
   </script>

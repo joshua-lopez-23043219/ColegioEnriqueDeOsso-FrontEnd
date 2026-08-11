@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consolidado de Asistencia — Colegio Enrique de Ossó</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    .layout__conteiner {
+      max-width: 1400px;
+    }
+    .layout--full {
+      grid-template-columns: 1fr;
+    }
+    .layout__section--full {
+      width: 100%;
+      max-width: 100%;
+      margin: 0 0 22px 0;
+      padding: 26px;
+    }
+
+    .consolidado-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .consolidado-toolbar .form__group {
+      margin: 0;
+      flex: 0 1 220px;
+    }
+    .btn-accion {
+      padding: 10px 20px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+    }
+    .btn-accion--suave {
+      background: var(--slate-100);
+      color: var(--primary-dark);
+      border: 1px solid var(--slate-200);
+    }
+
+    /* Encabezado del reporte */
+    .reporte-cabecera {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+    }
+    .reporte-fecha {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 1.05rem;
+    }
+
+    /* Alerta de docentes que no han pasado asistencia */
+    .alerta {
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+    }
+    .alerta--pendiente {
+      background: #FEF3C7;
+      border-color: #FCD34D;
+      color: #78350F;
+    }
+    .alerta--ok {
+      background: #D1FAE5;
+      border-color: #6EE7B7;
+      color: #065F46;
+    }
+    .alerta--info {
+      background: var(--slate-100);
+      border-color: var(--slate-200);
+      color: var(--gray-700);
+    }
+    .alerta__titulo {
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .alerta__lista {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 6px 18px;
+    }
+    .alerta__lista li {
+      padding: 4px 0;
+      border-bottom: 1px dashed rgba(120, 53, 15, 0.2);
+    }
+    .badge-1ra {
+      background: #DC2626;
+      color: #fff;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+
+    /* Tabla del consolidado */
+    .tabla-consolidado {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .tabla-consolidado th,
+    .tabla-consolidado td {
+      padding: 10px 12px;
+      border: 1px solid var(--slate-200);
+      text-align: center;
+    }
+    .tabla-consolidado thead th {
+      background: var(--gradient-primary);
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .tabla-consolidado thead th.col-grupo {
+      text-align: left;
+    }
+    .tabla-consolidado td.col-grupo {
+      text-align: left;
+      font-weight: 600;
+    }
+    .fila-subtotal td {
+      background: rgba(93, 60, 166, 0.08);
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+    .fila-total td {
+      background: var(--primary);
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .fila-sin-registro td.col-grupo::after {
+      content: ' · sin asistencia registrada';
+      color: #B45309;
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+    .fila-sin-registro td {
+      background: #FFFBEB;
+    }
+    .dato-vacio {
+      color: var(--gray-400);
+    }
+    .leyenda {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      line-height: 1.6;
+    }
+
+    @media print {
+      .nav, .separador, .background, .consolidado-toolbar, .no-imprimir {
+        display: none !important;
+      }
+      .layout__section--full {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        background: #fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item">
+      <span class="nav__title">Consolidado de Asistencia</span>
+    </div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout layout--full">
+      <div style="width: 100%;">
+
+        <!-- Controles -->
+        <section class="layout__section layout__section--full no-imprimir">
+          <div class="section">
+            <div class="section__title">📊 Consolidado Diario de Asistencia</div>
+            <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 18px;">
+              Conteo de toda la secundaria a la primera hora de clase.
+              <strong>AS</strong> = Ambos Sexos (total) &nbsp;·&nbsp; <strong>M</strong> = Mujeres.
+            </p>
+            <div class="consolidado-toolbar">
+              <div class="form__group">
+                <label class="form__label" for="fecha-consolidado">Fecha del consolidado</label>
+                <input type="date" class="form__control" id="fecha-consolidado">
+              </div>
+              <button type="button" class="btn-accion" id="btn-cargar">🔄 Actualizar</button>
+              <button type="button" class="btn-accion btn-accion--suave" id="btn-imprimir">🖨️ Imprimir</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Alerta de docentes pendientes -->
+        <div id="alerta-pendientes"></div>
+
+        <!-- Reporte -->
+        <section class="layout__section layout__section--full">
+          <div class="section">
+            <div class="reporte-cabecera">
+              <div>
+                <div style="font-family: var(--font-heading); font-weight: 700; color: var(--primary-dark); font-size: 1.15rem;">
+                  Colegio Enrique de Ossó — Consolidado de Asistencia
+                </div>
+                <div style="color: var(--gray-600); font-size: 0.85rem;" id="reporte-subtitulo">Educación Secundaria</div>
+              </div>
+              <div class="reporte-fecha" id="reporte-fecha">—</div>
+            </div>
+
+            <div id="reporte-contenido">
+              <p style="text-align:center; padding: 30px; color: var(--gray-600);">Cargando consolidado...</p>
+            </div>
+
+            <div class="leyenda">
+              <strong>AS</strong> = Ambos Sexos (total de estudiantes) &nbsp;|&nbsp;
+              <strong>M</strong> = Mujeres &nbsp;|&nbsp;
+              La asistencia se toma de la <strong>primera hora de clase</strong> de cada sección, según el horario vigente ese día.
+              Las secciones marcadas en ámbar aún no tienen asistencia registrada por su docente, y por eso no suman al total.
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.5.0"></script>
+  <script src="js/scriptConsolidado.js?v=1.0.0"></script>
+</body>
+</html>
