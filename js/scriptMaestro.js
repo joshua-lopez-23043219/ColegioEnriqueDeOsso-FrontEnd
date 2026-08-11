@@ -1,34 +1,48 @@
 /**
  * scriptMaestro.js — Teacher registration logic with API integration
  *
- * Áreas/asignaturas: un docente puede impartir más de una (Marta Herrera da
- * Química y Biología; Fanni Casco, Matemática y Aprender-Emprender-Prosperar).
- * El formulario permite agregar varias filas y se guardan en `area_teacher`
- * separadas por coma. Se mantiene ese mismo campo —y no una tabla nueva—
- * porque `area_teacher` es la ESPECIALIDAD del docente, texto libre que el
- * colegio ya escribe así ("Química y Biología"); las asignaturas concretas
- * que imparte a cada grupo viven en el horario (Imparte), que es donde
- * realmente se asignan clase por clase.
+ * Asignaturas: un docente puede impartir más de una (Marta Herrera da Química
+ * y Biología; Fanni Casco, Matemática y Aprender-Emprender-Prosperar). El
+ * formulario permite agregar varias filas con "Agregar materia".
+ *
+ * Lo que se elige NO es una etiqueta de texto: se envía en `subject_names` y
+ * el backend enlaza al docente con las asignaturas reales del sistema
+ * (Teacher.subjects). Ese vínculo es el que usa Registro de Horario para
+ * rechazar que se le asigne una clase de una materia que no imparte.
+ *
+ * `area_teacher` se sigue enviando con lo mismo, separado por coma, porque
+ * varias pantallas lo muestran como especialidad legible y el generador
+ * automático de horarios lo usa para repartir docentes por área.
  */
 
-const AREAS_DISPONIBLES = [
-  'Lengua y Literatura',
-  'Lengua Extranjera (Inglés)',
-  'Talleres de Arte y Cultura',
-  'Creciendo en Valores',
-  'Educación Física Y Práctica Deportiva',
-  'Educación para Aprender, Emprender, Prosperar',
-  'Ciencias Sociales (Geografía)',
-  'Ciencias Sociales (Geografía/Historia)',
-  'Ciencias Sociales (Geografía/Economía)',
-  'Ciencias Sociales (Geografía/Filosofía)',
-  'Ciencias Naturales',
-  'Química',
-  'Física',
-  'Biología',
-  'Matemática',
-  'TI',
-];
+// Nombres de asignatura disponibles. Se cargan de la tabla real de materias
+// (/apiSubjects) en vez de una lista fija, porque ahora la seleccion NO es
+// una etiqueta de texto: enlaza al docente con las asignaturas del sistema y
+// el horario usa ese vinculo para no asignarle una clase que no imparte.
+//
+// Se muestran los nombres UNICOS: cada asignatura existe una vez por grado
+// ("Matematicas" tiene fila para 7mo, otra para 8vo...), y al colegio le
+// interesa decir "Marta Herrera da Quimica", no marcarla cinco veces. El
+// backend enlaza todas las filas con ese nombre.
+let AREAS_DISPONIBLES = [];
+
+function cargarCatalogoMaterias() {
+  return apiFetch('/apiSubjects/Subjects/')
+    .then(res => {
+      if (!res.ok) throw new Error('No se pudo cargar el catálogo de asignaturas');
+      return res.json();
+    })
+    .then(datos => {
+      const lista = Array.isArray(datos) ? datos : (datos.Record || []);
+      AREAS_DISPONIBLES = Array.from(
+        new Set(lista.map(s => (s.name_subject || '').trim()).filter(Boolean))
+      ).sort((a, b) => a.localeCompare(b, 'es'));
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('No se pudo cargar el catálogo de asignaturas', 'error');
+    });
+}
 
 // Crea una fila de área. La primera lleva el id "asignatura" para no romper
 // el `for` de la etiqueta ni la validación del formulario.
@@ -117,7 +131,7 @@ function cargarAreas(areaTexto) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  cargarAreas('');
+  cargarCatalogoMaterias().then(() => cargarAreas(''));
   const botonAgregar = document.getElementById('btn-add-area');
   if (botonAgregar) {
     botonAgregar.addEventListener('click', () => crearFilaArea());
@@ -162,7 +176,11 @@ document.getElementById("Nmaestro").addEventListener("keydown", function (event)
         document.getElementById('email').value = dataTR.email_teacher;
         
         // Rellenar las filas de area/asignatura del docente
-        cargarAreas(dataTR.area_teacher);
+        cargarAreas(
+          Array.isArray(dataTR.subjects_detail) && dataTR.subjects_detail.length
+            ? dataTR.subjects_detail.join(', ')
+            : dataTR.area_teacher
+        );
 
         document.getElementById("id_teacher").value = dataTR.id;
         showToast("Maestro encontrado correctamente", "success");
@@ -203,7 +221,10 @@ function guardarmaestro(event) {
     phone_teacher: telefono,
     email_teacher: email,
     address_teacher: direccion,
-    area_teacher: asignatura
+    // area_teacher se conserva como especialidad legible; subject_names es
+    // el vinculo real con las asignaturas del sistema.
+    area_teacher: asignatura,
+    subject_names: areas
   };
 
   apiFetch('/apiTeacher/Teacher/PostTeacher/', {
@@ -258,7 +279,10 @@ function editarmaestro(event) {
     phone_teacher: telefono,
     email_teacher: email,
     address_teacher: direccion,
-    area_teacher: asignatura
+    // area_teacher se conserva como especialidad legible; subject_names es
+    // el vinculo real con las asignaturas del sistema.
+    area_teacher: asignatura,
+    subject_names: areas
   };
 
   apiFetch('/apiTeacher/Teacher/UpdateTeacher/', {
