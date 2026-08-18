@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
   cargarGrupos();
   document.getElementById('btn-generar').addEventListener('click', generar);
   document.getElementById('btn-imprimir').addEventListener('click', () => window.print());
+  document.getElementById('btn-mined').addEventListener('click', descargarMined);
 
   const logout = document.getElementById('logout-link');
   if (logout) {
@@ -145,4 +146,47 @@ function pintarActa(datos) {
     'entre todas las materias marcadas como cuantitativas, y una de ellas (Tecnología) solo ' +
     'lleva letra: al no tener número cuenta como cero y baja el promedio de cada estudiante ' +
     'unos 14 puntos. Por eso este valor no coincide con el del libro — el del libro está mal.';
+}
+
+/**
+ * Descarga el formato de recoleccion del MINED.
+ *
+ * Se pide con apiFetch para que viaje el token, y el archivo se guarda desde
+ * el blob de la respuesta: un enlace directo no llevaria la autorizacion y el
+ * servidor devolveria 401.
+ */
+function descargarMined() {
+  const idGrupo = document.getElementById('sel-grupo').value;
+  const corte = document.getElementById('sel-corte').value;
+  if (!idGrupo) {
+    showToast('Seleccione un grupo', 'warning');
+    return;
+  }
+
+  showToast('Generando el archivo...', 'info');
+  apiFetch(`/apiNote/Note/ExportarICMINED/?id_group=${encodeURIComponent(idGrupo)}&corte=${encodeURIComponent(corte)}`)
+    .then(res => {
+      if (res.status === 403) {
+        throw new Error('Solo el maestro guía de este grupo o la dirección pueden exportar.');
+      }
+      if (!res.ok) throw new Error('No se pudo generar el archivo');
+      return res.blob();
+    })
+    .then(blob => {
+      const grupo = document.getElementById('sel-grupo');
+      const etiqueta = grupo.options[grupo.selectedIndex].textContent.split(' - ')[0];
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = `IC-MINED ${etiqueta} ${corte}.xlsx`;
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
+      URL.revokeObjectURL(url);
+      showToast('Archivo descargado', 'success');
+    })
+    .catch(err => {
+      console.error(err);
+      showToast(err.message, 'error', 7000);
+    });
 }
