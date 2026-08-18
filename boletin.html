@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boletín de Calificaciones — Colegio Enrique de Ossó</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    .layout__conteiner { max-width: 1200px; }
+    .layout--full { grid-template-columns: 1fr; }
+    .layout__section--full { width: 100%; max-width: 100%; margin: 0 0 20px 0; padding: 24px; }
+
+    .barra { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
+    .barra .form__group { margin: 0; flex: 0 1 230px; }
+    .btn-accion {
+      padding: 10px 20px; font-weight: 600; border-radius: var(--radius-sm);
+      border: none; cursor: pointer; background: var(--primary); color: var(--white);
+      font-family: var(--font-body); font-size: 0.9rem;
+    }
+    .btn-accion--suave {
+      background: var(--slate-100); color: var(--primary-dark);
+      border: 1px solid var(--slate-200);
+    }
+
+    /* ── Hoja del boletín ── */
+    .hoja {
+      background: var(--white); padding: 30px 34px;
+      border: 1px solid var(--slate-200); border-radius: var(--radius-md);
+    }
+    .hoja__encabezado {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 14px;
+      margin-bottom: 18px;
+    }
+    .hoja__titulo {
+      font-family: var(--font-heading); color: var(--primary-dark);
+      font-size: 1.25rem; font-weight: 700; line-height: 1.3;
+    }
+    .hoja__subtitulo { color: var(--gray-600); font-size: 0.86rem; margin-top: 2px; }
+    .ficha { font-size: 0.87rem; line-height: 1.7; text-align: right; }
+    .ficha strong { color: var(--primary-dark); }
+
+    .bloque-titulo {
+      font-family: var(--font-heading); font-weight: 700; color: var(--primary-dark);
+      font-size: 0.95rem; margin: 22px 0 8px 0;
+      border-bottom: 1px solid var(--slate-200); padding-bottom: 4px;
+    }
+
+    table.bol { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    table.bol th, table.bol td {
+      border: 1px solid var(--slate-300); padding: 6px 8px; text-align: center;
+    }
+    table.bol thead th {
+      background: var(--gradient-primary); color: var(--white);
+      font-family: var(--font-heading); font-size: 0.72rem;
+      text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    table.bol td.izq, table.bol th.izq { text-align: left; }
+    table.bol tbody tr:nth-child(even) { background: var(--slate-50); }
+    .cual { font-weight: 700; }
+    .cual-AA { color: #047857; }
+    .cual-AS { color: #1D4ED8; }
+    .cual-AF { color: #B45309; }
+    .cual-AI { color: #B91C1C; }
+    .vacio { color: var(--gray-400); }
+    .fila-final td { background: rgba(93,60,166,0.08); font-weight: 700; }
+
+    .criterio-texto { text-align: left; font-size: 0.8rem; }
+    .observaciones {
+      border: 1px solid var(--slate-300); border-radius: var(--radius-sm);
+      padding: 12px 14px; font-size: 0.84rem; line-height: 1.6;
+      background: var(--slate-50); min-height: 60px;
+    }
+    .observacion-corte { margin-bottom: 10px; }
+    .observacion-corte:last-child { margin-bottom: 0; }
+    .observacion-corte strong { color: var(--primary-dark); }
+
+    .firmas {
+      display: flex; justify-content: space-around; gap: 40px;
+      margin-top: 46px; font-size: 0.84rem; text-align: center;
+    }
+    .firmas div { flex: 1; border-top: 1px solid var(--gray-700); padding-top: 6px; }
+
+    .leyenda-escala {
+      margin-top: 14px; font-size: 0.78rem; color: var(--gray-600); line-height: 1.6;
+    }
+
+    @media print {
+      .nav, .separador, .background, .no-imprimir { display: none !important; }
+      .layout__conteiner { max-width: 100%; padding: 0; }
+      .layout__section--full { padding: 0; box-shadow: none; border: none; background: #fff; }
+      .hoja { border: none; padding: 0; }
+      table.bol thead th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .hoja { page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item"><span class="nav__title">Boletín de Calificaciones</span></div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout layout--full">
+      <div style="width:100%;">
+
+        <section class="layout__section layout__section--full no-imprimir" id="seccion-busqueda">
+          <div class="section">
+            <div class="section__title">🎓 Boletín de Calificaciones</div>
+            <div class="barra">
+              <div class="form__group">
+                <label class="form__label" for="sel-grupo">Grupo</label>
+                <select class="form__control" id="sel-grupo">
+                  <option value="">Cargando grupos...</option>
+                </select>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="sel-estudiante">Estudiante</label>
+                <select class="form__control" id="sel-estudiante">
+                  <option value="">Seleccione un grupo primero</option>
+                </select>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="txt-codigo">O por código</label>
+                <input type="text" class="form__control" id="txt-codigo"
+                  placeholder="EST-9noA-01" style="text-transform:uppercase;">
+              </div>
+              <button type="button" class="btn-accion" id="btn-generar">Generar</button>
+              <button type="button" class="btn-accion btn-accion--suave" id="btn-imprimir">Imprimir</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="layout__section layout__section--full" id="seccion-boletin" style="display:none;">
+          <div class="hoja" id="hoja-boletin"></div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.5.0"></script>
+  <script src="js/scriptBoletin.js?v=1.0.0"></script>
+</body>
+</html>
