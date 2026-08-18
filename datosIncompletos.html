@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fichas Incompletas — Colegio Enrique de Ossó</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    .layout__conteiner { max-width: 1500px; }
+    .layout--full { grid-template-columns: 1fr; }
+    .layout__section--full {
+      width: 100%; max-width: 100%; margin: 0 0 22px 0; padding: 26px;
+    }
+
+    .toolbar {
+      display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+      margin-bottom: 18px;
+    }
+    .toolbar .form__group { margin: 0; flex: 1 1 220px; }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+    .chip {
+      border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
+      border: 1px solid transparent;
+    }
+    .chip--total { background: rgba(93,60,166,0.08); color: var(--primary-dark);
+                   border-color: rgba(93,60,166,0.18); }
+    .chip--critico { background: #FEE2E2; color: #991B1B; border-color: #FCA5A5; }
+    .chip--ok { background: #D1FAE5; color: #065F46; border-color: #6EE7B7; }
+
+    /* Resumen por campo */
+    .resumen {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 10px; margin-bottom: 8px;
+    }
+    .resumen__item {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-md); padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .resumen__campo { font-size: 0.86rem; color: var(--gray-700); }
+    .resumen__cuenta { font-weight: 700; color: var(--primary-dark); font-size: 1.05rem; }
+
+    /* Tabla con scroll interno */
+    .tabla-scroll {
+      max-height: 62vh; overflow: auto; border-radius: var(--radius-md);
+      border: 1px solid var(--slate-200); background: var(--white);
+    }
+    .tabla-scroll table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+    .tabla-scroll thead th {
+      position: sticky; top: 0; z-index: 2;
+      background: var(--gradient-primary); color: var(--white);
+      font-family: var(--font-heading); font-size: 0.78rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 12px; text-align: left; white-space: nowrap;
+    }
+    .tabla-scroll td {
+      padding: 10px 12px; border-bottom: 1px solid var(--slate-100);
+      font-size: 0.86rem; vertical-align: top;
+    }
+    .tabla-scroll tr:hover td { background: var(--slate-50); }
+
+    .etiqueta {
+      display: inline-block; border-radius: 6px; padding: 2px 8px;
+      font-size: 0.75rem; font-weight: 600; margin: 2px 4px 2px 0;
+      white-space: nowrap;
+    }
+    .etiqueta--critico { background: #FEE2E2; color: #991B1B; }
+    .etiqueta--importante { background: #FEF3C7; color: #78350F; }
+    .etiqueta--opcional { background: var(--slate-100); color: var(--gray-600); }
+
+    .btn-completar {
+      background: var(--primary); color: var(--white); border: none;
+      border-radius: var(--radius-sm); padding: 7px 14px; cursor: pointer;
+      font-weight: 600; font-size: 0.82rem; font-family: var(--font-body);
+      white-space: nowrap;
+    }
+    .btn-completar:hover { filter: brightness(1.1); }
+
+    .leyenda { margin-top: 14px; font-size: 0.82rem; color: var(--gray-600); line-height: 1.7; }
+    .punto { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:5px; }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item">
+      <span class="nav__title">Fichas Incompletas</span>
+    </div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout layout--full">
+      <div style="width: 100%;">
+
+        <section class="layout__section layout__section--full">
+          <div class="section">
+            <div class="section__title">📋 Estudiantes con Datos Pendientes</div>
+            <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 18px;">
+              Estudiantes cargados sin la ficha completa. Aquí se ve qué le falta a cada uno
+              y se puede completar sin salir de esta pantalla.
+            </p>
+
+            <div class="toolbar">
+              <div class="form__group">
+                <label class="form__label" for="filtro-grupo">Grupo</label>
+                <select class="form__control" id="filtro-grupo">
+                  <option value="">Todos los grupos</option>
+                </select>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="filtro-criticidad">Qué mostrar</label>
+                <select class="form__control" id="filtro-criticidad">
+                  <option value="">Todos los pendientes</option>
+                  <option value="critico">Solo los críticos</option>
+                  <option value="importante">Con algo importante</option>
+                </select>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="filtro-texto">Buscar</label>
+                <input type="text" class="form__control" id="filtro-texto" placeholder="🔍 Nombre o código...">
+              </div>
+            </div>
+
+            <div class="chips" id="chips"></div>
+          </div>
+        </section>
+
+        <section class="layout__section layout__section--full">
+          <div class="section">
+            <div class="section__title">Resumen: cuántos estudiantes tienen cada campo vacío</div>
+            <div class="resumen" id="resumen"></div>
+          </div>
+        </section>
+
+        <section class="layout__section layout__section--full">
+          <div class="section">
+            <div class="section__title" id="titulo-tabla">Detalle por estudiante</div>
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th style="width:120px;">Código</th>
+                    <th style="width:230px;">Estudiante</th>
+                    <th style="width:110px;">Grupo</th>
+                    <th>Le falta</th>
+                    <th style="width:120px;">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo"></tbody>
+              </table>
+            </div>
+
+            <div class="leyenda">
+              <span class="punto" style="background:#FCA5A5;"></span><strong>Crítico</strong>:
+              algo del sistema da un resultado incorrecto mientras falte. Sin <em>sexo</em>, el
+              consolidado de asistencia no puede contar mujeres; sin <em>matrícula del ciclo</em>,
+              el estudiante no aparece en Notas, Asistencia ni Boletín.<br>
+              <span class="punto" style="background:#FCD34D;"></span><strong>Importante</strong>:
+              hace falta para la ficha de matrícula y el contacto con la familia.<br>
+              <span class="punto" style="background:#CBD5E1;"></span><strong>Opcional</strong>:
+              completa la ficha, pero nada depende de él.
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: completar la ficha -->
+  <div class="modal__container" id="modalFicha">
+    <div class="modal" style="width: min(760px, 94vw); max-height: 88vh; overflow-y: auto;">
+      <span class="modal__close" onclick="cerrarModal()">&times;</span>
+      <h2 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 4px;"
+          id="modal-nombre">Completar ficha</h2>
+      <p style="color: var(--gray-600); font-size: 0.88rem; margin-bottom: 18px;" id="modal-sub"></p>
+
+      <form id="form-ficha" novalidate>
+        <input type="hidden" id="f_id">
+        <div class="form__grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));">
+          <div class="form__group">
+            <label class="form__label" for="f_gender">Sexo</label>
+            <select class="form__control" id="f_gender">
+              <option value="">Sin definir</option>
+              <option value="M">Masculino (M)</option>
+              <option value="F">Femenino (F)</option>
+            </select>
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_birthday">Fecha de Nacimiento</label>
+            <input type="date" class="form__control" id="f_birthday">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_nationality">Nacionalidad</label>
+            <input type="text" class="form__control" id="f_nationality">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_religion">Religión</label>
+            <input type="text" class="form__control" id="f_religion">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_phone">Teléfono</label>
+            <input type="tel" class="form__control" id="f_phone">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_email">Correo Electrónico</label>
+            <input type="email" class="form__control" id="f_email">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_weight">Peso</label>
+            <input type="text" class="form__control" id="f_weight">
+          </div>
+          <div class="form__group">
+            <label class="form__label" for="f_height">Talla</label>
+            <input type="text" class="form__control" id="f_height">
+          </div>
+          <div class="form__group" style="grid-column: span 2;">
+            <label class="form__label" for="f_health">Diagnóstico de Salud / Alergias</label>
+            <input type="text" class="form__control" id="f_health" placeholder="Ej: Asma, NINGUNO">
+          </div>
+          <div class="form__group" style="grid-column: span 2;">
+            <label class="form__label" for="f_address">Domicilio</label>
+            <input type="text" class="form__control" id="f_address">
+          </div>
+          <div class="form__group" style="grid-column: span 2;">
+            <label class="form__label" for="f_siblings">Hermanos en el Colegio</label>
+            <input type="text" class="form__control" id="f_siblings">
+          </div>
+        </div>
+
+        <p style="font-size:0.82rem; color:var(--gray-600); margin-top:12px;" id="nota-matricula"></p>
+
+        <div class="form__button mt-2" style="justify-content: flex-end; gap: 12px;">
+          <button type="button" class="form__button--red" onclick="cerrarModal()">Cancelar</button>
+          <button type="submit" class="form__button--green">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.5.0"></script>
+  <script src="js/scriptDatosIncompletos.js?v=1.0.0"></script>
+</body>
+</html>
