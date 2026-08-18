@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valores y Actitudes — Colegio Enrique de Ossó</title>
+  <link rel="stylesheet" href="css/global.css?v=1.0.8">
+  <style>
+    .layout__conteiner { max-width: 1600px; }
+    .layout--full { grid-template-columns: 1fr; }
+    .layout__section--full { width: 100%; max-width: 100%; margin: 0 0 20px 0; padding: 24px; }
+
+    .barra { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .barra .form__group { margin: 0; flex: 0 1 240px; }
+    .btn-accion {
+      padding: 10px 20px; font-weight: 600; border-radius: var(--radius-sm);
+      border: none; cursor: pointer; background: var(--primary); color: var(--white);
+      font-family: var(--font-body); font-size: 0.9rem;
+    }
+    .btn-accion--verde { background: var(--success); }
+    .btn-accion:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Leyenda de los 7 criterios */
+    .leyenda-criterios {
+      background: rgba(93,60,166,0.05);
+      border: 1px solid rgba(93,60,166,0.15);
+      border-radius: var(--radius-md);
+      padding: 14px 18px; margin-bottom: 18px; font-size: 0.85rem;
+    }
+    .leyenda-criterios ol { margin: 8px 0 0 0; padding-left: 22px; line-height: 1.6; }
+    .leyenda-criterios li { margin-bottom: 3px; color: var(--gray-700); }
+
+    /* Tabla de captura */
+    .tabla-scroll {
+      max-height: 62vh; overflow: auto;
+      border: 1px solid var(--slate-200); border-radius: var(--radius-md);
+      background: var(--white);
+    }
+    .tabla-valores { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .tabla-valores th, .tabla-valores td {
+      padding: 8px 10px; border: 1px solid var(--slate-200); text-align: center;
+    }
+    .tabla-valores thead th {
+      position: sticky; top: 0; z-index: 3;
+      background: var(--gradient-primary); color: var(--white);
+      font-family: var(--font-heading); font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .tabla-valores td.col-alumno, .tabla-valores th.col-alumno {
+      text-align: left; min-width: 230px;
+      position: sticky; left: 0; background: var(--white); z-index: 2;
+    }
+    .tabla-valores thead th.col-alumno { z-index: 4; background: var(--primary-dark); }
+    .tabla-valores tbody tr:nth-child(even) td.col-alumno { background: var(--slate-50); }
+    .tabla-valores tbody tr:nth-child(even) { background: var(--slate-50); }
+    .sel-escala {
+      border: 1px solid var(--slate-300); border-radius: 4px;
+      padding: 4px 2px; font-size: 0.82rem; width: 58px;
+      font-family: var(--font-body); background: var(--white);
+    }
+    .sel-escala[data-valor="AA"] { background: #D1FAE5; border-color: #6EE7B7; }
+    .sel-escala[data-valor="AS"] { background: #DBEAFE; border-color: #93C5FD; }
+    .sel-escala[data-valor="AF"] { background: #FEF3C7; border-color: #FCD34D; }
+    .sel-escala[data-valor="AI"] { background: #FEE2E2; border-color: #FCA5A5; }
+    .input-horas {
+      width: 62px; padding: 4px; text-align: center;
+      border: 1px solid var(--slate-300); border-radius: 4px;
+      font-family: var(--font-body);
+    }
+    .btn-observacion {
+      background: transparent; border: 1px solid var(--slate-300);
+      border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 0.8rem;
+      color: var(--primary-dark); white-space: nowrap;
+    }
+    .btn-observacion.tiene {
+      background: rgba(93,60,166,0.1); border-color: var(--primary); font-weight: 600;
+    }
+    .aviso-cambios {
+      display: none; background: #FEF3C7; border: 1px solid #FCD34D;
+      color: #78350F; padding: 10px 14px; border-radius: var(--radius-sm);
+      margin-bottom: 14px; font-size: 0.88rem; font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item"><span class="nav__title">Valores y Actitudes</span></div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <div class="layout__conteiner">
+    <div class="layout layout--full">
+      <div style="width:100%;">
+
+        <section class="layout__section layout__section--full">
+          <div class="section">
+            <div class="section__title">📝 Valores y Actitudes del Corte</div>
+            <p style="color:var(--gray-600); font-size:0.9rem; margin-bottom:16px;">
+              Lo llena el <strong>maestro guía</strong> de cada grupo. No se calcula de las
+              notas: es una valoración del acompañamiento, y se decide a mano.
+            </p>
+            <div class="barra">
+              <div class="form__group">
+                <label class="form__label" for="sel-grupo">Grupo</label>
+                <select class="form__control" id="sel-grupo">
+                  <option value="">Cargando grupos...</option>
+                </select>
+              </div>
+              <div class="form__group">
+                <label class="form__label" for="sel-corte">Corte</label>
+                <select class="form__control" id="sel-corte">
+                  <option value="I">I Corte</option>
+                  <option value="II">II Corte</option>
+                  <option value="III">III Corte</option>
+                  <option value="IV">IV Corte</option>
+                </select>
+              </div>
+              <button type="button" class="btn-accion" id="btn-cargar">🔄 Cargar</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="layout__section layout__section--full" id="seccion-tabla" style="display:none;">
+          <div class="section">
+            <div class="section__title" id="titulo-tabla">Estudiantes</div>
+
+            <div class="aviso-cambios" id="aviso-cambios">
+              Hay cambios sin guardar.
+            </div>
+
+            <div class="leyenda-criterios">
+              <strong>Criterios de valoración</strong> — escala: AA (Avanzado) · AS (Satisfactorio) · AF (Fundamental) · AI (Inicial)
+              <ol id="lista-criterios"></ol>
+            </div>
+
+            <div class="tabla-scroll">
+              <table class="tabla-valores" id="tabla-valores">
+                <thead>
+                  <tr>
+                    <th class="col-alumno">Estudiante</th>
+                    <th title="Criterio 1">C1</th><th title="Criterio 2">C2</th>
+                    <th title="Criterio 3">C3</th><th title="Criterio 4">C4</th>
+                    <th title="Criterio 5">C5</th><th title="Criterio 6">C6</th>
+                    <th title="Criterio 7">C7</th>
+                    <th>Desempeño</th>
+                    <th>Reunión PPMM</th>
+                    <th>Horas Ecol.</th>
+                    <th>Observación</th>
+                  </tr>
+                </thead>
+                <tbody id="cuerpo-tabla"></tbody>
+              </table>
+            </div>
+
+            <div style="margin-top:16px; display:flex; gap:12px; align-items:center;">
+              <button type="button" class="btn-accion btn-accion--verde" id="btn-guardar">
+                Guardar Corte
+              </button>
+              <span style="color:var(--gray-600); font-size:0.85rem;" id="estado-guardado"></span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de observación -->
+  <div class="modal__container" id="modal-observacion">
+    <div class="modal" style="width:min(680px,94vw);">
+      <span class="modal__close" onclick="cerrarObservacion()">&times;</span>
+      <h2 style="font-family:var(--font-heading); color:var(--primary-dark); margin-bottom:4px;">
+        Observación del docente
+      </h2>
+      <p style="color:var(--gray-600); font-size:0.88rem; margin-bottom:14px;" id="obs-alumno"></p>
+      <textarea class="form__control" id="obs-texto" rows="7"
+        placeholder="Comentario que saldrá impreso en el boletín del estudiante..."></textarea>
+      <div class="form__button mt-2" style="justify-content:flex-end; gap:10px;">
+        <button type="button" class="form__button--red" onclick="cerrarObservacion()">Cancelar</button>
+        <button type="button" class="form__button--green" id="btn-aplicar-obs">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/global.js?v=1.5.0"></script>
+  <script src="js/scriptValores.js?v=1.0.0"></script>
+</body>
+</html>
