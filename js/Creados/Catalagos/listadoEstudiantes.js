@@ -12,6 +12,9 @@ let allStudentsList = [];
 let allGroupsList = [];
 let filtroGrupo = 'ALL';
 let filtroTexto = '';
+// Cursando por defecto: los retirados conservan su ficha y su historial, pero
+// mostrarlos junto a los demas volveria a inflar el conteo que se lee arriba.
+let filtroEstado = 'ACTIVOS';
 
 document.addEventListener('DOMContentLoaded', function () {
   loadGroups();
@@ -22,6 +25,14 @@ document.addEventListener('DOMContentLoaded', function () {
   if (groupFilter) {
     groupFilter.addEventListener('change', function () {
       filtroGrupo = this.value;
+      aplicarFiltros();
+    });
+  }
+
+  const estadoFilter = document.getElementById('estado-filter');
+  if (estadoFilter) {
+    estadoFilter.addEventListener('change', function () {
+      filtroEstado = this.value;
       aplicarFiltros();
     });
   }
@@ -104,8 +115,18 @@ function loadAllStudents() {
 }
 
 // Filtro combinado: grupo + búsqueda libre
+function estaRetirado(student) {
+  return student.estado_matricula === 'RETIRADA';
+}
+
 function aplicarFiltros() {
   let lista = allStudentsList;
+
+  if (filtroEstado === 'ACTIVOS') {
+    lista = lista.filter(s => !estaRetirado(s));
+  } else if (filtroEstado === 'RETIRADOS') {
+    lista = lista.filter(estaRetirado);
+  }
 
   if (filtroGrupo && filtroGrupo !== 'ALL') {
     const idGrupo = parseInt(filtroGrupo);
@@ -140,6 +161,8 @@ function renderChips(students) {
   const sinCuenta = students.filter(s => !s.has_user).length;
   const conSalud = students.filter(s => s.health_condition && s.health_condition !== 'NINGUNO').length;
 
+  const retirados = students.filter(estaRetirado).length;
+
   const chips = [
     `👥 Total: <strong>${students.length}</strong>`,
     `♀ Mujeres: <strong>${mujeres}</strong>`,
@@ -148,6 +171,10 @@ function renderChips(students) {
     `🔑 Sin cuenta: <strong>${sinCuenta}</strong>`,
     `⚕️ Con condición de salud: <strong>${conSalud}</strong>`,
   ];
+
+  if (retirados > 0) {
+    chips.push(`🚪 Retirados: <strong>${retirados}</strong>`);
+  }
 
   cont.innerHTML = chips.map(c => `<span class="chip-dato">${c}</span>`).join('');
 }
@@ -188,7 +215,16 @@ function renderStudentsTable(students) {
     // 2. Nombre completo
     const cellName = document.createElement('td');
     cellName.className = 'form__table-campo';
-    cellName.textContent = nombreCompleto(student);
+    if (estaRetirado(student)) {
+      const desde = student.fecha_retiro
+        ? ` desde ${escapeHtml(student.fecha_retiro)}` : '';
+      cellName.innerHTML = `${escapeHtml(nombreCompleto(student))}<br>` +
+        `<span style="color:var(--gray-600); font-size:0.78rem; font-weight:600;">` +
+        `🚪 Retirado${desde}</span>`;
+      row.style.opacity = '0.65';
+    } else {
+      cellName.textContent = nombreCompleto(student);
+    }
     row.appendChild(cellName);
 
     // 3. Sexo
