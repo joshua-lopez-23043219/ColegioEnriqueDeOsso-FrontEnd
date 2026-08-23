@@ -793,6 +793,19 @@ function exportarNotas() {
     .catch(err => showToast(err.message, 'error'));
 }
 
+/**
+ * El valor que va en una celda del boletin.
+ *
+ * El backend separa lo numerico de lo cualitativo: en una asignatura que se
+ * califica con letra, `first_partial` viene VACIO y la letra esta en
+ * `first_partial_cual`. Leyendo solo el campo numerico esas materias salian
+ * siempre en blanco -- y al guardar se enviaba ese vacio, que borraba la letra
+ * que estaba guardada. Asi lo hace scriptBoletin.js, que es el correcto.
+ */
+function valorDe(g, campo) {
+  return (g.es_cualitativa ? g[`${campo}_cual`] : g[campo]) || '';
+}
+
 /** Campo de captura de un parcial: <select> si es cualitativa, si no <input>. */
 function campoParcial(g, idx, num, valor, habilitado) {
   const id = `p${num}_${idx}`;
@@ -852,37 +865,37 @@ function renderBulletinTable(grades) {
         
         <!-- I -->
         <td class="form__table-campo">
-          ${campoParcial(g, idx, 1, g.first_partial, !isReadOnly && !!g.id_subject_sem1)}
+          ${campoParcial(g, idx, 1, valorDe(g, 'first_partial'), !isReadOnly && !!g.id_subject_sem1)}
         </td>
 
         <!-- II -->
         <td class="form__table-campo">
-          ${campoParcial(g, idx, 2, g.second_partial, !isReadOnly && !!g.id_subject_sem1)}
+          ${campoParcial(g, idx, 2, valorDe(g, 'second_partial'), !isReadOnly && !!g.id_subject_sem1)}
         </td>
         
         <!-- IS (Readonly/calculated) -->
         <td class="form__table-campo" id="sem1_${idx}" style="font-weight: 600; background: var(--gray-50);">
-          ${g.first_semester}
+          ${valorDe(g, 'first_semester')}
         </td>
         
         <!-- III -->
         <td class="form__table-campo">
-          ${campoParcial(g, idx, 3, g.third_partial, !isReadOnly && !!g.id_subject_sem2)}
+          ${campoParcial(g, idx, 3, valorDe(g, 'third_partial'), !isReadOnly && !!g.id_subject_sem2)}
         </td>
 
         <!-- IV -->
         <td class="form__table-campo">
-          ${campoParcial(g, idx, 4, g.quarter_partial, !isReadOnly && !!g.id_subject_sem2)}
+          ${campoParcial(g, idx, 4, valorDe(g, 'quarter_partial'), !isReadOnly && !!g.id_subject_sem2)}
         </td>
         
         <!-- IIS (Readonly/calculated) -->
         <td class="form__table-campo" id="sem2_${idx}" style="font-weight: 600; background: var(--gray-50);">
-          ${g.second_semester}
+          ${valorDe(g, 'second_semester')}
         </td>
         
         <!-- NF (Readonly/calculated) -->
         <td class="form__table-campo" id="final_${idx}" style="font-weight: 700; color: var(--primary-dark); background: rgba(93,60,166,0.05);">
-          ${g.final_grade}
+          ${valorDe(g, 'final_grade')}
         </td>
       </tr>`;
   });
