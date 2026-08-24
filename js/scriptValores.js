@@ -60,7 +60,7 @@ function marcarCambios() {
 }
 
 function cargarGrupos() {
-  apiFetch('/apiGroup/Group/group_AutoList/')
+  apiFetch('/apiGroup/Group/ListaGrupos/')
     .then(res => {
       if (!res.ok) throw new Error('No se pudieron cargar los grupos');
       return res.json();

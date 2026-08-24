@@ -108,7 +108,7 @@ function loadInitialData() {
     });
 
   // Load Groups
-  apiFetch('/apiGroup/Group/group_AutoList/')
+  apiFetch('/apiGroup/Group/ListaGrupos/')
     .then(res => {
       if (!res.ok) throw new Error('Error al cargar grupos');
       return res.json();

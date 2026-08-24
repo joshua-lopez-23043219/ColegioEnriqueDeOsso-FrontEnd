@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function cargarGrupos() {
-  apiFetch('/apiGroup/Group/group_AutoList/')
+  apiFetch('/apiGroup/Group/ListaGrupos/')
     .then(res => res.ok ? res.json() : Promise.reject(new Error('grupos')))
     .then(datos => {
       const grupos = Array.isArray(datos) ? datos : (datos.Record || []);
