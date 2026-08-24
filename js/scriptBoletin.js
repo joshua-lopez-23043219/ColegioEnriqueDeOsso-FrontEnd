@@ -19,6 +19,8 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('sel-grupo').addEventListener('change', cargarEstudiantesDelGrupo);
   document.getElementById('btn-generar').addEventListener('click', generar);
   document.getElementById('btn-imprimir').addEventListener('click', () => window.print());
+  document.getElementById('btn-pdf').addEventListener('click', descargarPdf);
+  document.getElementById('btn-pdf-grupo').addEventListener('click', descargarPdfDelGrupo);
   document.getElementById('txt-codigo').addEventListener('keydown', function (e) {
     if (e.key === 'Enter') { e.preventDefault(); generar(); }
   });
@@ -52,6 +54,9 @@ function cargarGrupos() {
       grupos.forEach(g => {
         const opt = document.createElement('option');
         opt.value = g.code_group;
+        // La descarga del grupo pide el id, no el codigo: se guarda aqui para
+        // no tener que resolverlo con otra consulta.
+        opt.dataset.id = g.id;
         opt.textContent = `${g.code_group} - ${g.level_group} (${g.section_group})`;
         select.appendChild(opt);
       });
@@ -280,4 +285,66 @@ function pintar(datos) {
     </div>`;
 
   document.getElementById('hoja-boletin').innerHTML = html;
+}
+
+
+/**
+ * Descarga el boletin con el formato de entrega del colegio.
+ *
+ * La pantalla y el PDF son cosas distintas y tienen endpoint propio: esta se
+ * lee, aquel se imprime y se le entrega a la familia. El archivo se pide con
+ * apiFetch para que viaje el token -- un enlace directo no llevaria la
+ * autorizacion y el servidor devolveria 401.
+ */
+function descargarPdf() {
+  const codigo = (document.getElementById('txt-codigo').value.trim() ||
+                  document.getElementById('sel-estudiante').value).toUpperCase();
+  if (!codigo) {
+    showToast('Seleccione un estudiante o escriba su código', 'warning');
+    return;
+  }
+  bajarArchivo(
+    `/apiNote/Note/DescargarBoletin/?code_student=${encodeURIComponent(codigo)}`,
+    `Boletin ${codigo}.pdf`);
+}
+
+/** Todos los boletines del grupo, uno por pagina. Para el cierre de corte. */
+function descargarPdfDelGrupo() {
+  const select = document.getElementById('sel-grupo');
+  const opcion = select.options[select.selectedIndex];
+  const idGrupo = opcion && opcion.dataset.id;
+  if (!idGrupo) {
+    showToast('Seleccione un grupo', 'warning');
+    return;
+  }
+  showToast('Generando los boletines del grupo...', 'info');
+  bajarArchivo(
+    `/apiNote/Note/DescargarBoletinesGrupo/?id_group=${encodeURIComponent(idGrupo)}`,
+    `Boletines ${select.value}.pdf`);
+}
+
+function bajarArchivo(url, nombre) {
+  apiFetch(url)
+    .then(res => {
+      if (res.status === 402) {
+        throw new Error('El boletín está bloqueado por mensualidades pendientes.');
+      }
+      if (res.status === 403) {
+        throw new Error('No tiene autorización para descargar este boletín.');
+      }
+      if (res.status === 404) throw new Error('No se encontró el boletín.');
+      if (!res.ok) throw new Error('No se pudo generar el archivo');
+      return res.blob();
+    })
+    .then(blob => {
+      const enlace = document.createElement('a');
+      enlace.href = URL.createObjectURL(blob);
+      enlace.download = nombre;
+      document.body.appendChild(enlace);
+      enlace.click();
+      document.body.removeChild(enlace);
+      URL.revokeObjectURL(enlace.href);
+      showToast('Boletín descargado', 'success');
+    })
+    .catch(err => showToast(err.message, 'error'));
 }
