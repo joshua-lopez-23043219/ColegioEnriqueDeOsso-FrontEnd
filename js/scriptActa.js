@@ -87,6 +87,7 @@ function pintarActa(datos) {
   let filaMaterias = '<tr>' +
     '<th class="col-num" rowspan="2">N°</th>' +
     '<th class="col-nombre" rowspan="2">Nombres y Apellidos</th>' +
+    '<th rowspan="2">Código</th>' +
     '<th rowspan="2">Sexo</th>';
   let filaTipos = '<tr>';
 
@@ -102,12 +103,13 @@ function pintarActa(datos) {
 
   filaMaterias += '<th class="materia" rowspan="2">Desempeño personal y ciudadano</th>' +
     '<th class="col-resumen" rowspan="2">Reprueban</th>' +
-    '<th class="col-resumen" rowspan="2">Promedio</th>' +
+    '<th class="col-resumen" colspan="2">Promedio</th>' +
     '<th class="col-resumen" rowspan="2">AA</th>' +
     '<th class="col-resumen" rowspan="2">AS</th>' +
     '<th class="col-resumen" rowspan="2">AF</th>' +
     '<th class="col-resumen" rowspan="2">AI</th></tr>';
-  filaTipos += '</tr>';
+  // El promedio lleva su letra al lado, igual que en el acta del colegio.
+  filaTipos += '<th class="col-resumen">CT</th><th class="col-resumen">CL</th></tr>';
 
   let html = `<thead>${filaMaterias}${filaTipos}</thead><tbody>`;
 
@@ -115,6 +117,7 @@ function pintarActa(datos) {
     html += `<tr>
       <td class="col-num">${alumno.numero}</td>
       <td class="col-nombre">${escapeHtml(alumno.name_student)}</td>
+      <td>${escapeHtml(alumno.code_student || '—')}</td>
       <td>${escapeHtml(alumno.sexo || '—')}</td>`;
 
     asignaturas.forEach(a => {
@@ -130,6 +133,7 @@ function pintarActa(datos) {
       <td>${celdaCual(alumno.desempeno)}</td>
       <td class="col-resumen ${alumno.reprueban > 0 ? 'reprueba' : ''}">${alumno.reprueban}</td>
       <td class="col-resumen">${alumno.promedio || '<span class="vacio">—</span>'}</td>
+      <td class="col-resumen">${celdaCual(alumno.promedio_cual)}</td>
       <td class="col-resumen">${conteo.AA || 0}</td>
       <td class="col-resumen">${conteo.AS || 0}</td>
       <td class="col-resumen">${conteo.AF || 0}</td>

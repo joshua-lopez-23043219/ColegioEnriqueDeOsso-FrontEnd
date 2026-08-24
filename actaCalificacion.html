@@ -44,12 +44,21 @@
       white-space: nowrap;
     }
     table.acta thead th {
-      position: sticky; top: 0; z-index: 3;
+      position: sticky; z-index: 3;
       background: var(--gradient-primary); color: var(--white);
       font-family: var(--font-heading); font-size: 0.66rem;
       text-transform: uppercase; letter-spacing: 0.2px;
     }
-    /* Los nombres de asignatura son largos: se giran para que la tabla quepa */
+    /* La cabecera tiene DOS filas y cada una se pega a distinta altura. Con
+       `top: 0` en las dos, la de CT/CL se pegaba arriba igual que la de
+       asignaturas y se le encimaba al hacer scroll: los CL aparecian flotando
+       sobre los nombres de las materias. La segunda fila arranca donde termina
+       la primera, asi que su `top` es la altura de la primera. */
+    table.acta thead tr:first-child th { top: 0; }
+    table.acta thead tr:nth-child(2) th { top: 165px; z-index: 3; }
+    /* Los nombres de asignatura son largos: se giran para que la tabla quepa.
+       Su altura es la que fija el `top` de la fila de abajo: si se cambia una
+       hay que cambiar la otra. */
     table.acta thead th.materia {
       writing-mode: vertical-rl; transform: rotate(180deg);
       height: 165px; vertical-align: bottom; padding: 6px 3px;
@@ -66,6 +75,11 @@
     table.acta thead th.col-nombre, table.acta thead th.col-num {
       z-index: 4; background: var(--primary-dark); writing-mode: horizontal-tb;
       transform: none; height: auto; vertical-align: middle;
+    }
+    /* Las columnas fijas de la izquierda tapan a las que pasan por debajo al
+       hacer scroll horizontal; sin fondo propio se transparentan. */
+    table.acta tbody td.col-num, table.acta tbody td.col-nombre {
+      background: var(--white);
     }
     table.acta tbody tr:nth-child(even) td { background: var(--slate-50); }
     table.acta tbody tr:nth-child(even) td.col-nombre,
@@ -182,6 +196,6 @@
   </div>
 
   <script src="js/global.js?v=1.5.0"></script>
-  <script src="js/scriptActa.js?v=1.1.0"></script>
+  <script src="js/scriptActa.js?v=1.2.0"></script>
 </body>
 </html>
