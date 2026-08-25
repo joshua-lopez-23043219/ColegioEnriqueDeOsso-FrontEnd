@@ -303,12 +303,19 @@ function descargarPdf() {
     showToast('Seleccione un estudiante o escriba su código', 'warning');
     return;
   }
+  // Sin nombre: lo pone el servidor, que es quien sabe como se llama el
+  // estudiante y en que grado esta.
   bajarArchivo(
-    `/apiNote/Note/DescargarBoletin/?code_student=${encodeURIComponent(codigo)}`,
-    `Boletin ${codigo}.pdf`);
+    `/apiNote/Note/DescargarBoletin/?code_student=${encodeURIComponent(codigo)}`);
 }
 
-/** Todos los boletines del grupo, uno por pagina. Para el cierre de corte. */
+/**
+ * Los boletines del grupo, un archivo por estudiante dentro de un ZIP.
+ *
+ * El colegio los imprime y los entrega uno por uno: un solo PDF con los 40
+ * obligaria a partirlo a mano. Cada archivo sale nombrado con el estudiante
+ * y su grado.
+ */
 function descargarPdfDelGrupo() {
   const select = document.getElementById('sel-grupo');
   const opcion = select.options[select.selectedIndex];
@@ -319,11 +326,24 @@ function descargarPdfDelGrupo() {
   }
   showToast('Generando los boletines del grupo...', 'info');
   bajarArchivo(
-    `/apiNote/Note/DescargarBoletinesGrupo/?id_group=${encodeURIComponent(idGrupo)}`,
-    `Boletines ${select.value}.pdf`);
+    `/apiNote/Note/DescargarBoletinesGrupo/?id_group=${encodeURIComponent(idGrupo)}`);
 }
 
-function bajarArchivo(url, nombre) {
+/**
+ * Descarga lo que devuelva el endpoint, con el nombre que el servidor indique.
+ *
+ * El nombre viaja en la cabecera `Content-Disposition`. Ponerlo aqui obligaria
+ * a repetir en el navegador la regla de como se arma --nombre del estudiante y
+ * grado-- y las dos copias se separarian.
+ */
+function nombreDelServidor(res, porDefecto) {
+  const cabecera = res.headers.get('Content-Disposition') || '';
+  const marca = cabecera.match(/filename="?([^"]+)"?/);
+  return marca ? marca[1] : porDefecto;
+}
+
+function bajarArchivo(url) {
+  let nombre = 'boletin.pdf';
   apiFetch(url)
     .then(res => {
       if (res.status === 402) {
@@ -334,6 +354,8 @@ function bajarArchivo(url, nombre) {
       }
       if (res.status === 404) throw new Error('No se encontró el boletín.');
       if (!res.ok) throw new Error('No se pudo generar el archivo');
+      // El nombre se lee ANTES de pasar a blob: despues ya no hay cabeceras.
+      nombre = nombreDelServidor(res, nombre);
       return res.blob();
     })
     .then(blob => {
@@ -344,7 +366,7 @@ function bajarArchivo(url, nombre) {
       enlace.click();
       document.body.removeChild(enlace);
       URL.revokeObjectURL(enlace.href);
-      showToast('Boletín descargado', 'success');
+      showToast('Descarga lista', 'success');
     })
     .catch(err => showToast(err.message, 'error'));
 }
