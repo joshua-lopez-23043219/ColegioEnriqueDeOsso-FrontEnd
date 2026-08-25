@@ -75,13 +75,30 @@
     var riesgoColor = (k.porcentaje_riesgo !== null && k.porcentaje_riesgo > 15)
       ? C.danger : C.warning;
 
+    // El promedio es PARCIAL mientras el ciclo va a medias: se calcula sobre
+    // los cortes ya calificados, no sobre la nota final (que el colegio no
+    // tiene hasta cerrar los cuatro). El pie de la tarjeta lo dice para que
+    // nadie lo lea como resultado definitivo.
+    var cortes = k.cortes_evaluados;
+    var pieProm = 'Histórico de todas las notas';
+    if (cortes === 0) {
+      pieProm = 'Aún no hay notas calificadas';
+    } else if (cortes > 0 && cortes < 4) {
+      pieProm = 'Parcial: promedio de ' + cortes +
+                (cortes === 1 ? ' corte calificado' : ' cortes calificados');
+    }
+
+    var pieAsist = (k.total_asistencias === 0)
+      ? 'Aún no se ha pasado lista'
+      : 'Promedio de presencia';
+
     var tarjetas = [
       { label: 'Estudiantes activos', valor: k.estudiantes_activos, unidad: '',
         pie: 'Matriculados este año', color: C.primary },
       { label: 'Promedio general', valor: fmt(k.promedio_general), unidad: '/100',
-        pie: 'Histórico de todas las notas', color: colorNota(k.promedio_general) },
+        pie: pieProm, color: colorNota(k.promedio_general) },
       { label: 'Asistencia', valor: fmt(k.tasa_asistencia), unidad: '%',
-        pie: 'Promedio de presencia', color: C.info },
+        pie: pieAsist, color: C.info },
       { label: 'En riesgo', valor: k.en_riesgo, unidad: '',
         pie: (k.porcentaje_riesgo !== null && k.porcentaje_riesgo !== undefined
               ? fmt(k.porcentaje_riesgo) + '% con promedio bajo ' + UMBRAL
