@@ -115,10 +115,18 @@ function performLogin() {
       localStorage.setItem('tutor_id', data.tutor_id || '');
       
       showToast(`¡Bienvenido/a, ${data.name}!`, 'success');
-      
-      // Redirect to portal index.html
+
+      // El estudiante entra DIRECTO a su portal. El menu intermedio le
+      // ofrecia solo dos tarjetas -- "Mi Portal" y "Boletin" -- y el boletin
+      // ya esta dentro del portal, asi que era un clic de mas para llegar a
+      // lo unico que iba a ver. El resto de roles si tiene varios modulos y
+      // sigue pasando por el menu.
+      const destino = data.role === 'ESTUDIANTE'
+         ? './portalEstudiante.html'
+         : './index.html';
+
       setTimeout(() => {
-         window.location.href = './index.html';
+         window.location.href = destino;
       }, 1000);
    })
    .catch(err => {

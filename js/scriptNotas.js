@@ -101,6 +101,7 @@ function loadInitialData() {
     .then(response => {
       allTeachers = response.Record || response;
       populateTeachers('notes_teacher', allTeachers);
+      fijarDocentePropio();
     })
     .catch(err => {
       console.error(err);
@@ -140,6 +141,30 @@ function loadInitialData() {
 }
 
 // ========== Populate Functions ==========
+/**
+ * Un docente solo se ve a si mismo en el selector de docentes.
+ *
+ * `ListTeacher` devuelve a todo el personal porque las pantallas de horario
+ * lo necesitan, pero aqui no: el docente califica SUS grupos. Antes veia a
+ * sus 16 colegas y podia elegir a cualquiera, para despues chocar con un 403
+ * al guardar.
+ */
+function fijarDocentePropio() {
+  if (localStorage.getItem('user_role') !== 'DOCENTE') return;
+  const mio = localStorage.getItem('teacher_id');
+  if (!mio) return;
+
+  const select = document.getElementById('notes_teacher');
+  if (!select) return;
+  const suya = Array.from(select.options).find(o => String(o.value) === String(mio));
+  select.innerHTML = '';
+  if (suya) select.appendChild(suya);
+  select.value = mio;
+  select.disabled = true;
+  select.style.backgroundColor = 'var(--gray-100)';
+  handleTeacherFilterChange(mio);
+}
+
 function populateTeachers(selectId, teachers) {
   const select = document.getElementById(selectId);
   if (!select) return;

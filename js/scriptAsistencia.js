@@ -89,6 +89,7 @@ function loadInitialData() {
       allTeachers = response.Record || response;
       populateTeachers('att_teacher', allTeachers);
       populateTeachers('hist_teacher', allTeachers);
+      fijarDocentePropio();
     })
     .catch(err => {
       console.error(err);
@@ -127,6 +128,33 @@ function loadInitialData() {
       console.error(err);
       showToast('No se pudieron cargar las asignaturas', 'error');
     });
+}
+
+/**
+ * Un docente solo se ve a si mismo en el selector de docentes.
+ *
+ * `ListTeacher` devuelve a todo el personal porque las pantallas de horario
+ * lo necesitan, pero aqui no tiene sentido: el docente pasa SU lista. Antes
+ * veia a sus 16 colegas y podia elegir a cualquiera; el backend lo frenaba
+ * al guardar con un 403 que no explicaba nada.
+ */
+function fijarDocentePropio() {
+  if (localStorage.getItem('user_role') !== 'DOCENTE') return;
+  const mio = localStorage.getItem('teacher_id');
+  if (!mio) return;
+
+  ['att_teacher', 'hist_teacher'].forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    // Se deja SOLO su fila, sin el "Todos los docentes".
+    const suya = Array.from(select.options).find(o => String(o.value) === String(mio));
+    select.innerHTML = '';
+    if (suya) select.appendChild(suya);
+    select.value = mio;
+    select.disabled = true;
+    select.style.backgroundColor = 'var(--gray-100)';
+    handleTeacherFilterChange(id.split('_')[0], mio);
+  });
 }
 
 // ========== Populate Functions ==========

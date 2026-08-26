@@ -12,7 +12,7 @@
   <link rel="icon" href="images/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" href="images/favicon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-  <link rel="stylesheet" href="css/global.css?v=1.3.5">
+  <link rel="stylesheet" href="css/global.css?v=1.7.0">
 </head>
 <body>
   <div class="background"></div>
@@ -91,6 +91,17 @@
       const role = localStorage.getItem('user_role');
       
       // Ocultar todas por defecto
+      // El estudiante no pasa por este menu: su unico destino es su portal,
+      // y el boletin ya vive dentro. Se redirige tambien aqui -- no solo al
+      // entrar -- porque si no, el boton "atras" o un marcador lo devolvian
+      // a una pantalla de dos tarjetas que no aporta nada.
+      // Un ADMINISTRADOR con rol distinto de ESTUDIANTE sigue viendo el menu
+      // completo, incluida la tarjeta del portal, para poder revisarlo.
+      if (role === 'ESTUDIANTE') {
+        window.location.replace('portalEstudiante.html');
+        return;
+      }
+
       document.getElementById('card-gestion-usuarios').style.display = 'none';
       document.getElementById('card-registros').style.display = 'none';
       document.getElementById('card-gacademica').style.display = 'none';

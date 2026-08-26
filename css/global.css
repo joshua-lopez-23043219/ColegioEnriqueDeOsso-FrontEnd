@@ -1272,6 +1272,39 @@ canvas {
 .lift { transition: transform var(--transition-normal), box-shadow var(--transition-normal); }
 .lift:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 
+/* ---------- Tablas anchas en telefono ----------
+   Una tabla de 8 o 15 columnas (acta, listados, valores, consolidado) mide
+   mucho mas que la pantalla de un telefono. Sin un contenedor que la
+   desplace, la tabla estira TODA la pagina: el encabezado, la barra de
+   navegacion y los botones quedan corridos, y para volver al menu hay que
+   arrastrar la pantalla completa de lado. Es el sintoma que se ve como "la
+   pagina esta descuadrada en el celular".
+
+   La tabla pasa a ser su propio contenedor de scroll, asi que se desliza
+   sola y el resto de la pagina se queda quieto.
+
+   Va en `@media screen`: la impresion del acta y del consolidado NO se toca,
+   que ahi la tabla si debe fluir completa. */
+@media screen and (max-width: 768px) {
+  .table-responsive,
+  .tbl-wrap,
+  .tabla-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Solo las tablas que no viven ya dentro de un contenedor con scroll. */
+  table:not(.tbl-wrap table):not(.table-responsive table) {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Los modales con ancho fijo en linea (440-600px) ya los limita
+     `.modal { max-width: 95vw }`, pero se deja explicito para que un modal
+     nuevo no reintroduzca el problema. */
+  .modal { width: auto !important; max-width: 94vw; }
+}
+
 /* ---------- Respeto a movimiento reducido ---------- */
 @media (prefers-reduced-motion: reduce) {
   .animate-rise,

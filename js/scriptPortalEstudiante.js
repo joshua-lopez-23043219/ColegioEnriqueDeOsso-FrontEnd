@@ -57,9 +57,20 @@
     return { color: 'var(--pe-risk)', label: 'En riesgo' };
   }
 
+  /**
+   * La nota como ENTERO, redondeando hacia arriba en el .5.
+   *
+   * El colegio califica con enteros: el boletín, el acta y el consolidado ya
+   * lo hacen así (`Apps/Utils/notas.py`). Este portal era el único sitio que
+   * mostraba decimales -- un 80.5 que sale de promediar el I y el II corte --
+   * y el estudiante veía una nota distinta a la de su boletín.
+   *
+   * `Math.round` de JavaScript sí redondea el .5 hacia arriba, a diferencia
+   * del `round()` de Python, que manda al par más cercano.
+   */
   function fmt(v) {
     if (v === null) return '—';
-    return (v % 1 === 0) ? String(v) : v.toFixed(1);
+    return String(Math.round(v));
   }
 
   // ---------- Anillo SVG ----------
