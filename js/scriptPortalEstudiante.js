@@ -12,12 +12,39 @@
   'use strict';
 
   // ---------- Utilidades de nota ----------
+  /**
+   * Punto medio del rango de cada categoría de logro.
+   *
+   * Es la MISMA tabla que usa el backend (`Subjects.EQUIVALENCIA_NUMERICA`),
+   * que ya la aplican el boletín, el acta y el dashboard. Si se cambia allá,
+   * hay que cambiarla aquí.
+   */
+  var CUALITATIVA = { AA: 95, AS: 82.5, AF: 67.5, AI: 45 };
+
+  /**
+   * La nota como número, venga como cifra o como categoría.
+   *
+   * Antes solo entendía cifras: `parseFloat('AA')` da NaN, así que toda
+   * asignatura cualitativa --Derecho y Dignidad de la Mujer, Creciendo en
+   * Valores, Talleres de Arte-- quedaba en nulo. El estudiante la veía como
+   * "Sin notas" y NO contaba en su promedio, ni en "Aprobadas", ni en "En
+   * riesgo": sus KPIs se calculaban sobre media docena de asignaturas en vez
+   * de sobre todas.
+   */
   function parseNum(v) {
     if (v === null || v === undefined) return null;
     var s = String(v).trim();
     if (!s) return null;
+    var codigo = CUALITATIVA[s.toUpperCase()];
+    if (codigo !== undefined) return codigo;
     var n = parseFloat(s);
     return isNaN(n) ? null : n;
+  }
+
+  /** `true` si la nota vino como categoría (AA/AS/AF/AI) y no como cifra. */
+  function esCualitativa(v) {
+    return v !== null && v !== undefined &&
+           CUALITATIVA[String(v).trim().toUpperCase()] !== undefined;
   }
 
   function avg(list) {
@@ -27,23 +54,44 @@
     return sum / vals.length;
   }
 
+  /**
+   * El valor de un campo de nota, mire donde mire el boletín.
+   *
+   * EL PROBLEMA QUE RESUELVE
+   * En una asignatura CUALITATIVA (Derecho y Dignidad de la Mujer, Creciendo
+   * en Valores, Talleres de Arte) el backend deja los campos numéricos
+   * VACÍOS y pone la letra en un campo aparte: `first_partial_cual`,
+   * `final_grade_cual`, etc. Así lo necesita el boletín impreso, que lleva
+   * dos columnas por corte (CT y CL).
+   *
+   * Este portal solo leía los numéricos, así que veía esas asignaturas como
+   * si no tuvieran ni una nota: salían "Sin notas" y quedaban FUERA del
+   * promedio, de "Aprobadas" y de "En riesgo". Los KPIs del estudiante se
+   * calculaban sobre una parte de sus asignaturas.
+   */
+  function campo(g, nombre) {
+    var directo = g[nombre];
+    if (directo !== null && directo !== undefined && String(directo).trim()) {
+      return directo;
+    }
+    return g[nombre + '_cual'];
+  }
+
   // Nota "actual" de una asignatura: preferimos la final; si no, promedio de
   // semestres disponibles; si no, promedio de parciales disponibles.
   function subjectCurrent(g) {
-    var fin = parseNum(g.final_grade);
+    var fin = parseNum(campo(g, 'final_grade'));
     if (fin !== null) return fin;
-    var sems = avg([parseNum(g.first_semester), parseNum(g.second_semester)]);
+    var sems = avg([parseNum(campo(g, 'first_semester')),
+                    parseNum(campo(g, 'second_semester'))]);
     if (sems !== null) return sems;
-    return avg([
-      parseNum(g.first_partial), parseNum(g.second_partial),
-      parseNum(g.third_partial), parseNum(g.quarter_partial)
-    ]);
+    return avg(partialsOf(g));
   }
 
   function partialsOf(g) {
     return [
-      parseNum(g.first_partial), parseNum(g.second_partial),
-      parseNum(g.third_partial), parseNum(g.quarter_partial)
+      parseNum(campo(g, 'first_partial')), parseNum(campo(g, 'second_partial')),
+      parseNum(campo(g, 'third_partial')), parseNum(campo(g, 'quarter_partial'))
     ];
   }
 
@@ -206,7 +254,7 @@
       { icon: '📘', value: String(perSubject.length), label: 'Asignaturas' },
       { icon: '✅', value: String(aprobadas), label: 'Aprobadas' },
       { icon: '⚠️', value: String(riesgo), label: 'En riesgo' },
-      { icon: '⭐', value: best ? fmt(best.value) : '—', label: best ? ('Mejor: ' + best.name) : 'Mejor nota' }
+      { icon: '⭐', value: best ? (best.etiqueta || fmt(best.value)) : '—', label: best ? ('Mejor: ' + best.name) : 'Mejor nota' }
     ];
     cards.forEach(function (c, i) {
       var el = document.createElement('div');
@@ -253,7 +301,7 @@
       card.style.animationDelay = (0.04 * i) + 's';
       card.style.color = s.value === null ? '#9a94ad' : b.color;
 
-      card.appendChild(makeRing(s.value, fmt(s.value), '', b.color, 74, 7));
+      card.appendChild(makeRing(s.value, s.etiqueta || fmt(s.value), '', b.color, 74, 7));
 
       var body = document.createElement('div');
       body.className = 'pe-subject__body';
@@ -305,9 +353,20 @@
     renderHero(student);
 
     var perSubject = grades.map(function (g) {
+      // `value` es el numero (para promediar y colorear); `etiqueta` es lo
+      // que ve el estudiante. En una asignatura cualitativa tiene que leer
+      // "AA", no el 95 con que se calcula por dentro: eso es lo que dice su
+      // boletin y lo que le van a preguntar en la casa.
+      var actual = subjectCurrent(g);
+      var cruda = campo(g, 'final_grade') || campo(g, 'second_semester') ||
+                  campo(g, 'first_semester') || campo(g, 'quarter_partial') ||
+                  campo(g, 'third_partial') || campo(g, 'second_partial') ||
+                  campo(g, 'first_partial');
       return {
         name: g.name_subject || g.code_subject || 'Asignatura',
-        value: subjectCurrent(g),
+        value: actual,
+        etiqueta: esCualitativa(cruda) ? String(cruda).trim().toUpperCase()
+                                       : fmt(actual),
         partials: partialsOf(g)
       };
     });
