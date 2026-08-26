@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión Académica — Colegio Enrique de Ossó</title>
+  <link rel="icon" href="images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="images/favicon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
   <link rel="stylesheet" href="css/global.css?v=1.0.8">
 </head>
 <body>
@@ -70,6 +73,10 @@
           <img src="./images/Matricula.png" class="section__item-icon" alt="Matrícula">
           Matrícula
         </a>
+        <a href="registroReingreso.html" class="section__item" id="card-ga-reingreso">
+          <img src="./images/Matricula.png" class="section__item-icon" alt="Reingreso">
+          Reingreso
+        </a>
         <a href="confirmarMatricula.html" class="section__item" id="card-ga-confirmar-matricula">
           <img src="./images/Matricula.png" class="section__item-icon" alt="Habilitar Matrícula">
           Habilitar Matrícula
@@ -78,7 +85,7 @@
     </section>
   </div>
 
-  <script src="js/global.js?v=1.5.0"></script>
+  <script src="js/global.js?v=1.5.1"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const role = localStorage.getItem('user_role');
@@ -96,12 +103,13 @@
       document.getElementById('card-ga-acta').style.display = 'none';
       document.getElementById('card-ga-horario').style.display = 'none';
       document.getElementById('card-ga-matricula').style.display = 'none';
+      document.getElementById('card-ga-reingreso').style.display = 'none';
       document.getElementById('card-ga-confirmar-matricula').style.display = 'none';
 
       if (role === 'DIRECTOR' || role === 'ADMINISTRADOR') {
         mostrar(['card-ga-asistencia', 'card-ga-consolidado', 'card-ga-notas',
                  'card-ga-valores', 'card-ga-boletin', 'card-ga-acta',
-                 'card-ga-horario', 'card-ga-matricula',
+                 'card-ga-horario', 'card-ga-matricula', 'card-ga-reingreso',
                  'card-ga-confirmar-matricula']);
       } else if (role === 'DOCENTE') {
         // El consolidado es de toda la secundaria: un docente solo puede ver
@@ -110,8 +118,8 @@
         mostrar(['card-ga-asistencia', 'card-ga-notas', 'card-ga-valores',
                  'card-ga-boletin', 'card-ga-acta']);
       } else if (role === 'ADMINISTRACION') {
-        mostrar(['card-ga-consolidado', 'card-ga-horario',
-                 'card-ga-matricula', 'card-ga-confirmar-matricula']);
+        mostrar(['card-ga-consolidado', 'card-ga-horario', 'card-ga-matricula',
+                 'card-ga-reingreso', 'card-ga-confirmar-matricula']);
       } else if (role === 'COORDINADOR') {
         mostrar(['card-ga-consolidado']);
       }

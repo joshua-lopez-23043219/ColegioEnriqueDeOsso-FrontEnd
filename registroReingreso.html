@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reingreso — Colegio Enrique de Ossó</title>
+  <link rel="icon" href="images/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="images/favicon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/global.css?v=1.4.2">
+  <style>
+    .rein { max-width: 1000px; margin: 0 auto; padding: 8px 18px 60px; }
+
+    .rein__intro {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius-lg); padding: 16px 20px; margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
+    .rein__intro h1 {
+      font-family: var(--font-heading); font-size: 1.25rem; font-weight: 800;
+      color: var(--slate-800); margin: 0 0 6px;
+    }
+    .rein__intro p { font-size: 0.88rem; color: var(--slate-600); margin: 0; line-height: 1.5; }
+    .rein__intro a { color: var(--primary); font-weight: 600; }
+
+    .panel {
+      background: var(--white); border: 1px solid var(--slate-200);
+      border-radius: var(--radius-lg); padding: 20px 22px;
+      box-shadow: var(--shadow-sm); margin-bottom: 18px;
+    }
+    .panel__title {
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
+      color: var(--slate-800); margin: 0 0 4px;
+    }
+    .panel__hint { font-size: 0.8rem; color: var(--slate-500); margin: 0 0 14px; }
+
+    .buscador { display: flex; gap: 10px; flex-wrap: wrap; }
+    .buscador input { flex: 1; min-width: 220px; }
+
+    .tbl-wrap { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tbl { width: 100%; border-collapse: collapse; font-size: 0.87rem; min-width: 640px; }
+    .tbl th {
+      text-align: left; font-size: 0.73rem; text-transform: uppercase;
+      letter-spacing: 0.4px; color: var(--slate-500); font-weight: 700;
+      padding: 8px 10px; border-bottom: 2px solid var(--slate-200);
+    }
+    .tbl td { padding: 10px; border-bottom: 1px solid var(--slate-100); color: var(--slate-700); }
+    .tbl tbody tr:hover { background: var(--slate-50); }
+
+    .pill {
+      display: inline-block; padding: 2px 9px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+    .pill--ok { background: #E8F5E9; color: #2E7D32; }
+    .pill--ya { background: #FFF3CD; color: #856404; }
+
+    .ficha { display: none; }
+    .ficha.activa { display: block; }
+    .ficha__datos {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px 18px; margin-bottom: 18px;
+      background: var(--slate-50); border-radius: var(--radius-md); padding: 16px;
+    }
+    .dato__label {
+      font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.4px;
+      color: var(--slate-500); font-weight: 700; margin-bottom: 2px;
+    }
+    .dato__valor { font-size: 0.9rem; color: var(--slate-800); font-weight: 600; }
+
+    .empty { text-align: center; padding: 30px 16px; color: var(--slate-500); font-size: 0.9rem; }
+    .empty__icon { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    @media screen and (max-width: 600px) {
+      .rein { padding: 8px 12px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="background"></div>
+
+  <nav class="nav">
+    <div class="nav__container">
+      <button class="nav__button" onclick="goBack()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="nav__button-icon" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+            clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="nav__item">
+      <span class="nav__title">Reingreso</span>
+    </div>
+    <div class="nav__profile">
+      <img src="./images/usuario.png" class="nav__profile-img">
+      <ul class="nav__profile-link">
+        <li><a href="ayuda.html"><img src="./images/help.png" class="nav__profile-img">Ayuda</a></li>
+        <li><a href="#" id="logout-link"><img src="./images/close.png" class="nav__profile-img">Cerrar Sesión</a></li>
+      </ul>
+    </div>
+  </nav>
+  <div class="separador"></div>
+
+  <main class="rein">
+    <div class="rein__intro">
+      <h1>🔁 Reingreso de estudiantes del centro</h1>
+      <p>
+        Para estudiantes que <strong>ya son del colegio</strong>. Sus datos y su tutor
+        se traen solos de la matrícula anterior: solo hay que elegir el grupo del
+        nuevo ciclo. Si la familia viene de fuera del centro, use
+        <a href="registroMatricula.html">Matrícula</a>, que captura la ficha completa.
+      </p>
+    </div>
+
+    <!-- Paso 1: encontrar al estudiante -->
+    <section class="panel">
+      <h2 class="panel__title">1. Buscar al estudiante</h2>
+      <p class="panel__hint">Por nombre, apellido o código. Solo aparecen quienes ya tuvieron matrícula.</p>
+      <div class="buscador">
+        <div class="form__group" style="flex:1; min-width:220px; margin:0;">
+          <input type="text" class="form__control" id="q" autocomplete="off"
+                 placeholder="Ej.: Ana Sofía López  ó  EST-9noA-12">
+        </div>
+        <div class="form__group" style="margin:0; min-width:150px;">
+          <label class="form__label" for="ciclo_destino">Ciclo a matricular</label>
+          <input type="number" class="form__control" id="ciclo_destino" min="2020" max="2100" step="1">
+        </div>
+      </div>
+      <div id="resultados" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- Paso 2: confirmar y elegir grupo -->
+    <section class="panel ficha" id="ficha">
+      <h2 class="panel__title">2. Confirmar el reingreso</h2>
+      <p class="panel__hint">Estos datos vienen de su ficha. Si alguno está mal, corríjalo en Estudiante o Tutor antes de matricular.</p>
+
+      <div class="ficha__datos" id="ficha_datos"></div>
+
+      <div class="form__grid">
+        <div class="form__group">
+          <label class="form__label" for="nivel_destino">Año académico</label>
+          <select class="form__control" id="nivel_destino">
+            <option value="" disabled selected>Seleccione el grado</option>
+          </select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="grupo_destino">Grupo</label>
+          <select class="form__control" id="grupo_destino">
+            <option value="" disabled selected>Seleccione un grupo</option>
+          </select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="turno_destino">Turno</label>
+          <select class="form__control" id="turno_destino">
+            <option value="">Mantener el anterior</option>
+            <option>Matutino</option>
+            <option>Vespertino</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="step-navigation" style="margin-top:18px;">
+        <button type="button" class="form__button--purple" id="btn_guardar">Registrar reingreso</button>
+        <button type="button" class="dash__refresh" id="btn_cancelar" style="margin-left:8px;">Cancelar</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/global.js?v=1.5.1"></script>
+  <script src="js/scriptReingreso.js?v=1.0.0"></script>
+</body>
+</html>

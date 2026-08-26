@@ -147,6 +147,10 @@ document.addEventListener('DOMContentLoaded', function () {
     'registroNotas.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'TUTOR', 'ESTUDIANTE'],
     'registroHorario.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
     'registroMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'TUTOR'],
+    // El reingreso lo tramita el personal en ventanilla. El tutor no entra
+    // aquí: su rematrícula en línea sigue por registroMatricula.html, que ya
+    // valida la ventana de reingreso y que el estudiante sea el suyo.
+    'registroReingreso.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
     'confirmarMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
     'dashboard.html': ['ADMINISTRADOR', 'DIRECTOR'],
     'analisisIA.html': ['ADMINISTRADOR', 'DIRECTOR'],
