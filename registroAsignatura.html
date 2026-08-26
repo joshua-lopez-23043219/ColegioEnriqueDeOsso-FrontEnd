@@ -76,13 +76,18 @@
               </div>
               <div class="form__group">
                 <label class="form__label" for="anio">Año Académico</label>
+                <!-- Los VALORES tienen que ser los mismos que `Group.level_group`
+                     (7mo..11mo). Con "Primer Año" la asignatura nacía con un grado
+                     que ningún grupo tiene: no aparecía en el boletín, ni en el
+                     acta, ni en el selector de asistencia de ningún grupo, y no
+                     había forma de saber por qué. -->
                 <select class="form__control" id="anio" name="anio" required>
                   <option value="" disabled selected>Seleccione una opción</option>
-                  <option>Primer Año</option>
-                  <option>Segundo Año</option>
-                  <option>Tercer Año</option>
-                  <option>Cuarto Año</option>
-                  <option>Quinto Año</option>
+                  <option value="7mo">Séptimo Grado (7mo)</option>
+                  <option value="8vo">Octavo Grado (8vo)</option>
+                  <option value="9no">Noveno Grado (9no)</option>
+                  <option value="10mo">Décimo Grado (10mo)</option>
+                  <option value="11mo">Undécimo Grado (11mo)</option>
                 </select>
               </div>
               <div class="form__group">
