@@ -63,7 +63,7 @@
                         </button>
                         <button type="button" class="tab-btn" id="tab_btn_2" onclick="showStep(2)">
                             <span class="tab-number">2</span>
-                            <span class="tab-text">Estudiante & Docs</span>
+                            <span class="tab-text">Estudiante</span>
                         </button>
                         <button type="button" class="tab-btn" id="tab_btn_3" onclick="showStep(3)">
                             <span class="tab-number">3</span>
@@ -101,13 +101,16 @@
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="level_registration">Año Académico</label>
+                                        <!-- Los VALORES tienen que ser los mismos que `Group.level_group`
+                                             (7mo..11mo): con "Primer Año" el filtro de grupos del Paso 4
+                                             no encontraba ninguno y el selector se quedaba vacío. -->
                                         <select class="form__control" id="level_registration" name="anio" required>
                                             <option value="" disabled selected>Seleccione una opción</option>
-                                            <option>Primer Año</option>
-                                            <option>Segundo Año</option>
-                                            <option>Tercer Año</option>
-                                            <option>Cuarto Año</option>
-                                            <option>Quinto Año</option>
+                                            <option value="7mo">Séptimo Grado (7mo)</option>
+                                            <option value="8vo">Octavo Grado (8vo)</option>
+                                            <option value="9no">Noveno Grado (9no)</option>
+                                            <option value="10mo">Décimo Grado (10mo)</option>
+                                            <option value="11mo">Undécimo Grado (11mo)</option>
                                         </select>
                                     </div>
                                     <div class="form__group">
@@ -140,73 +143,73 @@
                     <div id="step_2" class="step-content">
                         <section class="layout__section">
                             <div class="section">
-                                <div class="section__title">2. Detalles del Estudiante</div>
+                                <div class="section__title">2. Datos del Estudiante</div>
                                 <div class="form__grid">
                                     <div class="form__group">
-                                        <label class="form__label" for="code_student">Código Estudiante [Presione Enter]</label>
+                                        <label class="form__label" for="code_student">Código del Estudiante <small style="font-weight:400;color:var(--gray-600)">(vacío = se genera solo)</small></label>
                                         <input type="text" class="form__control" id="code_student" name="codestudiante"
-                                            required placeholder="Escribe el código y presiona Enter">
+                                            placeholder="¿Ya está en el sistema? Escriba el código y presione Enter">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="name_student">Nombre</label>
                                         <input type="text" class="form__control" id="name_student" name="nombreestudiante"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="surname_student">Apellidos</label>
                                         <input type="text" class="form__control" id="surname_student" name="apellidoestudiante"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="birthday_student">Fecha de Nacimiento</label>
                                         <input type="date" class="form__control" id="birthday_student" name="fecha_nac"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="phone_student">Teléfono</label>
                                         <input type="tel" class="form__control" id="phone_student" name="telefono"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="email_student">Correo Electrónico</label>
                                         <input type="email" class="form__control" id="email_student" name="email"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="gender_student">Sexo</label>
-                                        <input type="text" class="form__control" id="gender_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <select class="form__control" id="gender_student" required>
+                                            <option value="" disabled selected>Seleccione</option>
+                                            <option value="F">Femenino</option>
+                                            <option value="M">Masculino</option>
+                                        </select>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="nationality_student">Nacionalidad</label>
-                                        <input type="text" class="form__control" id="nationality_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="nationality_student">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="religion_student">Religión</label>
-                                        <input type="text" class="form__control" id="religion_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="religion_student">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="health_student">Diagnóstico de Salud / Alergias</label>
-                                        <input type="text" class="form__control" id="health_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="health_student">
                                     </div>
                                     <div class="form__group" style="grid-column: span 2;">
                                         <label class="form__label" for="address_student">Domicilio de Residencia</label>
-                                        <input type="text" class="form__control" id="address_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="address_student">
                                     </div>
                                     <div class="form__group" style="grid-column: span 2;">
                                         <label class="form__label" for="siblings_student">Hermanos en el Colegio</label>
-                                        <input type="text" class="form__control" id="siblings_student"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="siblings_student">
                                     </div>
                                     <input type="hidden" id="id_student" name="id_student">
                                 </div>
                                 <small style="display:block; color: var(--gray-600); font-size: 0.82rem;">
-                                    Estos datos provienen de la ficha del estudiante. Para corregirlos, edítelos en
-                                    <a href="registroEstudiante.html" style="color: var(--primary); font-weight:600;">Registro de Estudiante</a>.
+                                    Escriba los datos de la familia que solicita el cupo. Si el estudiante <strong>ya
+                                    estuvo en el centro</strong>, no lo registre aquí: use
+                                    <a href="registroReingreso.html" style="color: var(--primary); font-weight:600;">Reingreso</a>,
+                                    que trae su ficha y su tutor sin volver a escribirlos.
                                 </small>
                             </div>
                         </section>
@@ -239,57 +242,54 @@
                     <div id="step_3" class="step-content">
                         <section class="layout__section">
                             <div class="section">
-                                <div class="section__title">3. Detalles del Tutor</div>
+                                <div class="section__title">3. Datos del Tutor / Responsable</div>
                                 <div class="form__grid">
                                     <div class="form__group">
-                                        <label class="form__label" for="code_tutor">Número de Identidad / Cédula [Presione Enter]</label>
+                                        <label class="form__label" for="code_tutor">Número de Identidad / Cédula del Tutor</label>
                                         <input type="text" class="form__control" id="code_tutor" name="Ncédula"
-                                            required placeholder="Escribe la cédula y presiona Enter">
+                                            required placeholder="Si ya está registrado, presione Enter para traer sus datos">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="name_tutor">Nombre</label>
                                         <input type="text" class="form__control" id="name_tutor" name="nombres"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="surname_tutor">Apellidos</label>
                                         <input type="text" class="form__control" id="surname_tutor" name="apellidos"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="birthdate_tutor">Fecha de Nacimiento</label>
                                         <input type="date" class="form__control" id="birthdate_tutor" name="fecha"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="address_tutor">Dirección</label>
                                         <input type="text" class="form__control" id="address_tutor"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="phone_tutor">Teléfono</label>
                                         <input type="tel" class="form__control" id="phone_tutor"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="email_tutor">Correo Electrónico</label>
                                         <input type="email" class="form__control" id="email_tutor"
-                                            required readonly style="background-color: var(--gray-100);">
+                                            required>
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="document_tutor">Documento de Identidad</label>
-                                        <input type="text" class="form__control" id="document_tutor"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="document_tutor">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="nationality_tutor">Nacionalidad</label>
-                                        <input type="text" class="form__control" id="nationality_tutor"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="nationality_tutor">
                                     </div>
                                     <div class="form__group">
                                         <label class="form__label" for="religion_tutor">Religión</label>
-                                        <input type="text" class="form__control" id="religion_tutor"
-                                            readonly style="background-color: var(--gray-100);">
+                                        <input type="text" class="form__control" id="religion_tutor">
                                     </div>
                                     <input type="hidden" id="id_tutor" name="id_tutor">
                                 </div>
@@ -357,7 +357,7 @@
     </form>
 
     <script src="js/global.js?v=1.5.1"></script>
-    <script src="js/scriptMatricula.js?v=1.2.0"></script>
+    <script src="js/scriptMatricula.js?v=2.0.0"></script>
 </body>
 
 </html>
