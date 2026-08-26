@@ -125,6 +125,8 @@
       align-items: center;
       gap: 4px;
     }
+    .btn-editar { background: #E0E7FF; color: #3730A3; }
+    .btn-editar:hover { background: #C7D2FE; }
     .btn-reset { background: #FEF3C7; color: #92400E; }
     .btn-reset:hover { background: #FDE68A; }
     .btn-toggle-on { background: #D1FAE5; color: #065F46; }
@@ -261,6 +263,65 @@
   </main>
 
   <!-- Modal Crear Credencial -->
+
+  <!--
+    EDITAR UNA CUENTA
+    Antes solo se podia crear, activar/desactivar y restablecer contrasena. Si
+    alguien se equivocaba con el nombre o con el rol, la unica salida era crear
+    otra cuenta y desactivar la vieja, dejando dos filas para una misma persona.
+  -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="color: var(--primary-dark); font-size: 1.25rem;">Editar Cuenta</h3>
+        <i class="ri-close-line" id="close-edit-modal" style="font-size: 1.5rem; cursor: pointer; color: var(--slate-400);"></i>
+      </div>
+
+      <form id="edit-user-form">
+        <input type="hidden" id="edit-user-id">
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;">Rol de la Cuenta</label>
+          <select id="edit-role" required style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--slate-300);">
+            <option value="COORDINADOR">Coordinador Académico</option>
+            <option value="DOCENTE">Maestro / Docente</option>
+            <option value="ADMINISTRACION">Personal de Administración</option>
+            <option value="DIRECTOR">Director / Equipo Directivo</option>
+            <option value="ADMINISTRADOR">Administrador del Sistema</option>
+            <option value="TUTOR">Tutor / Responsable</option>
+            <option value="ESTUDIANTE">Estudiante</option>
+          </select>
+          <small id="edit-role-aviso" style="display:none; margin-top:6px; font-size:0.78rem; color:#92400E;"></small>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;">Nombre de Usuario</label>
+          <input type="text" id="edit-username" required style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--slate-300);">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;">Nombre(s)</label>
+            <input type="text" id="edit-firstname" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--slate-300);">
+          </div>
+          <div>
+            <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;">Apellido(s)</label>
+            <input type="text" id="edit-lastname" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--slate-300);">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem;">Correo Electrónico</label>
+          <input type="email" id="edit-email" style="width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--slate-300);">
+        </div>
+
+        <button type="submit" style="width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer;">
+          Guardar cambios
+        </button>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-overlay" id="create-modal">
     <div class="modal-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
@@ -313,7 +374,7 @@
     </div>
   </div>
 
-  <script src="js/global.js?v=1.7.0"></script>
+  <script src="js/global.js?v=1.7.1"></script>
   <script>
     let allUsers = [];
 
@@ -345,8 +406,18 @@
         if (e.target === createModal) createModal.classList.remove('active');
       });
 
+      // Modal de edicion
+      const editModal = document.getElementById('edit-modal');
+      document.getElementById('close-edit-modal').addEventListener('click', () => {
+        editModal.classList.remove('active');
+      });
+      editModal.addEventListener('click', (e) => {
+        if (e.target === editModal) editModal.classList.remove('active');
+      });
+
       // Form submit
       document.getElementById('create-user-form').addEventListener('submit', handleCreateUser);
+      document.getElementById('edit-user-form').addEventListener('submit', guardarEdicion);
 
       // Logout handler
       const logoutBtn = document.getElementById('logout-link');
@@ -434,6 +505,9 @@
             <td>${u.email ? escapeHtml(u.email) : '<span style="color:#94A3B8;">Sin correo</span>'}</td>
             <td>${activeText}</td>
             <td style="display: flex; gap: 6px;">
+              <button class="btn-action btn-editar" onclick="abrirEdicion(${u.id})">
+                <i class="ri-edit-line"></i> Editar
+              </button>
               <button class="btn-action btn-reset" onclick="resetPassword(${u.id}, '${usernameAttr}')">
                 <i class="ri-key-line"></i> Restablecer
               </button>
@@ -444,6 +518,65 @@
           </tr>
         `;
       }).join('');
+    }
+
+    /**
+     * Abre el formulario de edicion con los datos que ya tiene la cuenta.
+     *
+     * Se leen de `allUsers` --lo que ya trajo la tabla-- en vez de pedir otra
+     * vez al servidor: son los mismos datos que se estan viendo en pantalla.
+     */
+    function abrirEdicion(userId) {
+      const u = allUsers.find(x => x.id === userId);
+      if (!u) { showToast('No se encontró la cuenta', 'error'); return; }
+
+      document.getElementById('edit-user-id').value = u.id;
+      document.getElementById('edit-username').value = u.username || '';
+      document.getElementById('edit-firstname').value = u.first_name || '';
+      document.getElementById('edit-lastname').value = u.last_name || '';
+      document.getElementById('edit-email').value = u.email || '';
+      document.getElementById('edit-role').value = u.role || 'DOCENTE';
+
+      // El servidor tiene la ultima palabra sobre el rol; esto solo evita
+      // que la persona llene el formulario para recibir un rechazo.
+      const yo = (localStorage.getItem('user_username') || '').trim();
+      const selectorRol = document.getElementById('edit-role');
+      const aviso = document.getElementById('edit-role-aviso');
+      const esYo = u.username === yo;
+      selectorRol.disabled = esYo;
+      aviso.style.display = esYo ? 'block' : 'none';
+      aviso.textContent = esYo
+        ? 'No puede cambiar su propio rol: pídaselo a otro administrador.'
+        : '';
+
+      document.getElementById('edit-modal').classList.add('active');
+    }
+
+    function guardarEdicion(e) {
+      e.preventDefault();
+      const cuerpo = {
+        user_id: parseInt(document.getElementById('edit-user-id').value, 10),
+        username: document.getElementById('edit-username').value.trim(),
+        first_name: document.getElementById('edit-firstname').value.trim(),
+        last_name: document.getElementById('edit-lastname').value.trim(),
+        email: document.getElementById('edit-email').value.trim(),
+      };
+      const selectorRol = document.getElementById('edit-role');
+      if (!selectorRol.disabled) cuerpo.role = selectorRol.value;
+
+      apiFetch('/apiUserCreate/UsuarioCreate/update_user/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cuerpo)
+      })
+        .then(res => res.json().then(d => ({ ok: res.ok, d })))
+        .then(({ ok, d }) => {
+          if (!ok) throw new Error(d.error || 'No se pudo guardar');
+          showToast(d.message, 'success');
+          document.getElementById('edit-modal').classList.remove('active');
+          loadUsers();
+        })
+        .catch(err => showToast(err.message, 'error'));
     }
 
     function handleCreateUser(e) {
