@@ -85,7 +85,7 @@
     </section>
   </div>
 
-  <script src="js/global.js?v=1.6.0"></script>
+  <script src="js/global.js?v=1.7.0"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const role = localStorage.getItem('user_role');
@@ -121,7 +121,13 @@
         mostrar(['card-ga-consolidado', 'card-ga-horario', 'card-ga-matricula',
                  'card-ga-reingreso', 'card-ga-confirmar-matricula']);
       } else if (role === 'COORDINADOR') {
-        mostrar(['card-ga-consolidado']);
+        // El coordinador supervisa a TODOS los docentes: ve y corrige lo
+        // academico de cualquier grupo, igual que la direccion. Antes solo
+        // se le mostraba el consolidado. Se deja fuera la matricula, que es
+        // tramite de secretaria, no supervision academica.
+        mostrar(['card-ga-asistencia', 'card-ga-consolidado', 'card-ga-notas',
+                 'card-ga-valores', 'card-ga-boletin', 'card-ga-acta',
+                 'card-ga-horario']);
       }
     });
   </script>

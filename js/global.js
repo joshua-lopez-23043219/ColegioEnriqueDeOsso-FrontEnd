@@ -139,29 +139,37 @@ document.addEventListener('DOMContentLoaded', function () {
   }
   
   // 2. Control de acceso por roles
+  //
+  // El COORDINADOR academico aparece en todo lo academico: supervisa a los
+  // docentes, asi que ve y corrige notas, asistencia, actas, boletines y
+  // valores de cualquier grupo. Antes no figuraba en NINGUNA entrada, asi
+  // que esta pantalla lo expulsaba al menu antes de que cargara nada.
+  //
+  // Queda fuera de matricula, reingreso y confirmacion --tramite de
+  // secretaria-- y de la gestion de credenciales.
   const pageAccess = {
-    'registros.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'registroEstudiante.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'registroTutor.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'registroMaestro.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'registroGrupo.html': ['ADMINISTRADOR', 'DIRECTOR'],
-    'registroAsignatura.html': ['ADMINISTRADOR', 'DIRECTOR'],
-    'gAcademica.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'ADMINISTRACION'],
-    'registroAsistencia.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE'],
-    'registroNotas.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'TUTOR', 'ESTUDIANTE'],
-    'registroHorario.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'registros.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
+    'registroEstudiante.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
+    'registroTutor.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
+    'registroMaestro.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
+    'registroGrupo.html': ['ADMINISTRADOR', 'DIRECTOR', 'COORDINADOR'],
+    'registroAsignatura.html': ['ADMINISTRADOR', 'DIRECTOR', 'COORDINADOR'],
+    'gAcademica.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'ADMINISTRACION', 'COORDINADOR'],
+    'registroAsistencia.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'COORDINADOR'],
+    'registroNotas.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'TUTOR', 'ESTUDIANTE', 'COORDINADOR'],
+    'registroHorario.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
     'registroMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'TUTOR'],
     // El reingreso lo tramita el personal en ventanilla. El tutor no entra
     // aquí: su rematrícula en línea sigue por registroMatricula.html, que ya
     // valida la ventana de reingreso y que el estudiante sea el suyo.
     'registroReingreso.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
     'confirmarMatricula.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'dashboard.html': ['ADMINISTRADOR', 'DIRECTOR'],
-    'analisisIA.html': ['ADMINISTRADOR', 'DIRECTOR'],
+    'dashboard.html': ['ADMINISTRADOR', 'DIRECTOR', 'COORDINADOR'],
+    'analisisIA.html': ['ADMINISTRADOR', 'DIRECTOR', 'COORDINADOR'],
     'portalEstudiante.html': ['ADMINISTRADOR', 'ESTUDIANTE'],
-    'actividades.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE'],
-    'listadoEstudiantes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
-    'listadoDocentes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
+    'actividades.html': ['ADMINISTRADOR', 'DIRECTOR', 'DOCENTE', 'COORDINADOR'],
+    'listadoEstudiantes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
+    'listadoDocentes.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION', 'COORDINADOR'],
     'gestionUsuarios.html': ['ADMINISTRADOR', 'DIRECTOR', 'ADMINISTRACION'],
   };
   
