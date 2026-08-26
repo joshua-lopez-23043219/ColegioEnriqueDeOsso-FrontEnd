@@ -131,42 +131,93 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Asociar funciones a los botones
-    document.getElementById('register-btn').addEventListener('click', registrarEstudiante);
-    document.getElementById('edit-btn').addEventListener('click', editarEstudiante);
-    document.getElementById('btn-create-user').addEventListener('click', crearCuentaUsuario);
+    // Se enganchan solo los botones que EXISTEN. Antes se enganchaban tres a
+    // ciegas y dos no estaban en el HTML: `null.addEventListener` reventaba
+    // aqui mismo y se llevaba por delante lo que viniera despues.
+    const enganchar = (id, fn) => {
+        const boton = document.getElementById(id);
+        if (boton) boton.addEventListener('click', fn);
+    };
+    enganchar('edit-btn', editarEstudiante);
+    cargarGruposEnFicha();
+    enganchar('btn-create-user', crearCuentaUsuario);
 });
 
+// --------------------------------------------------------------------------
+// LO QUE ESTABA ROTO
+// Este script se escribio contra una version vieja de la pagina: leia y
+// escribia en `name_student`, `surname_student`, `phone_student` y
+// `email_student`, campos que el formulario ya NO tiene (ahora el nombre va
+// partido en cuatro). `document.getElementById(...).value` sobre null lanza
+// TypeError, asi que ni la busqueda ni la edicion funcionaban: la pantalla
+// entera estaba muerta.
+//
+// Ahora se trabaja con los campos que existen, y con ayudantes que toleran
+// que falte alguno: una pantalla no deberia caerse entera por un input que
+// alguien quito del HTML.
+// --------------------------------------------------------------------------
+function _leer(id) {
+    const campo = document.getElementById(id);
+    return campo ? String(campo.value || '').trim() : '';
+}
+
+function _escribir(id, valor) {
+    const campo = document.getElementById(id);
+    if (campo) campo.value = (valor === null || valor === undefined) ? '' : valor;
+}
+
+// Los campos de la ficha que esta pantalla puede corregir. El codigo NO va
+// aqui: identifica al estudiante, no es un dato a editar.
+const CAMPOS_FICHA = [
+    'first_name', 'second_name', 'first_lastname', 'second_lastname',
+    'birthday_student', 'gender', 'nationality', 'religion',
+    'weight', 'height', 'health_condition', 'address', 'siblings_info',
+    'phone_student', 'email_student'
+];
+
 function recolectarDatosEstudiante() {
-    return {
-        code_student: document.getElementById('code_student').value.trim(),
-        name_student: document.getElementById('name_student').value.trim(),
-        surname_student: document.getElementById('surname_student').value.trim(),
-        birthday_student: document.getElementById('birthday_student').value,
-        phone_student: document.getElementById('phone_student').value.trim(),
-        email_student: document.getElementById('email_student').value.trim()
-    };
+    const datos = { code_student: _leer('code_student') };
+    CAMPOS_FICHA.forEach(campo => {
+        const valor = _leer(campo);
+        if (valor) datos[campo] = valor;
+    });
+
+    // El modelo guarda el nombre partido en cuatro Y junto en dos. Las
+    // pantallas de notas, acta y boletin leen los juntos, asi que hay que
+    // recomponerlos o el cambio no se ve en ningun lado.
+    const nombre = [_leer('first_name'), _leer('second_name')].filter(Boolean).join(' ');
+    const apellido = [_leer('first_lastname'), _leer('second_lastname')].filter(Boolean).join(' ');
+    if (nombre) datos.name_student = nombre;
+    if (apellido) datos.surname_student = apellido;
+
+    const grupo = _leer('group_id');
+    if (grupo) datos.group = grupo;
+
+    return datos;
 }
 
-function registrarEstudiante() {
-    const data = recolectarDatosEstudiante();
-
-    apiFetch('/apiStudent/Student/PostStudent/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.json().then(body => ({ status: response.status, body })))
-        .then(({ status, body }) => {
-            if (status === 200) {
-                showToast("Estudiante registrado correctamente", "success");
-                document.getElementById('form-validation').reset();
-            } else {
-                showToast('⚠️ ' + (body.error || 'Error al registrar el estudiante'), "info");
-            }
+// El grupo es un selector: sin cargarlo, quedaba siempre vacio y editar la
+// ficha borraba la asignacion de grupo.
+function cargarGruposEnFicha() {
+    const selector = document.getElementById('group_id');
+    if (!selector) return;
+    apiFetch('/apiGroup/Group/ListaGrupos/')
+        .then(r => r.ok ? r.json() : Promise.reject(new Error('No se pudieron cargar los grupos')))
+        .then(grupos => {
+            grupos.forEach(g => {
+                const op = document.createElement('option');
+                op.value = g.id;
+                op.textContent = `${g.code_group} - ${g.level_group} (${g.section_group})`;
+                selector.appendChild(op);
+            });
         })
-        .catch(() => showToast('❌ No se pudo conectar con el servidor'), "info");
+        .catch(err => showToast(err.message, 'error'));
 }
+
+// El alta de fichas se hace SOLO desde Matricula, que crea el estudiante
+// junto con su tutor y su matricula en una transaccion. Crearla aqui dejaba
+// fichas sueltas sin matricula, que no salen en ninguna lista y que despues
+// nadie sabe de donde salieron. El servidor tambien lo rechaza.
 
 function editarEstudiante() {
     const data = recolectarDatosEstudiante();
@@ -179,7 +230,6 @@ function editarEstudiante() {
         .then(response => {
             if (response.ok) {
                 showToast("Estudiante actualizado correctamente", "success");
-                document.getElementById('form-validation').reset();
             } else {
                 showToast("Error al actualizar el estudiante", "error");
             }
@@ -212,8 +262,10 @@ function crearCuentaUsuario() {
     .then(data => {
         alert(`🔑 ¡Cuenta de Acceso Creada con éxito!\n\nUsuario (Código Estudiante): ${data.username}\nContraseña Temporal (Aleatoria): ${data.password}\n\nFavor entregar estas credenciales al tutor/estudiante.`);
         
-        document.getElementById('btn-create-user').style.display = 'none';
-        document.getElementById('user-status-text').style.display = 'block';
+        const btn = document.getElementById('btn-create-user');
+        const txt = document.getElementById('user-status-text');
+        if (btn) btn.style.display = 'none';
+        if (txt) txt.style.display = 'block';
         showToast("Cuenta de usuario creada", "success");
     })
     .catch(err => {
@@ -232,24 +284,18 @@ function buscarEstudiante() {
         .then(response => response.json().then(data => ({ status: response.status, body: data })))
         .then(({ status, body }) => {
             if (status === 200) {
-                document.getElementById('code_student').value = body.code_student;
-                document.getElementById('name_student').value = body.name_student;
-                document.getElementById('surname_student').value = body.surname_student;
-                document.getElementById('birthday_student').value = body.birthday_student;
-                document.getElementById('phone_student').value = body.phone_student;
-                document.getElementById('email_student').value = body.email_student;
-                
-                // Actualizar estado del botón de usuario
+                _escribir('code_student', body.code_student);
+                CAMPOS_FICHA.forEach(campo => _escribir(campo, body[campo]));
+                _escribir('student_id', body.id);
+                _escribir('group_id', body.group || '');
+
+                // El boton de crear cuenta solo existe en algunas versiones
+                // de la pagina; se toca solo si esta.
                 const btnUser = document.getElementById('btn-create-user');
                 const textUser = document.getElementById('user-status-text');
-                if (body.has_user) {
-                    btnUser.style.display = 'none';
-                    textUser.style.display = 'block';
-                } else {
-                    btnUser.style.display = 'block';
-                    textUser.style.display = 'none';
-                }
-                
+                if (btnUser) btnUser.style.display = body.has_user ? 'none' : 'block';
+                if (textUser) textUser.style.display = body.has_user ? 'block' : 'none';
+
                 showToast("Estudiante encontrado", "success");
             } else {
                 showToast('❌ ' + (body.error || 'Estudiante no encontrado'), "info");

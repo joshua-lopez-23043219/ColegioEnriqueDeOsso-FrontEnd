@@ -5,7 +5,11 @@
  * =============================================
  */
 
-const API_BASE_URL = 'https://colegioenriquedeosso-backend-production.up.railway.app';
+// El dominio propio del colegio. Es el UNICO lugar del frontend donde se
+// decide a donde apunta la API: cambiarlo aqui mueve las 30 paginas.
+// Ojo: la CSP de cada .html tambien nombra este host y hay que moverla
+// con el, o el navegador bloquea las llamadas sin decir por que.
+const API_BASE_URL = 'https://backendcolegioenriquedeosso.sistemaacademico.com';
 
 function getApiUrl(endpoint) {
   if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {

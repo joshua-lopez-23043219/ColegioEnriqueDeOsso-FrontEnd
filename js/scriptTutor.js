@@ -25,25 +25,9 @@ function recolectarDatosTutor() {
   };
 }
 
-function registrarTutor() {
-  const data = recolectarDatosTutor();
-
-  apiFetch('/apiMentor/Mentor/PostMentor/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-    .then(res => res.json().then(body => ({ status: res.status, body })))
-    .then(({ status, body }) => {
-      if (status === 200) {
-        showToast("Tutor registrado correctamente", "success");
-        document.getElementById('form-validation').reset();
-      } else {
-        showToast('⚠️ ' + (body.error || 'Error al registrar el tutor'), "info");
-      }
-    })
-    .catch(() => showToast('❌ No se pudo conectar con el servidor'), "info");
-}
+// El alta de tutores se hace SOLO desde Matricula, junto con el estudiante
+// del que son responsables: un tutor que no apunta a nadie queda huerfano.
+// El servidor tambien lo rechaza.
 
 function editarTutor() {
   const data = recolectarDatosTutor();

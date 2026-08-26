@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app; connect-src 'self' https://colegioenriquedeosso-backend-production.up.railway.app https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://colegioenriquedeosso-backend-production.up.railway.app; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com; connect-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://backendcolegioenriquedeosso.sistemaacademico.com; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Registro Completo de Estudiante — Colegio Enrique de Ossó</title>
@@ -136,15 +136,41 @@
                 <textarea class="form__control" id="address" rows="2" placeholder="Dirección exacta de residencia"></textarea>
               </div>
 
+              <!-- Teléfono y correo estaban en el script pero NO en el
+                   formulario: `getElementById(...).value` sobre null hacía
+                   caer la búsqueda y la edición enteras. -->
+              <div class="form__group">
+                <label class="form__label" for="phone_student">Teléfono</label>
+                <input type="tel" class="form__control" id="phone_student" placeholder="Ej: 8765-4321">
+              </div>
+
+              <div class="form__group">
+                <label class="form__label" for="email_student">Correo Electrónico</label>
+                <input type="email" class="form__control" id="email_student" placeholder="Ej: nombre@correo.com">
+              </div>
+
               <div class="form__group" style="grid-column: span 2;">
                 <label class="form__label" for="siblings_info">Hermanos en el Colegio</label>
                 <input type="text" class="form__control" id="siblings_info" placeholder="Ej. Nombre y Grado del hermano(a)">
               </div>
             </div>
 
-            <!-- BOTONES -->
-            <div class="form__button" style="margin-top: 1.5rem; display:flex; gap:12px;">
-              <button id="register-btn" type="submit" class="form__button--green"><i class="ri-save-line"></i> Guardar Estudiante</button>
+            <!-- BOTONES
+                 Esta pantalla ya NO da de alta: el alta ocurre solo en
+                 Matrícula, que crea la ficha junto con su tutor y su
+                 matrícula en un solo paso. Antes se podía crear aquí una
+                 ficha suelta que después nadie sabía de dónde salió, y que
+                 no aparecía en ninguna lista por no tener matrícula. -->
+            <div style="margin-top:1.5rem; padding:12px 16px; background:#EEF2FF;
+                        border-left:4px solid var(--primary); border-radius:8px;
+                        font-size:0.86rem; color:var(--slate-700); line-height:1.5;">
+              Esta pantalla es para <strong>corregir la ficha de un estudiante que ya existe</strong>:
+              busque su código y presione Enter. Para dar de alta a alguien nuevo use
+              <a href="registroMatricula.html" style="color:var(--primary); font-weight:600;">Matrícula</a>,
+              que crea la ficha con su tutor y su matrícula de una vez.
+            </div>
+            <div class="form__button" style="margin-top: 1rem; display:flex; gap:12px;">
+              <button id="edit-btn" type="button" class="form__button--green"><i class="ri-save-line"></i> Actualizar Datos</button>
               <button type="button" class="form__button--purple" onclick="location.href='listadoEstudiantes.html'"><i class="ri-file-list-line"></i> Ver Listado General</button>
             </div>
           </form>
@@ -153,7 +179,7 @@
     </div>
   </div>
 
-  <script src="js/global.js?v=1.5.1"></script>
-  <script src="./js/Creados/Catalagos/indexEstudiante.js?v=1.4.2"></script>
+  <script src="js/global.js?v=1.6.0"></script>
+  <script src="./js/Creados/Catalagos/indexEstudiante.js?v=1.5.0"></script>
 </body>
 </html>
