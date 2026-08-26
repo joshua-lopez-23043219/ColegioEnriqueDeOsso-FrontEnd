@@ -157,8 +157,13 @@ function fijarDocentePropio() {
   const select = document.getElementById('notes_teacher');
   if (!select) return;
   const suya = Array.from(select.options).find(o => String(o.value) === String(mio));
+  // Si su ficha NO esta en la lista --un `teacher_id` viejo en la sesion, o
+  // una cuenta sin docente enlazado-- se deja la lista completa. Vaciarla
+  // dejaba la pantalla diciendo que no hay ningun docente, que es peor que
+  // mostrarlos todos.
+  if (!suya) return;
   select.innerHTML = '';
-  if (suya) select.appendChild(suya);
+  select.appendChild(suya);
   select.value = mio;
   select.disabled = true;
   select.style.backgroundColor = 'var(--gray-100)';

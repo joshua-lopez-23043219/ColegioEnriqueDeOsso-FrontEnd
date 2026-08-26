@@ -44,11 +44,18 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 });
 
+/**
+ * Los grupos que esta persona puede consultar, desde el endpoint PROPIO del
+ * boletin.
+ *
+ * Antes se pedian a `ListaGrupos`, compartido con otras cinco pantallas: cada
+ * cambio que se hacia alli por otra pantalla llegaba aqui sin aviso.
+ */
 function cargarGrupos() {
-  apiFetch('/apiGroup/Group/ListaGrupos/')
+  apiFetch('/apiNote/Note/GruposParaBoletin/')
     .then(res => res.ok ? res.json() : Promise.reject(new Error('grupos')))
     .then(datos => {
-      const grupos = Array.isArray(datos) ? datos : (datos.Record || []);
+      const grupos = datos.grupos || [];
       const select = document.getElementById('sel-grupo');
       select.innerHTML = '<option value="">Seleccione un grupo</option>';
       grupos.forEach(g => {
@@ -73,20 +80,27 @@ function cargarEstudiantesDelGrupo() {
   }
   select.innerHTML = '<option value="">Cargando...</option>';
 
-  apiFetch(`/apiStudent/Student/ListStudent/?group_code=${encodeURIComponent(codigoGrupo)}`)
+  // El id del grupo, no su codigo: el endpoint propio del boletin ya devuelve
+  // los estudiantes con su MATRICULA resuelta, asi que la pantalla no tiene
+  // que adivinar cual es la buena. Adivinarla es lo que hacia que un
+  // estudiante promovido viera el boletin de su grado anterior.
+  const opcion = document.getElementById('sel-grupo').selectedOptions[0];
+  const idGrupo = opcion ? opcion.dataset.id : '';
+
+  apiFetch(`/apiNote/Note/GruposParaBoletin/?id_group=${encodeURIComponent(idGrupo)}`)
     .then(res => res.ok ? res.json() : Promise.reject(new Error('estudiantes')))
     .then(datos => {
-      const lista = datos.Record || datos || [];
+      const lista = datos.estudiantes || [];
       select.innerHTML = '<option value="">Seleccione un estudiante</option>';
-      lista
-        .slice()
-        .sort((a, b) => (a.surname_student || '').localeCompare(b.surname_student || '', 'es'))
-        .forEach(e => {
-          const opt = document.createElement('option');
-          opt.value = e.code_student;
-          opt.textContent = `${e.name_student || ''} ${e.surname_student || ''}`.trim() || e.code_student;
-          select.appendChild(opt);
-        });
+      lista.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.code_student;
+        // La matricula exacta viaja en el <option>; `generar()` la usa si
+        // esta, y solo cae al codigo cuando la escriben a mano.
+        opt.dataset.registration = e.id_registration;
+        opt.textContent = e.nombre || e.code_student;
+        select.appendChild(opt);
+      });
     })
     .catch(() => {
       select.innerHTML = '<option value="">Error al cargar</option>';
@@ -95,8 +109,17 @@ function cargarEstudiantesDelGrupo() {
 }
 
 function generar() {
-  const codigo = (document.getElementById('txt-codigo').value.trim() ||
-                  document.getElementById('sel-estudiante').value).toUpperCase();
+  const escrito = document.getElementById('txt-codigo').value.trim();
+  const seleccion = document.getElementById('sel-estudiante').selectedOptions[0];
+
+  // Con el estudiante elegido de la lista se manda su MATRICULA exacta: no
+  // hay forma de que el servidor tenga que adivinar de que ciclo es.
+  if (!escrito && seleccion && seleccion.dataset.registration) {
+    pedirBoletin({ id_registration: seleccion.dataset.registration });
+    return;
+  }
+
+  const codigo = (escrito || (seleccion ? seleccion.value : '')).toUpperCase();
   if (!codigo) {
     showToast('Seleccione un estudiante o escriba su código', 'warning');
     return;
