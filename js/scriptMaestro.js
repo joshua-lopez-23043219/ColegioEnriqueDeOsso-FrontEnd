@@ -115,6 +115,15 @@ function areasSeleccionadas() {
   return Array.from(new Set(valores));
 }
 
+// Asignaturas que traia el docente al cargarlo desde la base.
+//
+// Hace falta para distinguir dos situaciones que se ven iguales en el
+// formulario: un docente que NO tiene asignaturas asignadas, y uno al que el
+// usuario se las quito a proposito. El backend borra las asignaturas cuando
+// recibe una lista vacia, asi que confundirlas significa perder el vinculo
+// del docente con sus materias sin que nadie lo pida.
+let asignaturasAlCargar = [];
+
 // Rellena las filas a partir de lo guardado ("Química, Biología").
 function cargarAreas(areaTexto) {
   const contenedor = document.getElementById('areas-container');
@@ -176,6 +185,8 @@ document.getElementById("Nmaestro").addEventListener("keydown", function (event)
         document.getElementById('email').value = dataTR.email_teacher;
         
         // Rellenar las filas de area/asignatura del docente
+        asignaturasAlCargar = (Array.isArray(dataTR.subjects_detail)
+                               ? dataTR.subjects_detail.slice() : []);
         cargarAreas(
           Array.isArray(dataTR.subjects_detail) && dataTR.subjects_detail.length
             ? dataTR.subjects_detail.join(', ')
@@ -242,6 +253,7 @@ function guardarmaestro(event) {
       showToast("Maestro guardado correctamente", "success");
       document.getElementById("form-validation").reset();
       cargarAreas('');
+      asignaturasAlCargar = [];
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
@@ -267,8 +279,18 @@ function editarmaestro(event) {
     return;
   }
 
-  if (!Nmaestro || !nombres || !apellidos || !direccion || !telefono || !email || !asignatura) {
-    showToast("Completa todos los Campos", "warning");
+  // Para EDITAR solo se exige lo que identifica al docente. Antes se pedian
+  // los siete campos, y los docentes que el colegio ya tiene cargados no
+  // traen correo, direccion ni asignaturas: al intentar corregirles el
+  // telefono saltaba "Completa todos los Campos" y no habia forma de
+  // guardar. Ademas el mensaje no decia cual faltaba, y los campos vacios se
+  // ven igual que los llenos.
+  const faltantes = [];
+  if (!Nmaestro) faltantes.push("el número de cédula");
+  if (!nombres) faltantes.push("los nombres");
+  if (!apellidos) faltantes.push("los apellidos");
+  if (faltantes.length) {
+    showToast("Falta " + faltantes.join(", "), "warning");
     return;
   }
 
@@ -278,12 +300,30 @@ function editarmaestro(event) {
     name_teacher: `${nombres} ${apellidos}`,
     phone_teacher: telefono,
     email_teacher: email,
-    address_teacher: direccion,
-    // area_teacher se conserva como especialidad legible; subject_names es
-    // el vinculo real con las asignaturas del sistema.
-    area_teacher: asignatura,
-    subject_names: areas
+    address_teacher: direccion
   };
+
+  // Las asignaturas solo se mandan cuando hay algo que decir sobre ellas.
+  //
+  // El backend BORRA las asignaturas del docente cuando recibe una lista
+  // vacia. Mandarla siempre significaba que abrir un docente y guardarle un
+  // cambio de telefono le quitaba sus materias en silencio, y con ellas su
+  // horario. Ahora: si hay asignaturas se envian; si no hay y tampoco las
+  // tenia, no se toca el campo; y si las tenia y quedaron vacias, se
+  // pregunta antes de quitarselas.
+  if (areas.length) {
+    payload.area_teacher = asignatura;
+    payload.subject_names = areas;
+  } else if (asignaturasAlCargar.length) {
+    var aviso = "Este docente tiene asignadas: " + asignaturasAlCargar.join(", ")
+      + ". Al guardar sin ninguna asignatura se le quitaran todas, y dejara "
+      + "de aparecer en su horario. Desea continuar?";
+    if (!confirm(aviso)) {
+      return;
+    }
+    payload.area_teacher = "";
+    payload.subject_names = [];
+  }
 
   apiFetch('/apiTeacher/Teacher/UpdateTeacher/', {
     method: 'POST',
@@ -300,6 +340,7 @@ function editarmaestro(event) {
       showToast("Maestro actualizado correctamente", "success");
       document.getElementById("form-validation").reset();
       cargarAreas('');
+      asignaturasAlCargar = [];
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
@@ -340,6 +381,7 @@ function eliminarmaestro(event) {
       showToast("Maestro eliminado correctamente", "success");
       document.getElementById("form-validation").reset();
       cargarAreas('');
+      asignaturasAlCargar = [];
       document.getElementById("id_teacher").value = '';
     })
     .catch(error => {
