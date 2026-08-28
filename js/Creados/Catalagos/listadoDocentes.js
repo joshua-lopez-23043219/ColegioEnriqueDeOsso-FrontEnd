@@ -74,10 +74,21 @@ function loadTeachers() {
         cellName.textContent = teacher.name_teacher;
         row.appendChild(cellName);
 
-        // Área
+        // Asignaturas que imparte.
+        //
+        // Se muestran las asignaturas REALES (`subjects_detail`, que es la
+        // union de su habilitacion y su horario) y no `area_teacher`, que es
+        // un texto libre escrito a mano al cargar los datos y que puede estar
+        // equivocado: habia docentes que aqui figuraban dando Matematicas
+        // cuando en el horario daban Ingles. El texto libre queda de reserva
+        // solo para los docentes que todavia no tienen ninguna clase cargada.
         const cellArea = document.createElement('td');
         cellArea.className = 'form__table-campo';
-        cellArea.textContent = teacher.area_teacher || 'General';
+        const materias = Array.isArray(teacher.subjects_detail)
+          ? teacher.subjects_detail : [];
+        cellArea.textContent = materias.length
+          ? materias.join(', ')
+          : (teacher.area_teacher || 'Sin asignaturas');
         row.appendChild(cellArea);
 
         // Contacto (Teléfono y Correo)
