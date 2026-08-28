@@ -114,6 +114,18 @@ function performLogin() {
       localStorage.setItem('teacher_id', data.teacher_id || '');
       localStorage.setItem('tutor_id', data.tutor_id || '');
       
+      // La contrasena con la que acaba de entrar se la genero el sistema y la
+      // leyo en pantalla quien se la entrego. Hasta que elija una suya, la
+      // cuenta tiene dos duenos: va directo a cambiarla, y el servidor le
+      // responde 403 a todo lo demas mientras tanto.
+      if (data.debe_cambiar_password) {
+         showToast('Antes de empezar, cambie la contraseña que le entregaron', 'warning');
+         setTimeout(() => {
+            window.location.href = './cambiarPassword.html';
+         }, 1200);
+         return;
+      }
+
       showToast(`¡Bienvenido/a, ${data.name}!`, 'success');
 
       // El estudiante entra DIRECTO a su portal. El menu intermedio le

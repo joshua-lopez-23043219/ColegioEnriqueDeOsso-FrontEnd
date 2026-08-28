@@ -93,6 +93,26 @@ async function apiFetch(endpoint, options = {}, _retried = false) {
     throw new Error('Sesión expirada. Por favor inicie sesión nuevamente.');
   }
 
+  // Todavía usa la contraseña que le entregaron. El servidor le cierra la API
+  // entera menos el cambio de contraseña, así que se le lleva ahí aunque haya
+  // llegado escribiendo la dirección en la barra en vez de por el login.
+  if (response.status === 403 &&
+      !window.location.pathname.endsWith('cambiarPassword.html')) {
+    // Un 403 corriente (sin permiso para esa sección) no trae ese campo, y
+    // puede ni siquiera ser JSON: se lee sobre una copia y, si no se puede
+    // interpretar, se devuelve la respuesta tal cual a quien llamó.
+    let cuerpo = null;
+    try {
+      cuerpo = await response.clone().json();
+    } catch (_) {
+      cuerpo = null;
+    }
+    if (cuerpo && cuerpo.debe_cambiar_password) {
+      window.location.href = 'cambiarPassword.html';
+      throw new Error(cuerpo.error || 'Debe cambiar su contraseña antes de continuar.');
+    }
+  }
+
   return response;
 }
 
