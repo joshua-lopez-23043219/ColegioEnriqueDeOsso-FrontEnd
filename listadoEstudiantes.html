@@ -397,7 +397,47 @@
     </div>
   </div>
 
+  <!-- MODAL: Traslado de grupo -->
+  <div class="modal__container" id="trasladoModal">
+    <div class="modal" style="width: min(520px, 94vw);">
+      <span class="modal__close" onclick="closeTrasladoModal()">&times;</span>
+      <h2 style="font-family: var(--font-heading); color: var(--primary-dark); margin-bottom: 16px; border-bottom: 2px solid var(--accent); padding-bottom: 8px;">↔️ Trasladar de Grupo</h2>
+
+      <div style="background: var(--gray-100); border: 1px solid var(--gray-300); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 16px;">
+        <p style="margin: 0 0 4px; font-weight: 700; color: var(--gray-800);" id="traslado_nombre"></p>
+        <p style="margin: 0; font-size: 0.85rem; color: var(--gray-600);">
+          <span id="traslado_codigo" style="font-family: monospace;"></span>
+          &nbsp;·&nbsp; Grupo actual: <strong id="traslado_actual"></strong>
+        </p>
+      </div>
+
+      <div class="form__group" style="margin-bottom: 14px;">
+        <label class="form__label" for="traslado_destino">Grupo de destino</label>
+        <select class="form__control" id="traslado_destino"></select>
+      </div>
+
+      <div class="form__group" style="margin-bottom: 8px;">
+        <label class="form__label" for="traslado_motivo">Motivo del traslado</label>
+        <input type="text" class="form__control" id="traslado_motivo" maxlength="200"
+               placeholder="Petición de la familia, cupo, convivencia…">
+        <p style="font-size: 0.78rem; color: var(--gray-600); margin: 6px 0 0;">
+          Queda en el expediente del estudiante, con la fecha y quién lo hizo.
+        </p>
+      </div>
+
+      <p style="font-size: 0.8rem; color: var(--gray-700); background: var(--primary-glow); border-radius: var(--radius-sm); padding: 10px 12px; margin: 14px 0;">
+        Sus notas y su asistencia lo acompañan. Su código no cambia: es también
+        su usuario para entrar al sistema.
+      </p>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; flex-wrap: wrap;">
+        <button type="button" onclick="closeTrasladoModal()" style="padding: 9px 18px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid var(--gray-400); cursor: pointer; background: var(--white); color: var(--gray-700);">Cancelar</button>
+        <button type="button" id="btn-traslado-confirmar" onclick="confirmarTraslado(false)" style="padding: 9px 18px; font-weight: 600; border-radius: var(--radius-sm); border: none; cursor: pointer; background: var(--primary); color: white;">Trasladar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/global.js?v=1.7.1"></script>
-  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.7.0"></script>
+  <script src="js/Creados/Catalagos/listadoEstudiantes.js?v=1.8.0"></script>
 </body>
 </html>

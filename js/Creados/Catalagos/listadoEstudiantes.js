@@ -368,6 +368,21 @@ function renderStudentsTable(students) {
     editBtn.addEventListener('click', () => openEditModal(student));
     cellActions.appendChild(editBtn);
 
+    // Trasladar de grupo. Solo para quien sigue matriculado: a un retirado se
+    // le hace reingreso, no traslado, y el servidor lo rechaza igualmente.
+    if (!estaRetirado(student)) {
+      const moveBtn = document.createElement('button');
+      moveBtn.type = 'button';
+      moveBtn.className = 'action-btn';
+      moveBtn.title = 'Trasladar a otro grupo';
+      moveBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width: 20px; height: 20px; color: #0e7490;">
+          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 9H5a1 1 0 010-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>`;
+      moveBtn.addEventListener('click', () => openTrasladoModal(student));
+      cellActions.appendChild(moveBtn);
+    }
+
     row.appendChild(cellActions);
     tbody.appendChild(row);
   });
@@ -680,6 +695,116 @@ function resetUserPassword() {
       loadAllStudents();
     })
     .catch(err => {
+      showToast(err.message, 'error');
+    });
+}
+
+// ─────────────────────────────────────────────
+// Traslado de grupo
+//
+// Notas y asistencia cuelgan de la matricula, asi que siguen al estudiante
+// solos. Lo que no viaja son los puntos de actividades, porque una actividad
+// pertenece a un grupo: el servidor los cuenta y lo dice al terminar.
+//
+// El codigo del estudiante NO cambia. Codifica la seccion en la que ingreso,
+// pero es tambien su usuario para entrar al sistema.
+// ─────────────────────────────────────────────
+let trasladoEstudiante = null;
+
+function openTrasladoModal(student) {
+  trasladoEstudiante = student;
+
+  document.getElementById('traslado_nombre').textContent = nombreCompleto(student);
+  document.getElementById('traslado_codigo').textContent = student.code_student;
+  document.getElementById('traslado_actual').textContent =
+    student.group_code || 'sin grupo';
+  document.getElementById('traslado_motivo').value = '';
+
+  const select = document.getElementById('traslado_destino');
+  select.innerHTML = '<option value="">Cargando grupos…</option>';
+  document.getElementById('trasladoModal').style.display = 'flex';
+
+  apiFetch('/apiRegistration/Registration/GruposParaTraslado/')
+    .then(r => r.json())
+    .then(data => {
+      const actual = (student.group_code || '').toLowerCase();
+      const opciones = (data.grupos || [])
+        .filter(g => g.code_group.toLowerCase() !== actual);
+
+      if (!opciones.length) {
+        select.innerHTML = '<option value="">No hay otro grupo disponible</option>';
+        return;
+      }
+      select.innerHTML = '<option value="">Seleccione el grupo…</option>' +
+        opciones.map(g => {
+          const lleno = g.capacidad && g.disponibles <= 0;
+          const cupo = lleno
+            ? 'LLENO'
+            : `${g.disponibles} cupo${g.disponibles === 1 ? '' : 's'}`;
+          const guia = g.guia ? ` — ${escapeHtml(g.guia)}` : '';
+          return `<option value="${g.id}" ${lleno ? 'disabled' : ''}>` +
+                 `${escapeHtml(g.code_group)}${guia} (${cupo})</option>`;
+        }).join('');
+    })
+    .catch(() => {
+      select.innerHTML = '<option value="">No se pudieron cargar los grupos</option>';
+      showToast('No se pudieron cargar los grupos', 'error');
+    });
+}
+
+function closeTrasladoModal() {
+  document.getElementById('trasladoModal').style.display = 'none';
+  trasladoEstudiante = null;
+}
+
+function confirmarTraslado(confirmarCambioDeGrado) {
+  if (!trasladoEstudiante) return;
+
+  const destino = document.getElementById('traslado_destino').value;
+  const motivo = document.getElementById('traslado_motivo').value.trim();
+
+  if (!destino) {
+    showToast('Seleccione el grupo de destino', 'warning');
+    return;
+  }
+  if (!motivo) {
+    showToast('Indique el motivo: queda en el expediente del estudiante', 'warning');
+    return;
+  }
+
+  const boton = document.getElementById('btn-traslado-confirmar');
+  boton.disabled = true;
+
+  apiFetch('/apiRegistration/Registration/TrasladarEstudiante/', {
+    method: 'POST',
+    body: JSON.stringify({
+      code_student: trasladoEstudiante.code_student,
+      id_group_destino: destino,
+      motivo: motivo,
+      confirmar_cambio_de_grado: !!confirmarCambioDeGrado
+    })
+  })
+    .then(async r => {
+      const data = await r.json();
+      if (!r.ok) throw Object.assign(new Error(data.error || 'Error'), { data });
+      return data;
+    })
+    .then(data => {
+      closeTrasladoModal();
+      showToast(data.message, 'success');
+      loadAllStudents();
+    })
+    .catch(err => {
+      boton.disabled = false;
+      // Cambio de GRADO con notas ya puestas: el servidor no lo hace solo.
+      // Se le muestra a quien traslada exactamente lo que va a quedar
+      // descolgado antes de que decida.
+      if (err.data && err.data.requiere_confirmacion) {
+        if (confirm(err.message + '\n\n¿Trasladarlo de todos modos?')) {
+          confirmarTraslado(true);
+        }
+        return;
+      }
       showToast(err.message, 'error');
     });
 }
