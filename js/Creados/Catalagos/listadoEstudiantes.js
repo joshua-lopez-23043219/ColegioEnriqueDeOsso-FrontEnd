@@ -119,13 +119,28 @@ function estaRetirado(student) {
   return student.estado_matricula === 'RETIRADA';
 }
 
+// Cursa quien tiene una matricula viva EN EL CICLO EN CURSO. Antes "cursando"
+// era "no retirado", y eso incluia a quien no tiene matricula este ciclo: al
+// cambiar de ano, los bachilleres de 11mo y los que no volvieron habrian
+// seguido contando como estudiantes activos para siempre.
+function estaCursando(student) {
+  return student.estado_matricula === 'PENDIENTE' ||
+         student.estado_matricula === 'CONFIRMADA';
+}
+
+function sinMatriculaEsteCiclo(student) {
+  return !student.estado_matricula;
+}
+
 function aplicarFiltros() {
   let lista = allStudentsList;
 
   if (filtroEstado === 'ACTIVOS') {
-    lista = lista.filter(s => !estaRetirado(s));
+    lista = lista.filter(estaCursando);
   } else if (filtroEstado === 'RETIRADOS') {
     lista = lista.filter(estaRetirado);
+  } else if (filtroEstado === 'SIN_MATRICULA') {
+    lista = lista.filter(sinMatriculaEsteCiclo);
   }
 
   if (filtroGrupo && filtroGrupo !== 'ALL') {
@@ -176,6 +191,11 @@ function renderChips(students) {
     chips.push(`🚪 Retirados: <strong>${retirados}</strong>`);
   }
 
+  const sinMatricula = students.filter(sinMatriculaEsteCiclo).length;
+  if (sinMatricula > 0) {
+    chips.push(`📄 Sin matrícula este ciclo: <strong>${sinMatricula}</strong>`);
+  }
+
   cont.innerHTML = chips.map(c => `<span class="chip-dato">${c}</span>`).join('');
 }
 
@@ -194,6 +214,17 @@ function renderStudentsTable(students) {
   tbody.innerHTML = '';
 
   if (!students || students.length === 0) {
+    // A principios de ciclo "Cursando" sale vacio aunque haya cientos de
+    // fichas: todavia nadie se ha matriculado. Se dice, en vez de dejar creer
+    // que los estudiantes desaparecieron.
+    const sinMatricula = allStudentsList.filter(sinMatriculaEsteCiclo).length;
+    if (filtroEstado === 'ACTIVOS' && !filtroTexto && filtroGrupo === 'ALL' && sinMatricula > 0) {
+      noMessage.textContent =
+        `Todavía no hay estudiantes matriculados en este ciclo. Hay ${sinMatricula} ` +
+        `ficha(s) sin matrícula: elija "Sin matrícula este ciclo" para verlas.`;
+    } else {
+      noMessage.textContent = 'No hay estudiantes que coincidan con el filtro.';
+    }
     noMessage.style.display = 'block';
     tableWrapper.style.display = 'none';
     return;
@@ -370,7 +401,7 @@ function renderStudentsTable(students) {
 
     // Trasladar de grupo. Solo para quien sigue matriculado: a un retirado se
     // le hace reingreso, no traslado, y el servidor lo rechaza igualmente.
-    if (!estaRetirado(student)) {
+    if (estaCursando(student)) {
       const moveBtn = document.createElement('button');
       moveBtn.type = 'button';
       moveBtn.className = 'action-btn';

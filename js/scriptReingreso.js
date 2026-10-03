@@ -252,9 +252,23 @@
 
   // ---------------- Arranque ----------------
   window.addEventListener('DOMContentLoaded', function () {
-    // Las ventanas de matricula se abren durante un ciclo para llenar el
-    // SIGUIENTE, asi que ese es el valor util por defecto.
-    document.getElementById('ciclo_destino').value = new Date().getFullYear() + 1;
+    // El ciclo que se esta matriculando lo dice el servidor. Antes se ponia
+    // "ano + 1" a ciegas: acierta en noviembre, pero en enero ofrecia el ciclo
+    // de dentro de dos anos. Mientras llega la respuesta se usa la misma regla
+    // del servidor (de octubre en adelante, el ano siguiente).
+    var ahora = new Date();
+    var campoCiclo = document.getElementById('ciclo_destino');
+    campoCiclo.value = ahora.getFullYear() + (ahora.getMonth() + 1 >= 10 ? 1 : 0);
+    apiFetch('/apiUserCreate/UsuarioCreate/GetEnrollmentWindow/')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (datos) {
+        var ciclo = datos && datos.ventanas && datos.ventanas.reingreso &&
+                    datos.ventanas.reingreso.ciclo;
+        // Solo si nadie lo cambio a mano mientras tanto.
+        if (ciclo && !campoCiclo.dataset.tocado) campoCiclo.value = ciclo;
+      })
+      .catch(function () { /* se queda la regla local */ });
+    campoCiclo.addEventListener('input', function () { campoCiclo.dataset.tocado = '1'; });
 
     document.getElementById('q').addEventListener('input', alEscribir);
     document.getElementById('ciclo_destino').addEventListener('change', buscar);

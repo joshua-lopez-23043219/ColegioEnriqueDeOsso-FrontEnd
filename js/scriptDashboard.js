@@ -80,8 +80,15 @@
     // tiene hasta cerrar los cuatro). El pie de la tarjeta lo dice para que
     // nadie lo lea como resultado definitivo.
     var cortes = k.cortes_evaluados;
-    var pieProm = 'Histórico de todas las notas';
-    if (cortes === 0) {
+    // Los indicadores describen UN ciclo. Normalmente el que corre; en enero y
+    // febrero, cuando el ciclo nuevo aun no tiene notas, el ultimo calificado.
+    // Se dice cual, para que nadie lea las cifras de un ano como si fueran del
+    // otro.
+    var esOtroCiclo = k.ciclo && k.ciclo_en_curso && k.ciclo !== k.ciclo_en_curso;
+    var pieProm = k.ciclo ? ('Ciclo ' + k.ciclo) : 'Notas del ciclo';
+    if (esOtroCiclo) {
+      pieProm = 'Ciclo ' + k.ciclo + ': el ' + k.ciclo_en_curso + ' aún no tiene notas';
+    } else if (cortes === 0) {
       pieProm = 'Aún no hay notas calificadas';
     } else if (cortes > 0 && cortes < 4) {
       pieProm = 'Parcial: promedio de ' + cortes +

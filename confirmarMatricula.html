@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com; connect-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://backendcolegioenriquedeosso.sistemaacademico.com; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com; connect-src 'self' https://backendcolegioenriquedeosso.sistemaacademico.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://unpkg.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: blob: https://backendcolegioenriquedeosso.sistemaacademico.com; frame-src blob:; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com;">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestión de Matrículas — Colegio Enrique de Ossó</title>
@@ -188,7 +188,8 @@
                   </div>
                   <div class="form__group">
                     <label class="form__label" for="rein_period">Periodo Académico</label>
-                    <input type="text" class="form__control" id="rein_period" placeholder="Ej. 2026-1">
+                    <input type="text" class="form__control" id="rein_period" placeholder="Ej. 2027">
+                    <p id="rein_ciclo" style="font-size: 0.78rem; color: var(--primary-dark); font-weight: 600; margin: 6px 0 0;"></p>
                   </div>
                   <div class="form__group">
                     <label class="form__label" for="rein_start">Fecha de inicio</label>
@@ -222,7 +223,8 @@
                   </div>
                   <div class="form__group">
                     <label class="form__label" for="mat_period">Periodo Académico</label>
-                    <input type="text" class="form__control" id="mat_period" placeholder="Ej. 2026-1">
+                    <input type="text" class="form__control" id="mat_period" placeholder="Ej. 2027">
+                    <p id="mat_ciclo" style="font-size: 0.78rem; color: var(--primary-dark); font-weight: 600; margin: 6px 0 0;"></p>
                   </div>
                   <div class="form__group">
                     <label class="form__label" for="mat_start">Fecha de inicio</label>
@@ -312,7 +314,23 @@
     </div>
   </div>
 
+  <!-- MODAL: visor de documentos de matrícula.
+       Los archivos llegan por un endpoint que exige el token, así que se
+       descargan con apiFetch y se muestran aquí mismo desde un blob:. Por eso
+       el CSP de esta página admite blob: en img-src y frame-src. -->
+  <div class="modal__container" id="visorDocumentoModal" style="z-index: 1200;">
+    <div class="modal" style="width: min(900px, 96vw); max-height: 92vh; display: flex; flex-direction: column;">
+      <span class="modal__close" onclick="cerrarVisorDocumento()">&times;</span>
+      <h2 id="visor_titulo" style="font-family: var(--font-heading); color: var(--primary-dark); margin: 0 28px 12px 0; font-size: 1.1rem; overflow-wrap: anywhere;"></h2>
+      <div id="visor_cuerpo" style="flex: 1; min-height: 50vh; display: flex; align-items: center; justify-content: center; background: var(--gray-100); border-radius: var(--radius-md); overflow: auto;"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
+        <a id="visor_descargar" class="form__button--purple" style="padding: 9px 18px; font-weight: 600; border-radius: var(--radius-sm); text-decoration: none; background: var(--primary); color: white;">Descargar</a>
+        <button type="button" onclick="cerrarVisorDocumento()" style="padding: 9px 18px; font-weight: 600; border-radius: var(--radius-sm); border: 1px solid var(--gray-400); cursor: pointer; background: var(--white); color: var(--gray-700);">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/global.js?v=1.8.0"></script>
-  <script src="js/confirmarMatricula.js?v=1.1.0"></script>
+  <script src="js/confirmarMatricula.js?v=1.2.0"></script>
 </body>
 </html>

@@ -100,7 +100,23 @@ function setTodayDate() {
   document.getElementById("date_registration").value = `${d.getFullYear()}-${mes}-${dia}`;
 
   const campoCiclo = document.getElementById("anio_lectivo");
-  if (campoCiclo && !campoCiclo.value) campoCiclo.value = d.getFullYear();
+  if (campoCiclo && !campoCiclo.value) {
+    campoCiclo.value = d.getFullYear();
+    // Si la ventana de matricula esta ABIERTA, el colegio esta matriculando
+    // para el ciclo de esa ventana, que de octubre a diciembre es el ano
+    // siguiente. Con la ventana cerrada, lo normal es un ingreso al ano en
+    // curso. El campo queda a la vista para corregirlo en cualquier caso.
+    campoCiclo.addEventListener('input', () => { campoCiclo.dataset.tocado = '1'; });
+    apiFetch('/apiUserCreate/UsuarioCreate/GetEnrollmentWindow/')
+      .then(r => (r.ok ? r.json() : null))
+      .then(datos => {
+        const v = datos && datos.ventanas && datos.ventanas.matricula;
+        if (v && v.abierta && v.ciclo && !campoCiclo.dataset.tocado) {
+          campoCiclo.value = v.ciclo;
+        }
+      })
+      .catch(() => { /* se queda el ano en curso */ });
+  }
 }
 
 function _fijar(id, valor) {

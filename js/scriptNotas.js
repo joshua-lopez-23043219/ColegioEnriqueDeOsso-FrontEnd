@@ -308,8 +308,12 @@ function loadActivityGrades() {
       // Parse students: structure their scores
       activeStudents = (data.students || []).map(st => {
         const scores = {};
+        // Solo los puntajes que existen. Un valor nulo o vacio es "sin
+        // calificar" y no se convierte en cero.
         for (const [actId, score] of Object.entries(st.scores || {})) {
-          scores[String(actId)] = parseFloat(score || 0.0);
+          if (score === null || score === undefined || score === '') continue;
+          const numero = parseFloat(score);
+          if (!isNaN(numero)) scores[String(actId)] = numero;
         }
         return {
           id_registration: st.id_registration,
@@ -453,12 +457,12 @@ function renderGradesTable() {
       html += `
         <td class="form__table-campo">
           <input type="number" class="form__input" value="${val}" min="0" max="${act.max_score}" step="0.5"
-            oninput="updateStudentScore(${st.id_registration}, '${act.key}', this)" required>
+            oninput="updateStudentScore(${st.id_registration}, '${act.key}', this)">
         </td>`;
     });
 
     // Total cell
-    const formattedTotal = st.total % 1 !== 0 ? st.total.toFixed(1) : st.total;
+    const formattedTotal = textoTotal(st);
     html += `
         <td class="form__table-campo" id="total_reg_${st.id_registration}" style="font-weight: 700; color: var(--primary-dark); font-size: 0.95rem;">
           ${formattedTotal}
@@ -594,9 +598,9 @@ function saveActivityFromModal() {
       max_score: maxScore
     });
 
-    activeStudents.forEach(st => {
-      st.scores[key] = 0.0;
-    });
+    // La actividad nueva nace SIN puntajes. Antes se le ponia 0.0 a toda la
+    // clase: al guardar, quien todavia no habia sido calificado quedaba con
+    // un cero de verdad, y eso bajaba su nota del corte.
 
     closeAddActivityModal();
     renderActivitiesList();
@@ -627,7 +631,24 @@ function updateStudentScore(registrationId, activityKey, input) {
 
   if (!act) return;
 
-  if (val === '' || isNaN(score) || score < 0 || score > act.max_score) {
+  // Casilla vacia = todavia sin calificar. No es un error ni es un cero: se
+  // quita el puntaje y la nota del corte se calcula con lo demas. Antes una
+  // casilla vacia se marcaba en rojo y bloqueaba el guardado, asi que la unica
+  // forma de "no calificar" a alguien era ponerle 0.
+  if (val === '') {
+    input.style.border = '1px solid var(--gray-300)';
+    input.style.boxShadow = 'none';
+    const alumno = activeStudents.find(st => st.id_registration === registrationId);
+    if (alumno) {
+      delete alumno.scores[activityKey];
+      alumno.total = Object.values(alumno.scores).reduce((sum, v) => sum + (parseFloat(v) || 0.0), 0.0);
+      const celda = document.getElementById(`total_reg_${registrationId}`);
+      if (celda) celda.textContent = textoTotal(alumno);
+    }
+    return;
+  }
+
+  if (isNaN(score) || score < 0 || score > act.max_score) {
     input.style.border = '2px solid var(--danger)';
     input.style.boxShadow = '0 0 0 3px rgba(231, 76, 60, 0.15)';
     return;
@@ -647,13 +668,20 @@ function updateStudentScore(registrationId, activityKey, input) {
     // Update total cell
     const cell = document.getElementById(`total_reg_${registrationId}`);
     if (cell) {
-      cell.textContent = student.total % 1 !== 0 ? student.total.toFixed(1) : student.total;
+      cell.textContent = textoTotal(student);
     }
   }
 }
 
+// El total del corte de un estudiante. Raya, y no cero, cuando todavia no
+// tiene ningun puntaje: "sin calificar" y "saco cero" no son lo mismo.
+function textoTotal(st) {
+  if (!st.scores || Object.keys(st.scores).length === 0) return '—';
+  return st.total % 1 !== 0 ? st.total.toFixed(1) : st.total;
+}
+
 // Save student activity grades
-function saveActivityGrades() {
+function saveActivityGrades(reemplazarDirectas) {
   const groupId = document.getElementById('notes_group').value;
   const subjectId = document.getElementById('notes_subject').value;
   const partial = document.getElementById('notes_partial').value;
@@ -685,7 +713,8 @@ function saveActivityGrades() {
     grades: activeStudents.map(st => ({
       id_registration: st.id_registration,
       scores: st.scores
-    }))
+    })),
+    reemplazar_notas_directas: reemplazarDirectas === true
   };
 
   apiFetch('/apiNote/Note/SaveActivityGrades/', {
@@ -693,9 +722,12 @@ function saveActivityGrades() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Error al guardar');
-      return res.json();
+    .then(async res => {
+      // El servidor dice que nota esta mal y por que. Antes se tiraba ese
+      // mensaje y solo salia "Error al guardar".
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw Object.assign(new Error(data.error || 'Error al guardar'), { data });
+      return data;
     })
     .then(response => {
       showToast('Calificaciones guardadas y sincronizadas con el boletín', 'success');
@@ -703,8 +735,17 @@ function saveActivityGrades() {
       loadActivityGrades();
     })
     .catch(err => {
+      // Hay estudiantes con nota en este corte que no vino de actividades
+      // (importada del libro, o traida de otro grupo). Guardar la reemplaza:
+      // se pregunta antes en vez de hacerlo en silencio.
+      if (err.data && err.data.requiere_confirmacion) {
+        if (confirm(err.message + ' ¿Reemplazar esas notas de todos modos?')) {
+          saveActivityGrades(true);
+        }
+        return;
+      }
       console.error(err);
-      showToast('Error al guardar las notas por actividades', 'error');
+      showToast(err.message || 'Error al guardar las notas por actividades', 'error');
     });
 }
 
@@ -905,7 +946,7 @@ function renderBulletinTable(grades) {
         
         <!-- IS (Readonly/calculated) -->
         <td class="form__table-campo" id="sem1_${idx}" style="font-weight: 600; background: var(--gray-50);">
-          ${valorDe(g, 'first_semester')}
+          ${escapeHtml(String(valorDe(g, 'first_semester')))}
         </td>
         
         <!-- III -->
@@ -920,12 +961,12 @@ function renderBulletinTable(grades) {
         
         <!-- IIS (Readonly/calculated) -->
         <td class="form__table-campo" id="sem2_${idx}" style="font-weight: 600; background: var(--gray-50);">
-          ${valorDe(g, 'second_semester')}
+          ${escapeHtml(String(valorDe(g, 'second_semester')))}
         </td>
         
         <!-- NF (Readonly/calculated) -->
         <td class="form__table-campo" id="final_${idx}" style="font-weight: 700; color: var(--primary-dark); background: rgba(93,60,166,0.05);">
-          ${valorDe(g, 'final_grade')}
+          ${escapeHtml(String(valorDe(g, 'final_grade')))}
         </td>
       </tr>`;
   });
@@ -1057,9 +1098,11 @@ function saveStudentBulletin() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   })
-    .then(res => {
-      if (!res.ok) throw new Error('Error al guardar boletín');
-      return res.json();
+    .then(async res => {
+      // El servidor dice que nota esta mal escrita y en que asignatura.
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Error al guardar el boletín');
+      return data;
     })
     .then(response => {
       showToast('Boletín de calificaciones guardado exitosamente', 'success');
@@ -1067,7 +1110,7 @@ function saveStudentBulletin() {
     })
     .catch(err => {
       console.error(err);
-      showToast('Error al guardar el boletín', 'error');
+      showToast(err.message || 'Error al guardar el boletín', 'error');
     });
 }
 

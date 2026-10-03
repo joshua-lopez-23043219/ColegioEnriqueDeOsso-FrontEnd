@@ -48,6 +48,7 @@ function _campos(ventana) {
     start: document.getElementById(`${p}_start`),
     end: document.getElementById(`${p}_end`),
     estado: document.getElementById(`estado-${ventana}`),
+    ciclo: document.getElementById(`${p}_ciclo`),
   };
 }
 
@@ -59,6 +60,14 @@ function _pintarEstado(ventana, datos) {
   c.period.value = datos.periodo || '';
   c.start.value = datos.fecha_inicio || '';
   c.end.value = datos.fecha_fin || '';
+
+  // A que ciclo lectivo van las solicitudes que entren por esta ventana. Lo
+  // decide el servidor por calendario; el "periodo" solo puede adelantarlo.
+  if (c.ciclo) {
+    c.ciclo.textContent = datos.ciclo
+      ? `Las solicitudes de esta ventana se registran en el ciclo ${datos.ciclo}.`
+      : '';
+  }
 
   if (c.estado) {
     c.estado.textContent = datos.abierta ? 'Abierta ahora' : (datos.motivo || 'Cerrada');
@@ -293,13 +302,31 @@ function openDetailsModal(registrationId) {
     docList.innerHTML = '<p style="color:var(--gray-600); font-style:italic;">No se adjuntaron documentos de respaldo.</p>';
   } else {
     reg.documents.forEach(doc => {
-      const docLink = document.createElement('a');
-      docLink.href = getApiUrl(doc.file_url);
-      docLink.target = '_blank';
-      docLink.className = 'form__group-item';
-      docLink.style.cssText = 'padding: 8px 16px; font-size: 0.85rem; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; max-width: fit-content; margin-top: 4px;';
-      docLink.innerHTML = `📄 Ver ${escapeHtml(doc.name)}`;
-      docList.appendChild(docLink);
+      // Es un boton y no un enlace: los documentos se entregan por un endpoint
+      // que exige el token, y un <a href> no puede mandarlo. Antes apuntaba a
+      // /media/..., una ruta que el servidor no servia: daba 404 siempre.
+      const docBtn = document.createElement('button');
+      docBtn.type = 'button';
+      docBtn.className = 'form__group-item';
+      docBtn.style.cssText = 'padding: 8px 16px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 8px; max-width: fit-content; margin-top: 4px; cursor: pointer; border: none; font-family: inherit;';
+
+      if (!doc.file_url) {
+        docBtn.disabled = true;
+        docBtn.style.cursor = 'not-allowed';
+        docBtn.style.opacity = '0.6';
+        docBtn.textContent = `📄 ${doc.name} (sin archivo adjunto)`;
+      } else if (doc.archivo_disponible === false) {
+        // La fila existe pero el archivo no esta en el servidor.
+        docBtn.disabled = true;
+        docBtn.style.cursor = 'not-allowed';
+        docBtn.style.opacity = '0.6';
+        docBtn.title = 'El archivo ya no está en el servidor. Hay que volver a subirlo.';
+        docBtn.textContent = `⚠️ ${doc.name} (archivo no disponible)`;
+      } else {
+        docBtn.textContent = `📄 Ver ${doc.name}`;
+        docBtn.addEventListener('click', () => abrirDocumento(doc.file_url, doc.name, docBtn));
+      }
+      docList.appendChild(docBtn);
     });
   }
 
@@ -360,3 +387,82 @@ function confirmarMatricula(registrationId) {
 
 // La configuración de matrícula ahora se maneja por ventana (Reingreso y
 // Matrícula) en cargarVentanas() / guardarVentana(), al inicio de este archivo.
+
+
+// Descarga un documento de matricula con el token y lo muestra en el visor.
+// Los documentos son partidas y cedulas de menores: el servidor comprueba el
+// rol antes de entregarlos, asi que no se pueden abrir con un enlace directo.
+//
+// Se muestra en la misma pagina y no en una pestana nueva: `window.open`
+// despues de una descarga asincrona lo frena el bloqueador de ventanas
+// emergentes en casi todos los navegadores.
+let visorUrlActual = null;
+
+function abrirDocumento(fileUrl, nombre, boton) {
+  const textoOriginal = boton.textContent;
+  boton.disabled = true;
+  boton.textContent = '⏳ Abriendo…';
+
+  apiFetch(fileUrl)
+    .then(async r => {
+      if (!r.ok) {
+        let mensaje = 'No se pudo abrir el documento.';
+        try { mensaje = (await r.json()).error || mensaje; } catch (_) { /* no era JSON */ }
+        throw new Error(mensaje);
+      }
+      return r.blob();
+    })
+    .then(blob => mostrarEnVisor(blob, nombre))
+    .catch(err => showToast(err.message, 'error'))
+    .finally(() => {
+      boton.disabled = false;
+      boton.textContent = textoOriginal;
+    });
+}
+
+function mostrarEnVisor(blob, nombre) {
+  cerrarVisorDocumento();
+  visorUrlActual = URL.createObjectURL(blob);
+
+  const cuerpo = document.getElementById('visor_cuerpo');
+  cuerpo.innerHTML = '';
+
+  if (blob.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.src = visorUrlActual;
+    img.alt = nombre || 'Documento';
+    img.style.cssText = 'max-width: 100%; max-height: 70vh; object-fit: contain;';
+    cuerpo.appendChild(img);
+  } else if (blob.type === 'application/pdf') {
+    const marco = document.createElement('iframe');
+    marco.src = visorUrlActual;
+    marco.title = nombre || 'Documento';
+    marco.style.cssText = 'width: 100%; height: 70vh; border: none; background: white;';
+    cuerpo.appendChild(marco);
+  } else {
+    const aviso = document.createElement('p');
+    aviso.style.cssText = 'color: var(--gray-700); padding: 24px; text-align: center;';
+    aviso.textContent = 'Este tipo de archivo no se puede previsualizar. Use "Descargar".';
+    cuerpo.appendChild(aviso);
+  }
+
+  // El boton de descarga funciona siempre, tambien si el navegador no puede
+  // previsualizar el archivo dentro de la pagina.
+  const descargar = document.getElementById('visor_descargar');
+  descargar.href = visorUrlActual;
+  descargar.download = nombre || 'documento';
+
+  document.getElementById('visor_titulo').textContent = nombre || 'Documento';
+  document.getElementById('visorDocumentoModal').style.display = 'flex';
+}
+
+function cerrarVisorDocumento() {
+  const modal = document.getElementById('visorDocumentoModal');
+  if (modal) modal.style.display = 'none';
+  const cuerpo = document.getElementById('visor_cuerpo');
+  if (cuerpo) cuerpo.innerHTML = '';
+  if (visorUrlActual) {
+    URL.revokeObjectURL(visorUrlActual);
+    visorUrlActual = null;
+  }
+}
